@@ -4,8 +4,7 @@ rspreadsheet - manipulating spreadsheets with Ruby. Read, modify, write or creat
 
 ## Status
 
-This project is its brainstorming phase. Nothing is implemented yet, the documentation now serves as a list of intentions. Please submit issues and/or fork the repository if you have more ideas, wishes, etc ...
-
+*This project is in its brainstorming phase.* Nothing is implemented yet, the documentation now serves as a list of intentions. Please submit issues and/or fork the repository if you have more ideas, wishes, etc ... once the coding begins, it will be much more difficult to change syntax.
 
 ## Examples
   
@@ -41,3 +40,17 @@ This is the basic functionality. However rspreadsheet should allows lots of alte
 To install the gem run the following
 
     gem install rspreadsheet
+
+## Motivation
+
+This project arised from the necessity. Alhought it is not true that there are no ruby gems allowing to acess OpenDOcument spreadsheet, I did not find another decent one which would suit my needs. Most of them also look abandoned and inactive. I have investigated these options:
+
+  * [ruby-ods](https://github.com/yalab/ruby-ods) - this one seems as if it never really started
+  * [rodf](https://github.com/thiagoarrais/rodf)- this only server as builder, it can not read existing files
+  * [rods](http://www.drbreinlinger.de/ruby/rods/) - this is pretty ok, but it has terrible syntax. I first thought of writing wrapper around it, but it turned to be not so easy. Also last commit is 2 years old.
+  * [rubiod](https://github.com/netoctone/rubiod) - this oneis quite ok, the syntax is definitely better that in rods, but it seems also very abandoned. This is a closest match.
+
+
+
+
+
