@@ -22,8 +22,11 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   # testig - see http://bit.ly/1n5yM51
   spec.add_development_dependency "rspec"
+  
+  # optional and testing
+  spec.add_development_dependency "coveralls"    
   spec.add_development_dependency "test_notifier" # test notifier for kde and other platforms
   spec.add_development_dependency "guard"
-  spec.add_development_dependency "guard-rspec"
-
+  spec.add_development_dependency "guard-rspec"   
+  
 end
