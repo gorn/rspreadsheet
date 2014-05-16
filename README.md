@@ -12,7 +12,7 @@ sheet = book.worksheets 'Icecream list'
 total = 0
 
 sheet.rows[3..20].each do |row|
-  puts 'Icecream name: " + row[2]
+  puts 'Icecream name: ' + row[2]
   puts 'Icecream ingredients: ' + row[3]
   puts "I ate this " + row[4] + ' times'
   total += row[4]
