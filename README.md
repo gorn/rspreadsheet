@@ -6,7 +6,7 @@ rspreadsheet - manipulating spreadsheets with Ruby. Read, modify, write or creat
 
 *This project is in its brainstorming phase.* Nothing is implemented yet, the documentation now serves as a list of intentions. Please submit issues and/or fork the repository if you have more ideas, wishes, etc ... once the coding begins, it will be much more difficult to change syntax.
 
-## Examples
+## Examples of usage
   
 ```ruby
 require 'rspreadsheet'
@@ -33,11 +33,19 @@ book.save
 
 This is the basic functionality. However rspreadsheet should allows lots of alternative syntax, like described in [GUIDE.md](GUIDE.md)
 
-## Installing
+## Installation
 
-To install the gem run the following
+Add this line to your application's Gemfile:
 
-    gem install rspreadsheet
+    gem 'rspreadsheet'
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install rspreadsheet
 
 ## Motivation
 
@@ -50,8 +58,11 @@ This project arised from the necessity. Alhought it is not true that there are n
   * [spreadsheet](https://github.com/zdavatz/spreadsheet) - this does not work with OpenDocument and even with Excel has issues in modyfying document. However since it is supposedly used, and has quite good syntax it might be inspirative.
 
 
+## Contributing
 
-
-
-
+1. [Fork it](http://github.com/gorn/rspreadsheet/fork)
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
 
