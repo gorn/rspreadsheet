@@ -20,4 +20,10 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.5"
   spec.add_development_dependency "rake"
+  # testig - see http://bit.ly/1n5yM51
+  spec.add_development_dependency "rspec"
+  spec.add_development_dependency "test_notifier" # test notifier for kde and other platforms
+  spec.add_development_dependency "guard"
+  spec.add_development_dependency "guard-rspec"
+
 end
