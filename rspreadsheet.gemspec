@@ -6,12 +6,12 @@ require 'rspreadsheet/version'
 Gem::Specification.new do |spec|
   spec.name          = "rspreadsheet"
   spec.version       = Rspreadsheet::VERSION
-  spec.authors       = ["Jakub Tesinsky"]
-  spec.email         = ["jAkub.cz"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
-  spec.homepage      = ""
-  spec.license       = "MIT"
+  spec.authors       = ["Jakub A.Těšínský"]
+  spec.email         = ["jAkub.cz (A is at)"]
+  spec.summary       = %q{Manipulating spreadsheets with Ruby (read / create / modify OpenDocument Spreadsheet).}
+#   spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.homepage      = "https://github.com/gorn/rspreadsheet"
+  spec.license       = "GPL"
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
