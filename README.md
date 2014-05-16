@@ -33,8 +33,6 @@ book.save
 
 This is the basic functionality. However rspreadsheet should allows lots of alternative syntax, like described in [GUIDE.md](GUIDE.md)
 
-
-
 ## Installing
 
 To install the gem run the following
@@ -48,7 +46,10 @@ This project arised from the necessity. Alhought it is not true that there are n
   * [ruby-ods](https://github.com/yalab/ruby-ods) - this one seems as if it never really started
   * [rodf](https://github.com/thiagoarrais/rodf)- this only server as builder, it can not read existing files
   * [rods](http://www.drbreinlinger.de/ruby/rods/) - this is pretty ok, but it has terrible syntax. I first thought of writing wrapper around it, but it turned to be not so easy. Also last commit is 2 years old.
-  * [rubiod](https://github.com/netoctone/rubiod) - this oneis quite ok, the syntax is definitely better that in rods, but it seems also very abandoned. This is a closest match.
+  * [rubiod](https://github.com/netoctone/rubiod) - this one is quite ok, the syntax is definitely better that in rods, but it seems also very abandoned. This is a closest match.
+  * [spreadsheet](https://github.com/zdavatz/spreadsheet) - this does not work with OpenDocument and even with Excel has issues in modyfying document. However since it is supposedly used, and has quite good syntax it might be inspirative.
+
+
 
 
 
