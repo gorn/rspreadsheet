@@ -21,8 +21,7 @@ end
 sheet[21,3] = 'Total:'
 sheet[21,4] = total
 
-sheet.D21 = 'Total'
-sheet.D21.format.bold = true
+sheet.rows[21].format.bold = true
 
 book.save
 
