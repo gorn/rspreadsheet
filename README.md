@@ -32,7 +32,7 @@ book.save
 
 ```
 
-This is the basic functionality. However rspreadsheet should allows lots of alternative syntax, like described in (GUIDE.md)
+This is the basic functionality. However rspreadsheet should allows lots of alternative syntax, like described in [GUIDE.md](GUIDE.md)
 
 
 
