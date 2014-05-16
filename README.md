@@ -46,6 +46,8 @@ And then execute:
 Or install it yourself as:
 
     $ gem install rspreadsheet
+    
+gem is hosted on Rubygems - https://rubygems.org/gems/rspreadsheet
 
 ## Motivation
 

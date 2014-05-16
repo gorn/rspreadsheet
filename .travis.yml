@@ -1,0 +1,15 @@
+language: ruby
+cache: bundler
+
+rvm:
+  - jruby
+  - 2.0.0
+
+script: 'bundle exec rake'
+
+notifications:
+  email:
+    recipients:
+      - jatesins@ncsu.edu
+    on_failure: change
+    on_success: never
