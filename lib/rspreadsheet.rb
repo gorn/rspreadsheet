@@ -1,5 +1,12 @@
 require "rspreadsheet/version"
+require 'rspreadsheet/workbook'
+require 'rspreadsheet/worksheet'
 
 module Rspreadsheet
-  # Your code goes here...
+
+  class << self
+    def new
+       Workbook.new
+    end  
+  end
 end

@@ -13,7 +13,7 @@ Manipulating spreadsheets with Ruby. Read, modify, write or create new OpenDocum
 ```ruby
 require 'rspreadsheet'
 
-book = Rspreadsheet.open('./existing_file.ods')
+book = Rspreadsheet.open('./icecream_list.ods')
 sheet = book.worksheets 'Icecream list'
 total = 0
 

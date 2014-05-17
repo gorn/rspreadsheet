@@ -1,10 +1,10 @@
-Examplex of more advanced syntax follows:
+Examples of more advanced syntax follows:
 
 ```ruby
 require 'rspreadsheet'
 
-book = Rspreadsheet::Workbook.new
-sheet book.create_worksheet 'Top icecreams'
+book = Rspreadsheet.new
+sheet = book.create_worksheet 'Top icecreams'
 
 sheet[0,0] = 'My top 5'
 sheet[0,0].format.size = 15
