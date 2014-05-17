@@ -2,6 +2,8 @@ require 'rspreadsheet/row'
 
 module Rspreadsheet
 class Worksheet
+  attr_accessor :name
+
   def initialize
     @rows = []
   end
