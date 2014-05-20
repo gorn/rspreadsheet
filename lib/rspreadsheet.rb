@@ -6,7 +6,11 @@ module Rspreadsheet
 
   class << self
     def new
-       Workbook.new
+      Workbook.new
     end  
+    def open(filename)
+      Workbook.new
+    end
+
   end
 end

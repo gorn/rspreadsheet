@@ -6,7 +6,7 @@ Manipulating spreadsheets with Ruby. Read, modify, write or create new OpenDocum
 
 ## Status
 
-*This project is in its brainstorming phase.* Nothing is implemented yet, the documentation now serves as a list of intentions. Please submit issues and/or fork the repository if you have more ideas, wishes, etc ... once the coding begins, it will be much more difficult to change syntax.
+*This project is in its brainstorming phase.* Nothing is implemented yet, the documentation now serves as a list of intentions. Please submit issues and/or fork the repository if you have more ideas, wishes, etc ... once the coding begins, it will be much more difficult to change syntax. 
 
 ## Examples of usage
   
@@ -17,11 +17,11 @@ book = Rspreadsheet.open('./icecream_list.ods')
 sheet = book.worksheets 'Icecream list'
 total = 0
 
-sheet.rows[3..20].each do |row|
-  puts 'Icecream name: ' + row[2]
-  puts 'Icecream ingredients: ' + row[3]
-  puts "I ate this " + row[4] + ' times'
-  total += row[4]
+(3..20).each do |row|
+  puts 'Icecream name: ' + sheet[row,2]
+  puts 'Icecream ingredients: ' + sheet[row,3]
+  puts "I ate this " + sheet[row,4] + ' times'
+  total += sheet[row,4]
 end
 
 sheet[21,3] = 'Total:'
@@ -51,7 +51,7 @@ Or install it yourself as:
     
 gem is hosted on Rubygems - https://rubygems.org/gems/rspreadsheet
 
-## Motivation
+## Motivation and Ideas
 
 This project arised from the necessity. Alhought it is not true that there are no ruby gems allowing to acess OpenDOcument spreadsheet, I did not find another decent one which would suit my needs. Most of them also look abandoned and inactive. I have investigated these options:
 
@@ -59,9 +59,11 @@ This project arised from the necessity. Alhought it is not true that there are n
   * [rodf](https://github.com/thiagoarrais/rodf)- this only server as builder, it can not read existing files
   * [rods](http://www.drbreinlinger.de/ruby/rods/) - this is pretty ok, but it has terrible syntax. I first thought of writing wrapper around it, but it turned to be not so easy. Also last commit is 2 years old.
   * [rubiod](https://github.com/netoctone/rubiod) - this one is quite ok, the syntax is definitely better that in rods, but it seems also very abandoned. This is a closest match.
-  * [spreadsheet](https://github.com/zdavatz/spreadsheet) - this does not work with OpenDocument and even with Excel has issues in modyfying document. However since it is supposedly used, and has quite good syntax it might be inspirative.
+  * [spreadsheet](https://github.com/zdavatz/spreadsheet) - this does not work with OpenDocument and even with Excel has issues in modyfying document. However since it is supposedly used, and has quite good syntax it might be inspirative. I also find the way this gem handles lazy writing of new rows to Spreadsheet object flawed, as well as strange accesibility of rows array object, which if assigned breaks consistency of sheet.
 
+One of the main ideas is that the manipulation with OpenDOcument files should be forward compatible and as much current data preserving as possible. The parts of the file which are not needed for the change should not be changed. This is different to some of the mentioned gems, which generate the document from scratch, therefore any advanced features present in the original file which are not directly supported are lost.
 
+  
 ## Contributing
 
 1. [Fork it](http://github.com/gorn/rspreadsheet/fork)
