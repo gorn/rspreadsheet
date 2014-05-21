@@ -4,8 +4,20 @@ module Rspreadsheet
 class Worksheet
   attr_accessor :name
 
-  def initialize
+  def initialize(source_node=nil)
+    @source_node = source_node
     @worksheetcells=WorksheetCells.new
+    rowi = 0
+    unless @source_node.nil?
+      @source_node.elements.select{ |node| node.name == 'table-row'}.each do |row_source_node|
+        coli = 0
+        row_source_node.elements.select{ |node| node.name == 'table-cell'}.each do |cell_source_node|
+          cells.initialize_cell(rowi,coli,cell_source_node)
+          coli += 1
+        end
+        rowi += 1
+      end    
+    end
   end
 
   def cells
@@ -38,6 +50,9 @@ class WorksheetCells
     @cells[[r,c]]
   end
   
+  def initialize_cell(r,c,source_node)
+    @cells[[r,c]]=Cell.new(source_node)
+  end
 #   def row(r)
 #     @rows[r] || @rows[r] = Row.new(self,r)  # the association to the @rows should be written on creation, otherwise more desinchronized copies may exist. TODO:How amd when to handle writing to xml
 #   end  

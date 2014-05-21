@@ -2,9 +2,15 @@ require 'spec_helper'
 
 describe Rspreadsheet do
   it 'can open ods file' do
-    pending
-    book = Rspreadsheet.open('./testfile1.ods')
-    book.worksheets[0].cells[0,0].value.should === 1
+    book = Rspreadsheet.new('./spec/testfile1.ods')
+    book.worksheets[0].should_not == nil
+    book.worksheets[0].class.should == Rspreadsheet::Worksheet
+    s = book.worksheets[0]
+    (1..10).each do |i|
+      s[i-1,0].should === i
+    end
+    s[0,1].should === 'text'
+    s[1,1].should === Date.new(2014,1,1)
   end
   
   it 'can create file' do
