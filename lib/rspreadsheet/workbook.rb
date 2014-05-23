@@ -1,4 +1,4 @@
-require 'zip/zipfilesystem'
+require 'zip/zip'
 require 'libxml'
 
 module Rspreadsheet
@@ -23,8 +23,10 @@ class Workbook
     end
   end
   def save(new_filename=nil)
+    if @filename.nil? and new_filename.ni? then raise 'New file should be named on first save.' end
+    # if the filename has changed than first copy the original file to new location (or template if it is a new file)
     if new_filename
-      FileUtils.cp(@filename, new_filename)
+      FileUtils.cp(@filename || './lib/rspreadsheet/empty_file_template.ods', new_filename)
       @filename = new_filename
     end
     Zip::ZipFile.open(@filename) do |zip|
