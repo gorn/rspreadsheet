@@ -18,6 +18,11 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
+  # runtime dependencies
+  spec.add_runtime_dependency 'libxml-ruby'   # parsing XML files
+  spec.add_runtime_dependency 'rubyzip'       # opening zip files
+  
+  # development dependencies
   spec.add_development_dependency "bundler", "~> 1.5"
   spec.add_development_dependency "rake"
   # testig - see http://bit.ly/1n5yM51
@@ -27,6 +32,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "coveralls"    
   spec.add_development_dependency "test_notifier" # test notifier for kde and other platforms
   spec.add_development_dependency "guard"
-  spec.add_development_dependency "guard-rspec"   
+  spec.add_development_dependency "guard-rspec"  
   
 end

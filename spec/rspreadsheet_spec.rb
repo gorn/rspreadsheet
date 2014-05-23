@@ -1,8 +1,11 @@
 require 'spec_helper'
 
+$test_filename = './spec/testfile1.ods'
+
 describe Rspreadsheet do
+
   it 'can open ods file' do
-    book = Rspreadsheet.new('./spec/testfile1.ods')
+    book = Rspreadsheet.new($test_filename)
     book.worksheets[0].should_not == nil
     book.worksheets[0].class.should == Rspreadsheet::Worksheet
     s = book.worksheets[0]
@@ -14,8 +17,18 @@ describe Rspreadsheet do
   end
   
   it 'can open and save file, and saved file is the same as original' do
-#     File.de
-    book = Rspreadsheet.new('./spec/testfile1.ods')
+    pending
+    tmp_filename = './tmp/testfile1.ods'    
+    File.delete(tmp_filename) if File.exists?(tmp_filename)
+    book = Rspreadsheet.new()
+    book.save(tmp_filename)
+    bookorig = Rspreadsheet.new($test_filename)
+    bookcopy = Rspreadsheet.new(tmp_filename)
+  
+    bookorig.nonemptycells.each do |cell|
+      cell.row
+    
+    end
   
   end
   
@@ -29,6 +42,35 @@ describe Rspreadsheet do
   end
 
 end
+
+describe Rspreadsheet::Cell do
+  before do 
+    book1 = Rspreadsheet.new
+    @sheet1 = book1.create_worksheet
+    @sheet1[0,0] = 'text'
+    book2 = Rspreadsheet.new($test_filename)
+    @sheet2 = book2.worksheets[0]
+  end
+  it 'contains good row and col coordinates' do
+    pending
+    @cell = @sheet1.cells[0,0]
+    @cell.col.should == 0
+    @cell.row.should == 0
+    
+    @cell = @sheet2.cells[0,1]
+    @cell.col.should == 0
+    @cell.row.should == 1
+    
+  end
+  it 'can be referenced by more vars and both are synchromized' do
+  pending
+    @cell = @sheet1.cells[0,0]
+    @sheet1[0,0] = 'novinka'
+    @cell.value.should == 'novinka'
+  end
+    
+end
+
 
 describe Rspreadsheet::Worksheet do
   before do
@@ -61,5 +103,4 @@ describe Rspreadsheet::Worksheet do
     @sheet.name = 'Cofee'
     @sheet.name.should == 'Cofee'    
   end
-  
 end
