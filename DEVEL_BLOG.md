@@ -1,4 +1,7 @@
- 
+== Conventions
+  * with numeric coordinates row always comes before col as in  [row,col]
+  * with alphanumerical col always comes before row as in F12
+
 == Ideas/wishlist
 
   * Shouldn't some of the alternative syntax (like sheet.cells[x,y]) return cell objects, while normal sheet[cell] would just return value?

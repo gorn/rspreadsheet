@@ -38,7 +38,11 @@ end
 # this onject is result od sheet.cells
 class WorksheetCells
   def initialize
-    @cells = Hash.new{ |hash, coords| hash[coords]=Cell.new() }
+    @cells = Hash.new do |hash, coords| 
+      # we create empty cell and place it to hash, we do not have to check whether there is a cell in XML already, because it would be in hash as well
+      hash[coords]=Cell.new(coords[0],coords[1])
+      # TODO: create XML empty node here or upon save?
+    end
   end
   
   def [](r,c)
@@ -51,7 +55,7 @@ class WorksheetCells
   end
   
   def initialize_cell(r,c,source_node)
-    @cells[[r,c]]=Cell.new(source_node)
+    @cells[[r,c]]=Cell.new(r,c,source_node)
   end
 #   def row(r)
 #     @rows[r] || @rows[r] = Row.new(self,r)  # the association to the @rows should be written on creation, otherwise more desinchronized copies may exist. TODO:How amd when to handle writing to xml

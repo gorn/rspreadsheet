@@ -3,9 +3,10 @@ require 'libxml'
 
 module Rspreadsheet
 class Workbook
-  attr_reader :worksheets
-  def initialize filename=nil
+  attr_reader :worksheets, :filename
+  def initialize afilename=nil
     @worksheets={}
+    @filename = afilename
     if filename.nil?
     else
       @content_xml = Zip::ZipFile.open(filename) do |zip|
@@ -19,6 +20,18 @@ class Workbook
         @worksheets[node.name]=sheet
         ndx+=1
       }
+    end
+  end
+  def save(new_filename=nil)
+    if new_filename
+      FileUtils.cp(@filename, new_filename)
+      @filename = new_filename
+    end
+    Zip::ZipFile.open(@filename) do |zip|
+      # it is easy, because @content_xml in in sync with contents all the time
+      zip.get_output_stream('content.xml') do |f|
+        f.write @content_xml
+      end
     end
   end
   def create_worksheet(node=nil)

@@ -2,8 +2,10 @@ require 'andand'
 
 module Rspreadsheet
 class Cell
-  attr_reader :value
-  def initialize(source_node=nil)
+  attr_reader :value,:col,:row
+  def initialize(arow,acol,source_node=nil)
+    @col = acol
+    @row = arow
     @source_node = source_node
     unless @source_node.nil?
       @type = @source_node.attributes['value-type'].to_s
@@ -30,6 +32,9 @@ class Cell
   def value=(avalue)
     @value=avalue
     self
+  end
+  def coordinates
+    [row,col]
   end
 end
 end

@@ -21,6 +21,8 @@ Gem::Specification.new do |spec|
   # runtime dependencies
   spec.add_runtime_dependency 'libxml-ruby'   # parsing XML files
   spec.add_runtime_dependency 'rubyzip'       # opening zip files
+  spec.add_runtime_dependency 'andand'
+  
   
   # development dependencies
   spec.add_development_dependency "bundler", "~> 1.5"
