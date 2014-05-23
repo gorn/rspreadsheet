@@ -13,6 +13,12 @@ describe Rspreadsheet do
     s[1,1].should === Date.new(2014,1,1)
   end
   
+  it 'can open and save file, and saved file is the same as original' do
+#     File.de
+    book = Rspreadsheet.new('./spec/testfile1.ods')
+  
+  end
+  
   it 'can create file' do
     book = Rspreadsheet.new
   end

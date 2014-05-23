@@ -1,4 +1,5 @@
-require 'zip/zipfilesystem'
+# require 'zip/zipfilesystem'
+require 'zip/zip'
 require 'libxml'
 
 module Rspreadsheet
