@@ -36,10 +36,10 @@ describe Rspreadsheet do
     book.save(tmp_filename)                    # and save it as temp file
     
     # now compare them
-    @content_xml1 = Zip::ZipFile.open($test_filename) do |zip|
+    @content_xml1 = Zip::File.open($test_filename) do |zip|
       LibXML::XML::Document.io zip.get_input_stream('content.xml')
     end
-    @content_xml2 = Zip::ZipFile.open(tmp_filename) do |zip|
+    @content_xml2 = Zip::File.open(tmp_filename) do |zip|
       LibXML::XML::Document.io zip.get_input_stream('content.xml')
     end
     @content_doc1.eql?(@content_doc2).should == true
@@ -54,10 +54,10 @@ describe Rspreadsheet do
     book.save(tmp_filename)                    # and save it as temp file
     
     # now compare them
-    @content_doc1 = Zip::ZipFile.open($test_filename) do |zip|
+    @content_doc1 = Zip::File.open($test_filename) do |zip|
       LibXML::XML::Document.io zip.get_input_stream('content.xml')
     end
-    @content_doc2 = Zip::ZipFile.open(tmp_filename) do |zip|
+    @content_doc2 = Zip::File.open(tmp_filename) do |zip|
       LibXML::XML::Document.io zip.get_input_stream('content.xml')
     end
     @content_doc1.eql?(@content_doc2).should == false

@@ -1,4 +1,4 @@
-require 'zip/zipfilesystem'
+require 'zip'
 require 'libxml'
 
 module Rspreadsheet
@@ -9,7 +9,7 @@ class Workbook
     @filename = afilename
     if filename.nil?
     else
-      @content_xml = Zip::ZipFile.open(filename) do |zip|
+      @content_xml = Zip::File.open(filename) do |zip|
         LibXML::XML::Document.io zip.get_input_stream('content.xml')
       end
 
@@ -29,7 +29,7 @@ class Workbook
       FileUtils.cp(@filename || './lib/rspreadsheet/empty_file_template.ods', new_filename)
       @filename = new_filename
     end
-    Zip::ZipFile.open(@filename) do |zip|
+    Zip::File.open(@filename) do |zip|
       # it is easy, because @content_xml in in sync with contents all the time
       zip.get_output_stream('content.xml') do |f|
         f.write @content_xml
