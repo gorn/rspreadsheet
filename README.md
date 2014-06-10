@@ -4,9 +4,9 @@
 
 Manipulating spreadsheets with Ruby. Read, modify, write or create new OpenDocument Spreadsheet files from ruby code.
 
-## Status
+## Contibutions, ideas and wishes welcomed
 
-*This project is in its brainstorming phase.* Nothing is implemented yet, the documentation now serves as a list of intentions. Please submit issues and/or fork the repository if you have more ideas, wishes, etc ... once the coding begins, it will be much more difficult to change syntax. 
+Please submit issues and/or fork the repository if you have more ideas, wishes, etc ... If you find a bug you are welcomed to submit a pull request preferably including the failing test.
 
 ## Examples of usage
   
