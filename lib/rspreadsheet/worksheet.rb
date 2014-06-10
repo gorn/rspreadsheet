@@ -1,8 +1,11 @@
 require 'rspreadsheet/row'
+require 'forwardable'
 
 module Rspreadsheet
 class Worksheet
   attr_accessor :name
+  extend Forwardable
+  def_delegators :@worksheetcells, :nonemptycells
 
   def initialize(source_node=nil)
     @source_node = source_node
@@ -19,23 +22,19 @@ class Worksheet
       end    
     end
   end
-
   def cells
     @worksheetcells
   end
-
   def [](r,c)
     cells[r,c].value
   end
-
   def []=(r,c,avalue)
     cells[r,c].value=avalue
   end
-  
 end
 
 # this allows the sheet.cells[r,c] syntax
-# this onject is result od sheet.cells
+# this object is result of sheet.cells
 class WorksheetCells
   def initialize
     @cells = Hash.new do |hash, coords| 
@@ -44,22 +43,20 @@ class WorksheetCells
       # TODO: create XML empty node here or upon save?
     end
   end
-  
   def [](r,c)
     cells_object(r,c)
   end
+  def nonemptycells
+    @cells.values
+  end
   
-  # internal
+  ### internal
   def cells_object(r,c)
     @cells[[r,c]]
   end
-  
   def initialize_cell(r,c,source_node)
     @cells[[r,c]]=Cell.new(r,c,source_node)
   end
-#   def row(r)
-#     @rows[r] || @rows[r] = Row.new(self,r)  # the association to the @rows should be written on creation, otherwise more desinchronized copies may exist. TODO:How amd when to handle writing to xml
-#   end  
 end
 
 end

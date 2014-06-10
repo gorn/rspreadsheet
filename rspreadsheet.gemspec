@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Jakub A.Těšínský"]
   spec.email         = ["jAkub.cz (A is at)"]
   spec.summary       = %q{Manipulating spreadsheets with Ruby (read / create / modify OpenDocument Spreadsheet).}
-#   spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.description   = %q{Manipulating spreadsheets with Ruby (read / create / modify OpenDocument Spreadsheet).}
   spec.homepage      = "https://github.com/gorn/rspreadsheet"
   spec.license       = "GPL"
 
@@ -19,21 +19,21 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # runtime dependencies
-  spec.add_runtime_dependency 'libxml-ruby'   # parsing XML files
-  spec.add_runtime_dependency 'rubyzip'       # opening zip files
-  spec.add_runtime_dependency 'andand'
+  spec.add_runtime_dependency 'libxml-ruby', '~>2.7'   # parsing XML files
+  spec.add_runtime_dependency 'rubyzip', '~>1.1'       # opening zip files
+  spec.add_runtime_dependency 'andand', '~>1.3'
   
   
   # development dependencies
   spec.add_development_dependency "bundler", "~> 1.5"
-  spec.add_development_dependency "rake"
+  spec.add_development_dependency "rake", '~>0.9'
   # testig - see http://bit.ly/1n5yM51
-  spec.add_development_dependency "rspec"
+  spec.add_development_dependency "rspec", '~>2'
   
   # optional and testing
-  spec.add_development_dependency "coveralls"    
-  spec.add_development_dependency "test_notifier" # test notifier for kde and other platforms
-  spec.add_development_dependency "guard"
-  spec.add_development_dependency "guard-rspec"  
+  spec.add_development_dependency "coveralls", '~>0.7'
+  spec.add_development_dependency "test_notifier", '~>2.0' # test notifier for kde and other platforms
+  spec.add_development_dependency "guard", '~>2.6'
+  spec.add_development_dependency "guard-rspec", '~>2.6'
   
 end

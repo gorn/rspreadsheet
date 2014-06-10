@@ -12,6 +12,7 @@ class Cell
       if (@source_node.children.size == 0) and (not @source_node.attributes?)
         @value = nil
       else
+        # here you also ned to read style not only value
         @value = case @type
           when 'float'
             @source_node.attributes['value'].to_f
@@ -19,11 +20,17 @@ class Cell
             @source_node.elements.first.andand.content.to_s
           when 'date'
             Date.strptime(@source_node.attributes['date-value'].to_s, '%Y-%m-%d')
+          when 'percentage'  
+            @source_node.attributes['value'].to_f
           else
-            raise "Unknown type from "+@source_node.to_s
+            if @source_node.children.size == 0
+              nil
+            else
+              nil
+#               raise "Unknown type from #{@source_node.to_s} / children size=#{@source_node.children.size.to_s} / type=#{@type}"
+            end
         end
       end
-#       @value = @source_node.elements.first.andand.content
     end
   end
   def to_s
