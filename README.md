@@ -7,7 +7,7 @@ Manipulating spreadsheets with Ruby. Read, modify, write or create new OpenDocum
 ## Contibutions, ideas and wishes welcomed
 
 Please submit issues and/or fork the repository if you have more ideas, wishes, etc ... If you find a bug you are welcomed to submit a pull request preferably including the failing test.
-
+ 
 ## Examples of usage
   
 ```ruby
