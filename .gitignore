@@ -21,6 +21,7 @@ build/
 /_yardoc/
 /doc/
 /rdoc/
+.~lock*
 
 ## Environment normalisation:
 /.bundle/
