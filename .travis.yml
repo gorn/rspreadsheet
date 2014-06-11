@@ -1,7 +1,6 @@
 language: ruby
 cache: bundler
 rvm:
-  - jruby
   - 2.1.2
   - 2.0.0
   - 1.9.3
