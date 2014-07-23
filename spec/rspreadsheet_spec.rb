@@ -42,7 +42,7 @@ describe Rspreadsheet do
     @content_xml2 = Zip::File.open(tmp_filename) do |zip|
       LibXML::XML::Document.io zip.get_input_stream('content.xml')
     end
-    @content_doc1.eql?(@content_doc2).should == true
+    @content_xml1.root.equals?(@content_xml2.root).should == true
   end
   it 'when open and save file modified, than the file is different' do
     tmp_filename = '/tmp/testfile1.ods'        # first delete temp file
