@@ -97,6 +97,7 @@ describe Rspreadsheet::Cell do
   end
 end
 
+
 describe Rspreadsheet::Worksheet do
   before do
     book = Rspreadsheet.new
@@ -123,5 +124,22 @@ describe Rspreadsheet::Worksheet do
     @sheet.name.should == 'Icecream'
     @sheet.name = 'Cofee'
     @sheet.name.should == 'Cofee'    
+  end
+end
+
+describe Rspreadsheet::Row do
+  before do 
+    book1 = Rspreadsheet.new
+    @sheet1 = book1.create_worksheet
+  end
+  it 'allows access to cells in a row' do
+    (2..5).each { |i| @sheet1[7,i] = i }
+    (2..5).each { |i| 
+      a = @sheet1.rows
+      b = a[7]
+      c = b.cells
+      d = c[i]
+      d.value.should == i 
+    }
   end
 end

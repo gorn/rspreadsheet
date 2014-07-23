@@ -31,6 +31,9 @@ class Worksheet
   def []=(r,c,avalue)
     cells[r,c].value=avalue
   end
+  def rows
+    WorksheetRows.new(self)
+  end
 end
 
 # this allows the sheet.cells[r,c] syntax
@@ -56,6 +59,18 @@ class WorksheetCells
   end
   def initialize_cell(r,c,source_node)
     @cells[[r,c]]=Cell.new(r,c,source_node)
+  end
+end
+
+# this allows the sheet.rows[r] syntax
+# this object is result of sheet.rows
+class WorksheetRows
+  def initialize(aworkbook)
+    @workbook = aworkbook
+    @spredsheetrows=Array.new()
+  end
+  def [] rowi
+    @spredsheetrows[rowi] ||= Row.new(@workbook,rowi)
   end
 end
 

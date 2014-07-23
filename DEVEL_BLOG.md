@@ -1,11 +1,12 @@
-## Conventions
-  * with numeric coordinates row always comes before col as in  [row,col]
-  * with alphanumerical col always comes before row as in F12
+See [GUIDE.md#conventions] for syntax conventions.
 
 ## Ideas/wishlist
 
-  * Shouldn't some of the alternative syntax (like sheet.cells[x,y]) return cell objects, while normal sheet[cell] would just return value?
-  * We should determine whether sheet[0,0] should be base type like String or Rspreadsheet::Cell.
+  * Trying to make row Enumerable - perhaps skipping empty or undefined cells.
+  * Accessors for nonempty/defined cells.
+  * Maybe insted two syntaxes for accessing cell, we make both of them do the same and return Proxy object which would act either as value or cell.
+  * Allow any of these? 
+    * book['Spring 2014'] in place of book.worksheets('Spring 2014')
  
 ## Developing this gem
 
