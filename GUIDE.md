@@ -1,8 +1,3 @@
-## Conventions
-  * with numeric coordinates row always comes before col as in  [row,col]
-  * with alphanumerical col always comes before row as in F12
-  * Shorter syntax worksheet[x,y] returns value, longer syntax worksheet.cells[x,y] return cell objects. This allows to work conviniently with values using short syntax and access the cell object if needed (for formatting for example).
-
 ## Examples of advanced syntax
 
 Examples of more advanced syntax follows
@@ -47,3 +42,8 @@ sheet.columns[1][1..3].format.color = :red
 book.save
 
 ```
+## Conventions
+  * with numeric coordinates row always comes before col as in  [row,col]
+  * with alphanumerical col always comes before row as in F12
+  * Shorter syntax worksheet[x,y] returns value, longer syntax worksheet.cells[x,y] return cell objects. This allows to work conviniently with values using short syntax and access the cell object if needed (for formatting for example).
+
