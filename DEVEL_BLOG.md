@@ -14,9 +14,15 @@ See [GUIDE.md#conventions] for syntax conventions.
 
   * by running <code>guard</code> in terminal you will get tested any changes as soon as they are summitted
 
-
 ### Automated utilities
  
   * [travis-ci](https://travis-ci.org/gorn/rspreadsheet/jobs/25375065) provides automated testing
   * [github](https://github.com/gorn/rspreadsheet) hosts the repository where you can get the code
   * [coverals](https://coveralls.io/r/gorn/rspreadsheet) checks how well source is covered by tests
+
+### Notes
+
+Submitting to rubygems.org
+
+  gem build rspreadsheet
+  gem push rspreadsheet-0.0.2.gem
