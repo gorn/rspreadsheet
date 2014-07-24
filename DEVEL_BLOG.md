@@ -24,5 +24,6 @@ See [GUIDE.md#conventions] for syntax conventions.
 
 Submitting to rubygems.org
 
-    gem build rspreadsheet
-    gem push rspreadsheet-0.0.2.gem
+    gem build rspreadsheet.gemspec
+    gem push rspreadsheet-x.y.z.gem
+
