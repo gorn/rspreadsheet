@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rspreadsheet (0.0.1)
+    rspreadsheet (0.0.2)
       andand (~> 1.3)
       libxml-ruby (~> 2.7)
       rubyzip (~> 1.1)

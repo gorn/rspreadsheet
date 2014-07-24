@@ -4,7 +4,7 @@ require 'libxml'
 module Rspreadsheet
 class Workbook
   attr_reader :worksheets, :filename
-  def initialize afilename=nil
+  def initialize(afilename=nil)
     @worksheets={}
     @filename = afilename
     if filename.nil?

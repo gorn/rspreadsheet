@@ -2,7 +2,7 @@ require 'andand'
 
 module Rspreadsheet
 class Cell
-  attr_reader :value,:col,:row
+  attr_reader :value,:col,:row, :source_node
   def initialize(arow,acol,source_node=nil)
     @col = acol
     @row = arow

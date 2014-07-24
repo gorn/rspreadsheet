@@ -5,15 +5,10 @@ require 'class_extensions'
 
 module Rspreadsheet
 
-  class << self
-    def new filename=nil
-      Workbook.new filename
-    end  
-    def open(filename)
-      Workbook.new
-    end
-    def open
-      
-    end
+  def self.new(filename=nil)
+    Workbook.new(filename)
+  end  
+  def self.open(filename)
+    Workbook.new(filename)
   end
 end
