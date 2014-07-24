@@ -1,4 +1,4 @@
-See [GUIDE.md#conventions](GUIDE.md) for syntax conventions.
+See [GUIDE.md](GUIDE.md#conventions) for syntax conventions.
 
 ## Ideas/wishlist
 
