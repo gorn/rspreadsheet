@@ -95,6 +95,15 @@ describe Rspreadsheet::Cell do
     @sheet1[0,0] = 'novinka'
     @cell.value.should == 'novinka'
   end
+  it 'can be modyfied by more ways and all are identical' do
+    @cell = @sheet1.cells[2,2]
+    @sheet1[2,2] = 'zaprve'
+    @cell.value.should == 'zaprve'
+    @sheet1.cells[2,2].value = 'zadruhe'
+    @cell.value.should == 'zadruhe'
+    @sheet1.C3 = 'zatreti'
+    @cell.value.should == 'zatreti'
+  end
 end
 
 

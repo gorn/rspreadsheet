@@ -2,6 +2,28 @@ require 'rspreadsheet/row'
 require 'forwardable'
 
 module Rspreadsheet
+
+module Tools
+  ## converts cell adress like 'F12' to pair od integers [row,col]
+  def self.convert_cell_address(*coords)
+    if coords.length == 1
+      coords.match(/^([A-Z]{1,3})(\d{1,8})$/)
+      colname = $~[1]
+      rowname = $~[2]
+    elsif coords.length == 2
+      colname = coords[0]
+      rowname = coords[1]
+    else
+      raise 'Wrong number of arguments'
+    end
+      
+    colname=colname.rjust(3,'@')
+    col = (colname[-1].ord-65)+(colname[-2].ord-64)*26+(colname[-3].ord-64)*26*26
+    row = rowname.to_i-1
+    return [row,col]
+  end      
+end
+
 class Worksheet
   attr_accessor :name
   extend Forwardable
@@ -19,7 +41,7 @@ class Worksheet
           coli += 1
         end
         rowi += 1
-      end    
+      end
     end
   end
   def cells
@@ -33,6 +55,19 @@ class Worksheet
   end
   def rows
     WorksheetRows.new(self)
+  end
+  def method_missing method_name, *args, &block
+    if method_name.to_s.match(/^([A-Z]{1,3})(\d{1,8})(=?)$/)
+      row,col = Tools.convert_cell_address($~[1],$~[2])
+      assignchar = $~[3]
+      if assignchar == '='
+        self.cells[row,col].value = args.first
+      else
+        self.cells[row,col].value
+      end
+    else
+      super
+    end
   end
 end
 
