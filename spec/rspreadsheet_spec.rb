@@ -104,8 +104,11 @@ describe Rspreadsheet::Cell do
     @sheet1.C3 = 'zatreti'
     @cell.value.should == 'zatreti'
   end
+  it 'can include links' do
+    @sheet2.cells[11,0].value.should == '[http://example.org/]'
+    raise @sheet2.cells[11,0].value_xml
+  end
 end
-
 
 describe Rspreadsheet::Worksheet do
   before do

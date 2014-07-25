@@ -40,6 +40,13 @@ class Cell
     @value=avalue
     self
   end
+  def xml
+    self.source_node.to_s
+  end
+  def value_xml
+#     self.source_node.children.first.to_s
+    self.source_node.children.first.children.first.to_s
+  end
   def coordinates
     [row,col]
   end
