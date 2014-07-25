@@ -5,8 +5,9 @@ See [GUIDE.md](GUIDE.md#conventions) for syntax conventions.
   * Trying to make row Enumerable - perhaps skipping empty or undefined cells.
   * Accessors for nonempty/defined cells.
   * Maybe insted two syntaxes for accessing cell, we make both of them do the same and return Proxy object which would act either as value or cell.
-  * Allow any of these? 
-    * book['Spring 2014'] in place of book.worksheets('Spring 2014')
+  * Allow any of these:
+    * ``book['Spring 2014']`` as alternative to ``book.worksheets('Spring 2014')`` ?
+    * ``sheet.cells.F13`` as alternative to ``sheet.cells[14,5]`` ?
  
 ## Developing this gem
 
