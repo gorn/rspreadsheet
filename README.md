@@ -7,6 +7,8 @@ Manipulating spreadsheets with Ruby. Read, modify, write or create new OpenDocum
 ## Contibutions, ideas and wishes welcomed
 
 If you need any help or find a bug please [submit an issue](https://github.com/gorn/rspreadsheet/issues) here. I appreciate any feedback and even if you can not help with code, it is interesting for me to hear from you. Different people have different needs and I want to hear about them. If you are a programmer and you have any ideas, wishes, etc you are welcomed to fork the repository and submit a pull request preferably including a failing test.
+
+**Beware: this gem is still in alpha stage (however I use it and it works for what I need).**
  
 ## Examples of usage
   
