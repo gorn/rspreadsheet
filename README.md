@@ -41,7 +41,7 @@ Add this line to your application's Gemfile:
 
     gem 'rspreadsheet'
 
-And then execute:
+And then execute (if this fails install bundle gem):
 
     $ bundle
 
