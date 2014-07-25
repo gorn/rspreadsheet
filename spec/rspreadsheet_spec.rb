@@ -106,7 +106,7 @@ describe Rspreadsheet::Cell do
   end
   it 'can include links' do
     @sheet2.cells[11,0].value.should == '[http://example.org/]'
-    raise @sheet2.cells[11,0].value_xml
+#     raise @sheet2.cells[11,0].value_xml
   end
 end
 
