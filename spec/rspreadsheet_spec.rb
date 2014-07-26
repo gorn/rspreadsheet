@@ -17,7 +17,7 @@ describe Rspreadsheet::Tools::SparseRepeatedArray do
   end
 #   Float::INFINITY
   its 'set values can be read back unchanged' do
-    pending
+    skip
     @a[3..5]='test'
     @a[4].should == 'test'
   end
@@ -129,7 +129,7 @@ describe Rspreadsheet::Cell do
     @sheet2.A12.should == '[http://example.org/]'
   end
   it 'contains good row and col coordinates even after table:number-columns-repeated cells' do
-    pending
+    skip
     @cell = @sheet2.cells(13,5)
     @cell.value.should == 'afterrepeated'
     @cell.row.should == 13
