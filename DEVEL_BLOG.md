@@ -2,6 +2,7 @@ See [GUIDE.md](GUIDE.md#conventions) for syntax conventions.
 
 ## Ideas/wishlist
 
+  * In future inntroduce syntax like ``sheet.range('C3:E4')`` for mass operations. Also maybe ``sheet.cells('C3')`` or ``sheet.cells(3, 'C')`` etc.
   * Trying to make row Enumerable - perhaps skipping empty or undefined cells.
   * Accessors for nonempty/defined cells.
   * Maybe insted two syntaxes for accessing cell, we make both of them do the same and return Proxy object which would act either as value or cell.
