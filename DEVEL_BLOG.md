@@ -9,7 +9,12 @@ See [GUIDE.md](GUIDE.md#conventions) for syntax conventions.
   * Allow any of these:
     * ``book['Spring 2014']`` as alternative to ``book.worksheets('Spring 2014')`` ?
     * ``sheet.cells.F13`` as alternative to ``sheet.cells[14,5]`` ?
- 
+
+Guiding ideas
+  * xml document is always synchronized with the data. So the save is trivial.
+  * no duplication of data. Objects like RowArray should containg minimum information. This one exists solely to speed up cell search. Taken to extream it is questionable, whether we need such objects at all, it might be possible to always work with xml directly.
+
+    
 ## Developing this gem
 
 ### Automated testing

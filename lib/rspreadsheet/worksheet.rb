@@ -5,43 +5,32 @@ require 'forwardable'
 module Rspreadsheet
 
 class Worksheet
-  attr_accessor :name
+  attr_accessor :name, :xmlnode
   extend Forwardable
   def_delegators :nonemptycells
 
-  def initialize(source_node=nil)
-    @source_node = source_node
-    ## initialize cells
-    @cells = Hash.new do |hash, coords|
-      # we create empty cell and place it to hash, we do not have to check whether there is a cell in XML already, because it would be in hash as well
-      hash[coords]=Cell.new(coords[0],coords[1])
-      # TODO: create XML empty node here or upon save?
+  def initialize(xmlnode_or_sheet_name)
+    # set up the @xmlnode according to parameter
+    case xmlnode_or_sheet_name
+      when LibXML::XML::Node
+        @xmlnode = xmlnode_or_sheet_name
+      when String
+        @xmlnode = LibXML::XML::Node.new('table:table')
+        @xmlnode['table:name'] = xmlnode_or_sheet_name
+      else raise 'Provide name or xml node to create a Worksheet object'
     end
-    rowi = 1
-    unless @source_node.nil?
-      @source_node.elements.select{ |node| node.name == 'table-row'}.each do |row_source_node|
-        coli = 1
-        row_source_node.elements.select{ |node| node.name == 'table-cell'}.each do |cell_source_node|
-          initialize_cell(rowi,coli,cell_source_node)
-          coli += 1
-        end
-        rowi += 1
-      end
-    end
+      
     ## initialize rows
-    @spredsheetrows=Array.new()
-  end
-  def initialize_cell(r,c,source_node)
-    @cells[[r,c]]=Cell.new(r,c,source_node)
+    @spredsheetrows=RowArray.new(@xmlnode)
   end
   def cells(r,c)
-    @cells[[r,c]]
+    rows(r).cells(c)
   end
   def nonemptycells
     @cells.values
   end
   def rows(rowi)
-    @spredsheetrows[rowi] ||= Row.new(self,rowi)
+    @spredsheetrows.get_row(rowi)
   end
   ## syntactic sugar follows
   def [](r,c)

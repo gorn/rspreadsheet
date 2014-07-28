@@ -4,9 +4,10 @@ require 'libxml'
 module Rspreadsheet
 class Workbook
   attr_reader :worksheets, :filename
+  attr_reader :content_xml # debug
   def initialize(afilename=nil)
     @worksheets={}
-    @filename = afilename
+    @filename = afilename 
     if filename.nil?
     else
       @content_xml = Zip::File.open(filename) do |zip|
@@ -15,9 +16,7 @@ class Workbook
 
       ndx = 0
       @content_xml.find_first('//office:spreadsheet').each_element { |node|
-        sheet = Worksheet.new(node)
-        @worksheets[ndx]=sheet
-        @worksheets[node.name]=sheet
+        sheet = create_worksheet_from_node(node)
         ndx+=1
       }
     end
@@ -36,12 +35,26 @@ class Workbook
       end
     end
   end
-  def create_worksheet(node=nil)
-    sheet = Worksheet.new(node)
-    @worksheets[worksheets_count]=sheet
-    @worksheets[node.name]=sheet unless node.nil?
+  def create_worksheet_from_node(source_node)
+    sheet = Worksheet.new(source_node)
+    add_to_worksheets(sheet)
     return sheet
   end
+  def create_worksheet_with_name(name)
+    sheet = Worksheet.new(name)
+    add_to_worksheets(sheet)
+    return sheet
+  end
+  def create_worksheet
+    index = worksheets_count
+    create_worksheet_with_name("Strana#{index}")
+  end
+  def add_to_worksheets(worksheet)
+    index = worksheets_count
+    @worksheets[index]=worksheet
+    @worksheets[worksheet.name]=worksheet
+  end
+  
   def worksheets
     @worksheets
   end

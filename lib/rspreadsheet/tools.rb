@@ -20,13 +20,13 @@ module Tools
     row = rowname.to_i
     return [row,col]
   end
-  
-  # this object represents array which can contain repeated values
-  # inspired valuely by http://www-users.cs.umn.edu/~saad/software/SPARSKIT/paper.ps 
-  class SparseRepeatedArray < Array
-    
-  
-  end
 end
  
+end
+
+class Range
+  def size
+    res = self.end-self.begin+1
+    res>0 ? res : 0
+  end
 end

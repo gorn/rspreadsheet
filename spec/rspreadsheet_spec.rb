@@ -3,23 +3,11 @@ require 'spec_helper'
 $test_filename = './spec/testfile1.ods'
 
 describe Rspreadsheet::Tools do
-  it '=Converts correctly cell adresses' do
+  it 'converts correctly cell adresses' do
     Rspreadsheet::Tools.convert_cell_address('A1') [0].should == 1
     Rspreadsheet::Tools.convert_cell_address('A1')[1].should == 1
     Rspreadsheet::Tools.convert_cell_address('C5')[0].should == 5
     Rspreadsheet::Tools.convert_cell_address('C5')[1].should == 3
-  end
-end
-
-describe Rspreadsheet::Tools::SparseRepeatedArray do
-  before do
-#     @a = Rspreadsheet::Tools::SparseRepeatedArray.new()
-  end
-#   Float::INFINITY
-  its 'set values can be read back unchanged' do
-    skip
-    @a[3..5]='test'
-    @a[4].should == 'test'
   end
 end
 
@@ -30,6 +18,7 @@ describe Rspreadsheet do
     book.worksheets[0].class.should == Rspreadsheet::Worksheet
     s = book.worksheets[0]
     (1..10).each do |i|
+      binding.pry
       s[i,1].should === i
     end
     s[1,2].should === 'text'
@@ -129,11 +118,22 @@ describe Rspreadsheet::Cell do
     @sheet2.A12.should == '[http://example.org/]'
   end
   it 'contains good row and col coordinates even after table:number-columns-repeated cells' do
-    skip
     @cell = @sheet2.cells(13,5)
     @cell.value.should == 'afterrepeated'
     @cell.row.should == 13
     @cell.col.should == 5
+  end
+  it 'does not accept negative and zero coordinates' do
+    @sheet2.cells(0,5).shall be(nil)
+    @sheet2.cells(2,-5).shall be(nil)
+    @sheet2.cells(-2,-5).shall be(nil)
+  end
+end
+
+describe Rspreadsheet::Workbook do
+  it 'has correct number of sheets'
+    book = Rspreadsheet.new($test_filename)
+    book.worksheets_count.should == 1
   end
 end
 
@@ -171,7 +171,7 @@ describe Rspreadsheet::Row do
     book1 = Rspreadsheet.new
     @sheet1 = book1.create_worksheet
   end
-  it 'allows access to cells in a row' do
+  it 'allows alternative access to cells in a row' do
     (2..5).each { |i| @sheet1[7,i] = i }
     (2..5).each { |i| 
       a = @sheet1.rows(7)
@@ -179,4 +179,77 @@ describe Rspreadsheet::Row do
       c.value.should == i 
     }
   end
+  it 'is found even in empty sheets' do
+    @sheet1.rows(5).should be_kind_of(Rspreadsheet::Row)
+    @sheet1.rows(25).should be_kind_of(Rspreadsheet::Row)
+    @sheet1.cells(10,10).value = 'ahoj'
+    @sheet1.rows(9).should be_kind_of(Rspreadsheet::Row)
+    @sheet1.rows(10).should be_kind_of(Rspreadsheet::Row)
+    @sheet1.rows(11).should be_kind_of(Rspreadsheet::Row)
+  end
+  it 'detaches automatically row and creates new repeated rows when needed' do
+    @sheet1.rows(5).detach
+    @sheet1.rows(5).repeated?.should == false
+    @sheet1.rows(5).repeated.should == 1
+    @sheet1.rows(5).xmlnode.should_not == nil
+    
+    @sheet1.rows(3).repeated?.should == true
+    @sheet1.rows(3).repeated.should == 4
+    @sheet1.rows(3).xmlnode.should_not == nil
+    @sheet1.rows(3).xmlnode['table:number-rows-repeated'].should == '4'
+    
+    @sheet1.rows(5).style_name = 'newstylename'
+    @sheet1.rows(5).xmlnode.attributes['table:style-name'].should == 'newstylename'
+
+    @sheet1.rows(17).style_name = 'newstylename2'
+    @sheet1.rows(17).xmlnode.attributes['table:style-name'].should == 'newstylename2'
+  end
+  it 'ignores negative any zero row indexes' do
+    @sheet1.rows(0).should be_nil
+    @sheet1.rows(-78).should be_nil
+  end
+  it 'has correct rowindex' do
+    @sheet1.rows(5).detach
+    (4..6).each do |i|
+      @sheet1.rows(i).row.should == i
+    end
+  end
+  it 'can open ods testfile and read its content' do
+    book = Rspreadsheet.new($test_filename)
+    s = book.worksheets[0]
+    (1..10).each do |i|
+      s.row(i).should be_kind_of(Rspreadsheet::Row)
+      s.row(i).repeated.should == 1
+      s.row(i).used_range.size>0
+    end
+    s[1,2].should === 'text'
+    s[2,2].should === Date.new(2014,1,1)
+  end
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
