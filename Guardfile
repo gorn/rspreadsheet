@@ -1,7 +1,7 @@
 guard 'rspec' do
   # watch /lib/ files
   watch(%r{^lib/(.+).rb$}) do |m|
-    "spec/rspreadsheet_spec.rb"
+    "spec/#{m[1]}_spec.rb"
   end
 
   # watch /spec/ files

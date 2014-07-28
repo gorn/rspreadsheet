@@ -10,21 +10,55 @@ class Cell
     @xmlnode = asource_node
   end
   def to_s; value end
-  def value=(avalue); @value=avalue; self end
   def xml; self.source_node.to_s; end
   def value_xml; self.source_node.children.first.children.first.to_s; end
   def coordinates; [row,col]; end
   def row; @parent_row.row; end
   def value
-    type = @xmlnode.attributes['value-type'].to_s
-    if (@xmlnode.children.size == 0) and (not @xmlnode.attributes?)
-      nil
-    else
-      case type
-        when 'float' then @xmlnode.attributes['value'].to_f
-        when 'string' then @xmlnode.elements.first.andand.content.to_s
-        when 'date' then Date.strptime(@xmlnode.attributes['date-value'].to_s, '%Y-%m-%d')
-        when 'percentage' then @xmlnode.attributes['value'].to_f
+    case guess_cell_type(@xmlnode)
+      when nil then nil
+      when Float then @xmlnode.attributes['value'].to_f
+      when String then @xmlnode.elements.first.andand.content.to_s
+      when Date then Date.strptime(@xmlnode.attributes['date-value'].to_s, '%Y-%m-%d')
+      when 'percentage' then @xmlnode.attributes['value'].to_f
+    end
+  end
+  def value=(avalue)
+    case guess_cell_type(@xmlnode,avalue)
+      when nil then raise 'This value type is not storable to cell'
+      when Float 
+        set_type_attribute('float')
+        @xmlnode.attributes['office:value']=value.to_s
+        @xmlnode.content=''
+        @xmlnode << XML::Parser.string("<text:p>#{value}</text:p>").parse.root
+      when String then @xmlnode.elements.first.andand.content.to_s
+      when Date then Date.strptime(@xmlnode.attributes['date-value'].to_s, '%Y-%m-%d')
+      when 'percentage' then @xmlnode.attributes['value'].to_f
+    end
+  end
+  def set_type_attribute(typestring)
+    @xmlnode.attributes['office:value-type']=typestring
+  end
+  
+  # given cell xml node and optionally calue which is about to be assigned, guesses which type the result should be
+  def guess_cell_type(axmlnode,avalue=nil)
+    # try guessing by value
+    valueguess = case avalue
+      when Numeric then Float
+      when Date then Date
+      when String,nil then nil
+      else nil
+    end
+    
+    unless valueguess.nil? # valueguess is most important
+      valueguess
+    else # if not succesfull then try guessing by type
+      type = axmlnode.attributes['value-type'].to_s
+      typeguess = case type
+        when 'float' then Float
+        when 'string' then String
+        when 'date' then Date
+        when 'percentage' then 'percentage'
         else
           if @xmlnode.children.size == 0
             nil
@@ -32,6 +66,18 @@ class Cell
             raise "Unknown type from #{@xmlnode.to_s} / children size=#{@xmlnode.children.size.to_s} / type=#{type}"
           end
         end
+      end
+      # if not certain by value, but value present, then try converting to typeguess
+      if !avalue.nil? and !typeguess.nil?
+        if (typeguess(avalue) rescue false) # if convertible
+          typeguess
+        elsif (String(avalue) rescue false)
+          String
+        else
+          nil # not convertible to anyhing concious
+        end
+      else
+        typeguess
       end
     end
   end

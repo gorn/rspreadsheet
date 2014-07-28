@@ -8,28 +8,34 @@ module Rspreadsheet
 class RowArray
   def initialize(aworksheet_node)
     @worksheet_node = aworksheet_node
-    @rowgroups = []
 
-    # initialize @rowgroups
-    @rowgroups = @worksheet_node.elements.select{ |node| node.name == 'table:table-row'}.collect do |row_source_node|
-      new_row_group(row_source_node)
-    end unless @worksheet_node.nil?
+    # initialize @rowgroups from @worksheet_node
+    @rowgroups = []
+    unless @worksheet_node.nil?
+      @worksheet_node.elements.select{|node| node.name == 'table-row'}.each do |row_source_node|
+        @rowgroups << build_row_group(row_source_node)
+      end
+    end
   end
-  def new_row_group(size_or_xmlnode)  # appends new RowGroup at the end
+  def build_row_group(size_or_xmlnode)  # appends new RowGroup at the end
     # reading params
     if size_or_xmlnode.kind_of? LibXML::XML::Node
-      size = (xmlnode['table:number-cols-repeated'] || 1).to_i
-      xmlnode = size_or_xmlnode
+      size = (size_or_xmlnode['table:number-cols-repeated'] || 1).to_i
+      node = size_or_xmlnode
     elsif size_or_xmlnode.to_i>0
       size = size_or_xmlnode.to_i
-      xmlnode = nil
+      node = nil
     else
       return nil
     end
     index = first_unused_row_index
     
-    # intialize
-    result = RowGroup.new(self,index..index+size-1,xmlnode).normalize
+    # construct result
+    RowGroup.new(self,index..index+size-1,node)
+#     .normalize
+  end
+  def add_row_group(size_or_xmlnode)
+    result = build_row_group(size_or_xmlnode)
     @rowgroups << result
     @worksheet_node << result.xmlnode
     result
@@ -49,8 +55,8 @@ class RowArray
   # prolonges the RowArray to cantain rowi and returns it
   def get_out_of_bound_row_group(rowi)
     fill_row_group_size = rowi-first_unused_row_index
-    new_row_group(fill_row_group_size) if fill_row_group_size>0
-    new_row_group(1)
+    add_row_group(fill_row_group_size) if fill_row_group_size>0
+    add_row_group(1)
   end
   def first_unused_row_index
     if @rowgroups.empty? 
@@ -151,7 +157,7 @@ class RowGroup < RowWithXMLNode
   def normalize
     case range.size
       when 2..Float::INFINITY then self
-      when 1 then SingleRow.new(self,range.begin)
+      when 1 then SingleRow.new_from_rowgroup(self)
       else nil
     end
   end
@@ -164,17 +170,19 @@ class SingleRow < RowWithXMLNode
   @readonly = :no
   attr_accessor :xmlnode
   # index  Integer
-  def initialize(aparent_array,param)
-    case param 
-      when Integer then 
-        @index = param
-        @xmlnode = LibXML::XML::Node.new('table:table-row')
-      when RowGroup 
-        @index = param.range.begin
-        @xmlnode = param.xmlnode
-        @xmlnode['table:number-rows-repeated']=1
-      else raise "Invalid parameter in new"
+  def initialize(aparent_array,aindex,axmlnode=nil)
+    @parent_array = aparent_array
+    @index = aindex
+    if axmlnode.nil?
+      axmlnode = LibXML::XML::Node.new('table:table-row')
     end
+    @xmlnode = axmlnode
+  end
+  def self.new_from_rowgroup(rg)
+    anode = rg.xmlnode
+    anode['table:number-rows-repeated'] = '1'
+    
+    SingleRow.new(rg.parent_array,rg.range.begin,anode)
   end
   def normalize; self end
   def repeated?; false end

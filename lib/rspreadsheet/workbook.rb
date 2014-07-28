@@ -14,10 +14,8 @@ class Workbook
         LibXML::XML::Document.io zip.get_input_stream('content.xml')
       end
 
-      ndx = 0
-      @content_xml.find_first('//office:spreadsheet').each_element { |node|
-        sheet = create_worksheet_from_node(node)
-        ndx+=1
+      @content_xml.find('//office:spreadsheet/table:table').each { |node|
+        create_worksheet_from_node(node)
       }
     end
   end
@@ -47,12 +45,12 @@ class Workbook
   end
   def create_worksheet
     index = worksheets_count
-    create_worksheet_with_name("Strana#{index}")
+    create_worksheet_with_name("Strana #{index}")
   end
   def add_to_worksheets(worksheet)
-    index = worksheets_count
+    index = worksheets_count+1
     @worksheets[index]=worksheet
-    @worksheets[worksheet.name]=worksheet
+    @worksheets[worksheet.name]=worksheet unless worksheet.name.nil?
   end
   
   def worksheets
