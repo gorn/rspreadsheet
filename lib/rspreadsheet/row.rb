@@ -119,24 +119,30 @@ end
 class RowWithXMLNode < Row
   attr_accessor :xmlnode
   def style_name=(value)
-    @xmlnode['table:style-name'] = value
+    @xmlnode['style-name'] = value
   end
   def cells(coli)
     elindex = 0
     curr_coli=1
     cellnode = @xmlnode.elements.select{|n| n.name=='table-cell'}.find do |el|
-      curr_coli += (el['table:number-cols-repeated'] || 1).to_i
+      curr_coli += (el['number-cols-repeated'] || 1).to_i
       curr_coli > coli
     end
     Cell.new(self,coli,cellnode)
+  end
+  def add_cell(repeated=1)
+    cell = Cell.new(self,first_unused_column_index)
+    cell.xmlnode[':number-columns-repeated'] = repeated.to_s if repeated>1
+    @xmlnode << cell.xmlnode
+    cell
   end
   def used_range
     fu = first_unused_column_index
     (fu>1) ? 1..fu : nil
   end
   def first_unused_column_index
-    1 + @xmlnode.elements.select{|n| n.name=='table-cell'}.sum do |el|
-      (el['table:number-cols-repeated'] || 1).to_i
+    1 + @xmlnode.elements.select{|n| n.name=='table-cell'}.reduce(0) do |sum, el|
+      (el.attributes.get_attribute_ns('urn:oasis:names:tc:opendocument:xmlns:table:1.0', 'number-cols-repeated') || 1).to_i + sum
     end
   end
 end
@@ -149,7 +155,7 @@ class RowGroup < RowWithXMLNode
     @range = arange
     if axmlnode.nil?
       axmlnode = LibXML::XML::Node.new('table:table-row')
-      axmlnode['table:number-rows-repeated']=range.size.to_s
+      axmlnode['number-rows-repeated']=range.size.to_s
     end
     @xmlnode = axmlnode
   end

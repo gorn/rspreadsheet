@@ -4,44 +4,65 @@ module Rspreadsheet
 
 class Cell
   attr_reader :col,:row, :xmlnode
-  def initialize(aparent_row,coli,asource_node)
+  def initialize(aparent_row,coli,asource_node=nil)
     raise "First parameter should be Row object not #{aparent_row.class}" unless aparent_row.kind_of?(Rspreadsheet::Row)
     @parent_row = aparent_row
+    if asource_node.nil?
+      asource_node = LibXML::XML::Node.new('table-cell',nil, ns_table)
+    end
     @xmlnode = asource_node
   end
+  def ns_table; @parent_row.xmlnode.doc.root.namespaces.find_by_prefix('table') end
+  def ns_office; @parent_row.xmlnode.doc.root.namespaces.find_by_prefix('office') end
+  def ns_text; @parent_row.xmlnode.doc.root.namespaces.find_by_prefix('text') end
   def to_s; value end
   def xml; self.source_node.to_s; end
   def value_xml; self.source_node.children.first.children.first.to_s; end
   def coordinates; [row,col]; end
   def row; @parent_row.row; end
   def value
-    case guess_cell_type(@xmlnode)
-      when nil then nil
-      when Float then @xmlnode.attributes['value'].to_f
-      when String then @xmlnode.elements.first.andand.content.to_s
-      when Date then Date.strptime(@xmlnode.attributes['date-value'].to_s, '%Y-%m-%d')
-      when 'percentage' then @xmlnode.attributes['value'].to_f
+    gt = guess_cell_type
+    case 
+      when gt == nil then nil
+      when gt == Float then @xmlnode.attributes['value'].to_f
+      when gt == String then @xmlnode.elements.first.andand.content.to_s
+      when gt == Date then Date.strptime(@xmlnode.attributes['date-value'].to_s, '%Y-%m-%d')
+      when gt == 'percentage' then @xmlnode.attributes['value'].to_f
     end
   end
   def value=(avalue)
-    case guess_cell_type(@xmlnode,avalue)
-      when nil then raise 'This value type is not storable to cell'
-      when Float 
+    gt = guess_cell_type(avalue)
+    case
+      when gt == nil then raise 'This value type is not storable to cell'
+      when gt == Float 
         set_type_attribute('float')
-        @xmlnode.attributes['office:value']=value.to_s
+        (@xmlnode.attributes.get_attribute_ns(ns_office.href,'value').value = avalue.to_s) rescue raise(@xmlnode.inspect)
         @xmlnode.content=''
-        @xmlnode << XML::Parser.string("<text:p>#{value}</text:p>").parse.root
-      when String then @xmlnode.elements.first.andand.content.to_s
-      when Date then Date.strptime(@xmlnode.attributes['date-value'].to_s, '%Y-%m-%d')
-      when 'percentage' then @xmlnode.attributes['value'].to_f
+        @xmlnode << LibXML::XML::Node.new('p', avalue.to_f.to_s, ns_text)
+      when gt == String then
+        set_type_attribute('string')
+        @xmlnode.attributes.get_attribute_ns(ns_office.href,'value').remove!
+        @xmlnode.content=''
+        @xmlnode << LibXML::XML::Node.new('p', avalue.to_s, ns_text)
+      when gt == Date then 
+        Date.strptime(@xmlnode.attributes['date-value'].to_s, '%Y-%m-%d')
+        set_type_attribute('date')
+        @xmlnode.attributes.get_attribute_ns(ns_office.href,'date-value').value = avalue.strftime('%Y-%m-%d')
+        @xmlnode.content=''
+        @xmlnode << LibXML::XML::Node.new('p', avalue.strftime('%Y-%m-%d'), ns_text) 
+      when gt == 'percentage'
+        set_type_attribute('float')
+        @xmlnode.attributes.get_attribute_ns(ns_office.href,'value').value =avalue.to_f.to_s
+        @xmlnode.content=''
+        @xmlnode << LibXML::XML::Node.new('p', (avalue.to_f*100).round.to_s+'%', ns_text) 
     end
   end
   def set_type_attribute(typestring)
-    @xmlnode.attributes['office:value-type']=typestring
+    @xmlnode.attributes['value-type']=typestring
   end
   
-  # given cell xml node and optionally calue which is about to be assigned, guesses which type the result should be
-  def guess_cell_type(axmlnode,avalue=nil)
+  # based on @xmlnode and optionally value which is about to be assigned, guesses which type the result should be
+  def guess_cell_type(avalue=nil)
     # try guessing by value
     valueguess = case avalue
       when Numeric then Float
@@ -49,26 +70,25 @@ class Cell
       when String,nil then nil
       else nil
     end
+    result = valueguess
     
-    unless valueguess.nil? # valueguess is most important
-      valueguess
-    else # if not succesfull then try guessing by type
-      type = axmlnode.attributes['value-type'].to_s
+    if valueguess.nil? # valueguess is most important
+      # if not succesfull then try guessing by type
+      type = @xmlnode.attributes['value-type'].to_s
       typeguess = case type
         when 'float' then Float
         when 'string' then String
         when 'date' then Date
         when 'percentage' then 'percentage'
-        else
+        else 
           if @xmlnode.children.size == 0
             nil
           else 
             raise "Unknown type from #{@xmlnode.to_s} / children size=#{@xmlnode.children.size.to_s} / type=#{type}"
           end
-        end
       end
       # if not certain by value, but value present, then try converting to typeguess
-      if !avalue.nil? and !typeguess.nil?
+      result = if !avalue.nil? and !typeguess.nil?
         if (typeguess(avalue) rescue false) # if convertible
           typeguess
         elsif (String(avalue) rescue false)
@@ -80,17 +100,12 @@ class Cell
         typeguess
       end
     end
+
+    result
   end
 end
 
-#   def former_initialize(arow,acol,source_node=nil)
-#     @col = acol
-#     @row = arow
-#     @xmlnode = source_node
-#     unless @xmlnode.nil?
-#     end
-#   end
-
+end
 
 # ## initialize cells
 #   @cells = Hash.new do |hash, coords|

@@ -2,16 +2,26 @@ require 'spec_helper'
 
 describe Rspreadsheet::Row do
   before do 
-    book1 = Rspreadsheet.new
-    @sheet1 = book1.create_worksheet
+    @sheet1 = Rspreadsheet.new.create_worksheet
+    @sheet2 = Rspreadsheet.new($test_filename).worksheets[1]
   end
   it 'allows access to cells in a row' do
-    @row = Rspreadsheet::SingleRow.new(nil,1)
-    @row.cells(3).value = 3
-    @row.cells(3).value.should == 3
+    @row = @sheet2.rows(1)
+    @c = @row.cells(1)
+    @c.value = 3
+    @c.value.should == 3
+  end
+  it 'creates minimal row on demand, which contains correctly namespaced attributes only'do
+    @row = @sheet1.rows(1)
+    @xmlnode = @row.xmlnode
+    @xmlnode.namespaces.to_a.size.should >5
+    @xmlnode.namespaces.namespace.should_not be_nil
+    @xmlnode.namespaces.namespace.prefix.should == 'table'
   end
   it 'cells in row are settable through sheet' do
-    (2..5).each { |i| @sheet1[7,i] = i }
+    binding.pry
+    @sheet1.rows(7).cells(2).value = 2
+    (2..5).each { |i| @sheet1.rows(7).cells(i).value = i }
     (2..5).each { |i| 
       a = @sheet1.rows(7)
       c = a.cells(i)

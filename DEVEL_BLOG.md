@@ -42,3 +42,7 @@ alternative way using ``gem`` command
     gem push rspreadsheet-x.y.z.gem
 
 
+### Naming conventions
+
+  * create_xxx - creates object and inserts it where necessary
+  * build_xxx - create object, but does not insert it anywhere
