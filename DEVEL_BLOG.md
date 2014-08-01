@@ -45,4 +45,4 @@ alternative way using ``gem`` command
 ### Naming conventions
 
   * create_xxx - creates object and inserts it where necessary
-  * build_xxx - create object, but does not insert it anywhere
+  * prepare_xxx - create object, but does not insert it anywhere

@@ -19,8 +19,10 @@ describe Rspreadsheet::Row do
     @xmlnode.namespaces.namespace.prefix.should == 'table'
   end
   it 'cells in row are settable through sheet' do
-    binding.pry
-    @sheet1.rows(7).cells(2).value = 2
+    @sheet1.rows(9).add_cell
+    @sheet1.rows(9).cells(1).value = 2
+    @sheet1.rows(9).cells(1).value.should == 2
+    
     (2..5).each { |i| @sheet1.rows(7).cells(i).value = i }
     (2..5).each { |i| 
       a = @sheet1.rows(7)

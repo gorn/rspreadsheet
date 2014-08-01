@@ -13,14 +13,14 @@ class RowArray
     @rowgroups = []
     unless @worksheet_node.nil?
       @worksheet_node.elements.select{|node| node.name == 'table-row'}.each do |row_source_node|
-        @rowgroups << build_row_group(row_source_node)
+        @rowgroups << prepare_row_group(row_source_node) # it is in @worksheet_node so suffices to add object to @rowgroups
       end
     end
   end
-  def build_row_group(size_or_xmlnode)  # appends new RowGroup at the end
+  def prepare_row_group(size_or_xmlnode)  # appends new RowGroup at the end
     # reading params
     if size_or_xmlnode.kind_of? LibXML::XML::Node
-      size = (size_or_xmlnode['table:number-cols-repeated'] || 1).to_i
+      size = (size_or_xmlnode['number-cols-repeated'] || 1).to_i
       node = size_or_xmlnode
     elsif size_or_xmlnode.to_i>0
       size = size_or_xmlnode.to_i
@@ -35,7 +35,7 @@ class RowArray
 #     .normalize
   end
   def add_row_group(size_or_xmlnode)
-    result = build_row_group(size_or_xmlnode)
+    result = prepare_row_group(size_or_xmlnode)
     @rowgroups << result
     @worksheet_node << result.xmlnode
     result
@@ -122,13 +122,19 @@ class RowWithXMLNode < Row
     @xmlnode['style-name'] = value
   end
   def cells(coli)
-    elindex = 0
-    curr_coli=1
-    cellnode = @xmlnode.elements.select{|n| n.name=='table-cell'}.find do |el|
-      curr_coli += (el['number-cols-repeated'] || 1).to_i
-      curr_coli > coli
+    cellnode = nil
+    while true 
+      curr_coli=1
+      cellnode = @xmlnode.elements.select{|n| n.name=='table-cell'}.find do |el|
+        curr_coli += (el['number-cols-repeated'] || 1).to_i
+        curr_coli > coli
+      end
+      unless cellnode.nil? 
+        return Cell.new(self,coli,cellnode)
+      else
+        add_cell
+      end
     end
-    Cell.new(self,coli,cellnode)
   end
   def add_cell(repeated=1)
     cell = Cell.new(self,first_unused_column_index)
@@ -154,7 +160,9 @@ class RowGroup < RowWithXMLNode
     @parent_array = aparent_array
     @range = arange
     if axmlnode.nil?
-      axmlnode = LibXML::XML::Node.new('table:table-row')
+      ns = Tools.get_namespace('table')
+      axmlnode = LibXML::XML::Node.new('table-row')
+      axmlnode.namespaces.namespace = ns
       axmlnode['number-rows-repeated']=range.size.to_s
     end
     @xmlnode = axmlnode

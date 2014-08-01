@@ -36,7 +36,7 @@ class Cell
       when gt == nil then raise 'This value type is not storable to cell'
       when gt == Float 
         set_type_attribute('float')
-        (@xmlnode.attributes.get_attribute_ns(ns_office.href,'value').value = avalue.to_s) rescue raise(@xmlnode.inspect)
+        set_ns_attribute(@xmlnode,'office','value', avalue.to_s) 
         @xmlnode.content=''
         @xmlnode << LibXML::XML::Node.new('p', avalue.to_f.to_s, ns_text)
       when gt == String then
@@ -57,8 +57,17 @@ class Cell
         @xmlnode << LibXML::XML::Node.new('p', (avalue.to_f*100).round.to_s+'%', ns_text) 
     end
   end
+  def set_ns_attribute(node,ns_prefix,key,value)
+    ns = Tools.get_namespace(ns_prefix)
+    attr = node.attributes.get_attribute_ns(ns.href, key)
+    if attr.nil?
+      attr = LibXML::XML::Attr.new(node, key,'temporarilyempty')
+      attr.namespaces.namespace = ns
+    end
+    attr.value = value
+  end
   def set_type_attribute(typestring)
-    @xmlnode.attributes['value-type']=typestring
+    set_ns_attribute(@xmlnode,'office','value-type',typestring)
   end
   
   # based on @xmlnode and optionally value which is about to be assigned, guesses which type the result should be
