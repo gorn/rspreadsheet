@@ -223,9 +223,10 @@ class MemberOfRowGroup < Row
   def detach  # detaches MemberOfRowGroup from its RowGroup perhaps splitting RowGroup
     @row_group.parent_array.detach(@index)
   end
-  def row
-    @index
+  def cells(coli)
+    @row_group.cells(coli).tap{|n| n.readonly = true}
   end
+  def row; @index end
 end
 
 end

@@ -4,8 +4,10 @@ module Rspreadsheet
 
 class Cell
   attr_reader :col,:row, :xmlnode
+  attr_accessor :readonly
   def initialize(aparent_row,coli,asource_node=nil)
     raise "First parameter should be Row object not #{aparent_row.class}" unless aparent_row.kind_of?(Rspreadsheet::Row)
+    @readonly = false
     @parent_row = aparent_row
     if asource_node.nil?
       asource_node = LibXML::XML::Node.new('table-cell',nil, ns_table)
@@ -31,6 +33,7 @@ class Cell
     end
   end
   def value=(avalue)
+    if readonly then raise 'Cell is read only' end
     gt = guess_cell_type(avalue)
     case
       when gt == nil then raise 'This value type is not storable to cell'
