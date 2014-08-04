@@ -20,7 +20,7 @@ class RowArray
   def prepare_row_group(size_or_xmlnode)  # appends new RowGroup at the end
     # reading params
     if size_or_xmlnode.kind_of? LibXML::XML::Node
-      size = (size_or_xmlnode['number-cols-repeated'] || 1).to_i
+      size = (size_or_xmlnode['number-rows-repeated'] || 1).to_i
       node = size_or_xmlnode
     elsif size_or_xmlnode.to_i>0
       size = size_or_xmlnode.to_i
@@ -31,8 +31,7 @@ class RowArray
     index = first_unused_row_index
     
     # construct result
-    RowGroup.new(self,index..index+size-1,node)
-#     .normalize
+    RowGroup.new(self,index..index+size-1,node).normalize
   end
   def add_row_group(size_or_xmlnode)
     result = prepare_row_group(size_or_xmlnode)
@@ -48,15 +47,19 @@ class RowArray
     case rg
       when SingleRow then rg
       when RowGroup then MemberOfRowGroup.new(rowi, rg)
-      when nil then get_out_of_bound_row_group(rowi)
+      when nil
+       if rowi>0 then UninitializedEmptyRow.new(self,rowi) else nil end
       else raise
     end
   end
   # prolonges the RowArray to cantain rowi and returns it
-  def get_out_of_bound_row_group(rowi)
+  def detach_of_bound_row_group(rowi)
     fill_row_group_size = rowi-first_unused_row_index
-    add_row_group(fill_row_group_size) if fill_row_group_size>0
+    if fill_row_group_size>0
+      add_row_group(fill_row_group_size) 
+    end
     add_row_group(1)
+    return get_row(rowi)
   end
   def first_unused_row_index
     if @rowgroups.empty? 
@@ -95,7 +98,6 @@ class RowArray
     row_group.xmlnode.next = marker
     row_group.xmlnode.remove!
     replaceby.each{ |rg| 
-      puts rg.inspect
       marker.prev = rg.xmlnode
     } 
     marker.remove!
@@ -114,23 +116,42 @@ end
 class Row
   @readonly = :unknown
   # ? @rowindex 
+  def self.empty_row_node
+    LibXML::XML::Node.new('table-row',nil, Tools.get_namespace('table'))
+  end
 end
 
 class RowWithXMLNode < Row
   attr_accessor :xmlnode
-  def style_name=(value)
-    @xmlnode['style-name'] = value
-  end
+  def style_name=(value); Tools.set_ns_attribute(@xmlnode,'table','style-name',value)  end
   def cells(coli)
+    coli = coli.to_i
+    return nil if coli.to_i<=0
+    Cell.new(self,coli,cellnodes(coli))
+  end
+  def nonemptycells
+    nonemptycellsindexes.collect{ |index| cells(index) }
+  end
+  def nonemptycellsindexes
+    used_col_range.to_a.select do |coli|
+      cellnode = cellnodes(coli)
+      !(cellnode.content.nil? or cellnode.content.empty? or cellnode.content =='') or
+      !cellnode.attributes.to_a.reject{ |attr| attr.name == 'number-columns-repeated'}.empty?
+    end
+  end
+  def used_col_range
+    1..first_unused_column_index-1
+  end
+  def cellnodes(coli)
     cellnode = nil
     while true 
       curr_coli=1
       cellnode = @xmlnode.elements.select{|n| n.name=='table-cell'}.find do |el|
-        curr_coli += (el['number-cols-repeated'] || 1).to_i
+        curr_coli += (Tools.get_ns_attribute_value(el, 'table', 'number-columns-repeated') || 1).to_i
         curr_coli > coli
       end
       unless cellnode.nil? 
-        return Cell.new(self,coli,cellnode)
+        return cellnode
       else
         add_cell
       end
@@ -138,7 +159,7 @@ class RowWithXMLNode < Row
   end
   def add_cell(repeated=1)
     cell = Cell.new(self,first_unused_column_index)
-    cell.xmlnode[':number-columns-repeated'] = repeated.to_s if repeated>1
+    Tools.set_ns_attribute(cell.xmlnode,'table','number-columns-repeated',repeated) if repeated>1
     @xmlnode << cell.xmlnode
     cell
   end
@@ -148,22 +169,21 @@ class RowWithXMLNode < Row
   end
   def first_unused_column_index
     1 + @xmlnode.elements.select{|n| n.name=='table-cell'}.reduce(0) do |sum, el|
-      (el.attributes.get_attribute_ns('urn:oasis:names:tc:opendocument:xmlns:table:1.0', 'number-cols-repeated') || 1).to_i + sum
+      sum + (Tools.get_ns_attribute_value(el, 'table', 'number-columns-repeated') || 1).to_i
     end
   end
 end
 
 class RowGroup < RowWithXMLNode
   @readonly = :yes_always
-  attr_accessor :range, :parent_array, :xmlnode
+  attr_reader :range
+  attr_accessor :parent_array, :xmlnode
   def initialize(aparent_array,arange,axmlnode=nil)
     @parent_array = aparent_array
     @range = arange
     if axmlnode.nil?
-      ns = Tools.get_namespace('table')
-      axmlnode = LibXML::XML::Node.new('table-row')
-      axmlnode.namespaces.namespace = ns
-      axmlnode['number-rows-repeated']=range.size.to_s
+      axmlnode = Row.empty_row_node
+      Tools.set_ns_attribute(axmlnode,'table','number-rows-repeated',range.size) if range.size>1
     end
     @xmlnode = axmlnode
   end
@@ -177,7 +197,10 @@ class RowGroup < RowWithXMLNode
   end
   def repeated;  range.size   end
   def repeated?; range.size>1 end
-
+  def range=(arange)
+    @range=arange
+    Tools.set_ns_attribute(@xmlnode,'table','number-rows-repeated',range.size, 1)
+  end
 end
 
 class SingleRow < RowWithXMLNode
@@ -188,13 +211,13 @@ class SingleRow < RowWithXMLNode
     @parent_array = aparent_array
     @index = aindex
     if axmlnode.nil?
-      axmlnode = LibXML::XML::Node.new('table:table-row')
+      axmlnode = Row.empty_row_node
     end
     @xmlnode = axmlnode
   end
   def self.new_from_rowgroup(rg)
     anode = rg.xmlnode
-    anode['table:number-rows-repeated'] = '1'
+    Tools.remove_ns_attribute(anode,'table','number-rows-repeated')
     
     SingleRow.new(rg.parent_array,rg.range.begin,anode)
   end
@@ -204,10 +227,21 @@ class SingleRow < RowWithXMLNode
   def range; (@index..@index) end
   def detach; true end
   def row; @index end
+  
+end
+
+class LazyDetachableRow < Row
+  @readonly = :yes_but_detachable
+  def initialize(rowi)
+    @index = rowi.to_i
+  end
+  def add_cell; detach.add_cell end
+  def style_name=(value); detach.style_name=value end
+  def row; @index end
 end
 
 ## there are not data in this object, they are taken from RowGroup, but this is only readonly
-class MemberOfRowGroup < Row
+class MemberOfRowGroup < LazyDetachableRow
   @readonly = :yes_but_detachable
   extend Forwardable
   delegate [:repeated?, :repeated, :xmlnode, :parent_array] => :@row_group
@@ -215,8 +249,8 @@ class MemberOfRowGroup < Row
 
   # @index  Integer
   # @row_group   RepeatedRow
-  def initialize(aindex,arow_group)
-    @index = aindex.to_i
+  def initialize(arowi,arow_group)
+    super(arowi)
     @row_group = arow_group
     raise 'Wrong parameter given' unless @row_group.is_a? RowGroup
   end
@@ -224,18 +258,39 @@ class MemberOfRowGroup < Row
     @row_group.parent_array.detach(@index)
   end
   def cells(coli)
-    @row_group.cells(coli).tap{|n| n.readonly = true}
+    Cell.new(self,coli,@row_group.cellnodes(coli)).tap{|n| n.mode = :repeated}
   end
-  def row; @index end
+  def nonemptycells
+    @row_group.nonemptycellsindexes.collect{ |coli| cells(coli) }
+  end
+end
+
+## this is a row outside the used bounds. the main purpose of this object is to magically synchronize to existing data, once they are created
+class UninitializedEmptyRow < LazyDetachableRow
+  @readonly = :yes_but_detachable
+  attr_reader :parent_array  # debug only
+  def initialize(aparent_array,arowi)
+    super(arowi)
+    @parent_array = aparent_array
+  end
+  def cells(coli)
+    if still_out_of_used_range?
+      Cell.new(self,coli,Cell.empty_cell_node).tap{|n| n.mode = :outbound}
+    else
+      @parent_array.get_row(@index).cells(coli)
+    end
+  end
+  def normalize
+    if still_out_of_used_range?
+      self
+    else
+      @parent_array.get_row(@index)
+    end
+  end
+  def detach; @parent_array.detach_of_bound_row_group(@index) end
+  def still_out_of_used_range?; @index >= @parent_array.first_unused_row_index end
+  def xmlnode; Row.empty_row_node end
+  def nonemptycells; [] end
 end
 
 end
-
-## was in Row
-#   def initialize(workbook,rowi)
-#     @rowi = rowi
-#     @workbook = workbook
-#   end
-#   def cells(coli)
-#     @workbook.cells(@rowi,coli)
-#   end

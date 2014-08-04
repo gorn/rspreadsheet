@@ -47,15 +47,23 @@ describe Rspreadsheet do
     @content_xml2 = Zip::File.open(tmp_filename) do |zip|
       LibXML::XML::Document.io zip.get_input_stream('content.xml')
     end
+    
+    @content_xml2.root.first_diff(@content_xml1.root).should be_nil
+    @content_xml1.root.first_diff(@content_xml2.root).should be_nil
+    
     @content_xml1.root.equals?(@content_xml2.root).should == true
   end
   it 'when open and save file modified, than the file is different' do
     tmp_filename = '/tmp/testfile1.ods'        # first delete temp file
     File.delete(tmp_filename) if File.exists?(tmp_filename)
     book = Rspreadsheet.new($test_filename)    # than open test file
-    book.worksheets[1][1,1].should_not == 'xyzxyz'
-    book.worksheets[1][1,1]='xyzxyz'
-    book.worksheets[1][1,1].should == 'xyzxyz'
+    book.worksheets[1].rows(1).cells(1).value.should_not == 'xyzxyz'
+    book.worksheets[1].rows(1).cells(1).value ='xyzxyz'
+    book.worksheets[1].rows(1).cells(1).value.should == 'xyzxyz'
+    
+#     book.worksheets[1][1,1].should_not == 'xyzxyz'
+#     book.worksheets[1][1,1]='xyzxyz'
+#     book.worksheets[1][1,1].should == 'xyzxyz'
     book.save(tmp_filename)                    # and save it as temp file
     
     # now compare them
@@ -76,83 +84,6 @@ describe Rspreadsheet do
   end
 end
 
-describe Rspreadsheet::Cell do
-  before do 
-    book1 = Rspreadsheet.new
-    @sheet1 = book1.create_worksheet
-    @sheet1[0,0] = 'text'
-    book2 = Rspreadsheet.new($test_filename)
-    @sheet2 = book2.worksheets[1]
-  end
-  it 'contains good row and col coordinates' do
-    @cell = @sheet1.cells(1,3)
-    @cell.row.should == 1
-    @cell.col.should == 3
-    @cell.coordinates.should == [1,3]
-    
-    @cell = @sheet2.cells(7,2)
-    @cell.row.should == 7
-    @cell.col.should == 2
-    @cell.coordinates.should == [7,2]
-  end
-  it 'can be referenced by more vars and both are synchronized' do
-    @cell = @sheet1.cells(1,1)
-    @sheet1[1,1] = 'novinka'
-    @cell.value.should == 'novinka'
-  end
-  it 'can be modified by more ways and all are identical' do
-    @cell = @sheet1.cells(2,2)
-    @sheet1[2,2] = 'zaprve'
-    @cell.value.should == 'zaprve'
-    @sheet1.cells(2,2).value = 'zadruhe'
-    @cell.value.should == 'zadruhe'
-    @sheet1.B2 = 'zatreti'
-    @cell.value.should == 'zatreti'
-  end
-  it 'can include links' do
-    @sheet2.A12.should == '[http://example.org/]'
-  end
-  it 'contains good row and col coordinates even after table:number-columns-repeated cells' do
-    @cell = @sheet2.cells(13,5)
-    @cell.value.should == 'afterrepeated'
-    @cell.row.should == 13
-    @cell.col.should == 5
-  end
-  it 'does not accept negative and zero coordinates' do
-    @sheet2.cells(0,5).shall be(nil)
-    @sheet2.cells(2,-5).shall be(nil)
-    @sheet2.cells(-2,-5).shall be(nil)
-  end
-end
-
-describe Rspreadsheet::Worksheet do
-  before do
-    book = Rspreadsheet.new
-    @sheet = book.create_worksheet
-  end
-  it 'remembers the value stored to A1 cell' do
-    @sheet[1,1].should == nil
-    @sheet[1,1] = 'test text'
-    @sheet[1,1].class.should == String
-    @sheet[1,1].should == 'test text'
-  end
-  it 'value stored to A1 is accesible using different syntax' do
-    @sheet[1,1] = 'test text'
-    @sheet[1,1].should == 'test text'
-    @sheet.cells(1,1).value.should == 'test text'
-  end
-  it 'makes Cell object accessible' do
-    @sheet.cells(1,1).value = 'test text'
-    @sheet.cells(1,1).class.should == Rspreadsheet::Cell
-  end
-  it 'has name, which can be changed and is remembered' do
-    @sheet.name.should be(nil)
-    @sheet.name = 'Icecream'
-    @sheet.name.should == 'Icecream'
-    @sheet.name = 'Cofee'
-    @sheet.name.should == 'Cofee'    
-  end
-end
 
 
 

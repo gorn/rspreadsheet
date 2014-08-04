@@ -67,6 +67,33 @@ module Tools
     end
     return @ns[prefix]
   end
+  # sets namespaced attribute "ns_prefix:key" in node to value. if value == delete_value then remove the attribute
+  def self.set_ns_attribute(node,ns_prefix,key,value,delete_value=nil)
+    ns = Tools.get_namespace(ns_prefix)
+    attr = node.attributes.get_attribute_ns(ns.href, key)
+    
+    unless value==delete_value # set attribute
+      if attr.nil? # create attribute if needed
+        attr = LibXML::XML::Attr.new(node, key,'temporarilyempty')
+        attr.namespaces.namespace = ns
+      end
+      attr.value = value.to_s
+      attr
+    else # remove attribute
+      attr.remove! unless attr.nil? 
+      nil
+    end
+  end
+  def self.get_ns_attribute(node,ns_prefix,key)
+    node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key)
+  end
+  def self.get_ns_attribute_value(node,ns_prefix,key)
+    Tools.get_ns_attribute(node,ns_prefix,key).andand.value
+  end
+  def self.remove_ns_attribute(node,ns_prefix,key)
+    node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key)
+    attr.remove! unless attr.nil? 
+  end
 end
  
 end

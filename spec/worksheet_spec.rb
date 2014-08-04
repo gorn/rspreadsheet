@@ -16,8 +16,35 @@ describe Rspreadsheet::Worksheet do
     @xmlnode.namespaces.find_by_prefix('table').should_not be_nil
     @xmlnode.namespaces.namespace.should_not be_nil
     @xmlnode.namespaces.namespace.prefix.should == 'table'
-    binding.pry
-#     @xmlnode.attributes['name'].namespaces.namespace
   end
  
+end
+
+describe Rspreadsheet::Worksheet do
+  before do
+    book = Rspreadsheet.new
+    @sheet = book.create_worksheet
+  end
+  it 'remembers the value stored to A1 cell' do
+    @sheet[1,1].should == nil
+    @sheet[1,1] = 'test text'
+    @sheet[1,1].class.should == String
+    @sheet[1,1].should == 'test text'
+  end
+  it 'value stored to A1 is accesible using different syntax' do
+    @sheet[1,1] = 'test text'
+    @sheet[1,1].should == 'test text'
+    @sheet.cells(1,1).value.should == 'test text'
+  end
+  it 'makes Cell object accessible' do
+    @sheet.cells(1,1).value = 'test text'
+    @sheet.cells(1,1).class.should == Rspreadsheet::Cell
+  end
+  it 'has name, which can be changed and is remembered' do
+    @sheet.name.should be(nil)
+    @sheet.name = 'Icecream'
+    @sheet.name.should == 'Icecream'
+    @sheet.name = 'Cofee'
+    @sheet.name.should == 'Cofee'    
+  end
 end

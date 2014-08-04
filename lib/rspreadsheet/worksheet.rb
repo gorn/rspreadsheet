@@ -1,13 +1,13 @@
 require 'rspreadsheet/row'
 require 'rspreadsheet/tools'
-require 'forwardable'
+# require 'forwardable'
 
 module Rspreadsheet
 
 class Worksheet
   attr_accessor :name, :xmlnode
-  extend Forwardable
-  def_delegators :nonemptycells
+#   extend Forwardable
+#   def_delegators :nonemptycells
 
   def initialize(xmlnode_or_sheet_name)
     # set up the @xmlnode according to parameter
@@ -26,10 +26,10 @@ class Worksheet
     @spredsheetrows=RowArray.new(@xmlnode)
   end
   def cells(r,c)
-    rows(r).cells(c)
+    rows(r).andand.cells(c)
   end
   def nonemptycells
-    @cells.values
+    used_rows_range.collect{ |rowi| rows(rowi) }.collect { |row| row.nonemptycells }.flatten
   end
   def rows(rowi)
     @spredsheetrows.get_row(rowi)
@@ -54,6 +54,9 @@ class Worksheet
     else
       super
     end
+  end
+  def used_rows_range
+    1..@spredsheetrows.first_unused_row_index-1
   end
 end
 

@@ -3,16 +3,21 @@ require 'andand'
 module Rspreadsheet
 
 class Cell
-  attr_reader :col,:row, :xmlnode
-  attr_accessor :readonly
+  attr_reader :col, :xmlnode
+  attr_reader  :parent_row  # for debug only
+  attr_accessor :mode
+  def self.empty_cell_node
+    LibXML::XML::Node.new('table-cell',nil, Tools.get_namespace('table'))
+  end
   def initialize(aparent_row,coli,asource_node=nil)
     raise "First parameter should be Row object not #{aparent_row.class}" unless aparent_row.kind_of?(Rspreadsheet::Row)
-    @readonly = false
+    @mode = :regular
     @parent_row = aparent_row
     if asource_node.nil?
-      asource_node = LibXML::XML::Node.new('table-cell',nil, ns_table)
+      asource_node = Cell.empty_cell_node
     end
     @xmlnode = asource_node
+    @col = coli
   end
   def ns_table; @parent_row.xmlnode.doc.root.namespaces.find_by_prefix('table') end
   def ns_office; @parent_row.xmlnode.doc.root.namespaces.find_by_prefix('office') end
@@ -24,53 +29,63 @@ class Cell
   def row; @parent_row.row; end
   def value
     gt = guess_cell_type
-    case 
-      when gt == nil then nil
-      when gt == Float then @xmlnode.attributes['value'].to_f
-      when gt == String then @xmlnode.elements.first.andand.content.to_s
-      when gt == Date then Date.strptime(@xmlnode.attributes['date-value'].to_s, '%Y-%m-%d')
-      when gt == 'percentage' then @xmlnode.attributes['value'].to_f
+    if (@mode == :regular) or (@mode == @repeated)
+      case 
+        when gt == nil then nil
+        when gt == Float then @xmlnode.attributes['value'].to_f
+        when gt == String then @xmlnode.elements.first.andand.content.to_s
+        when gt == Date then Date.strptime(@xmlnode.attributes['date-value'].to_s, '%Y-%m-%d')
+        when gt == 'percentage' then @xmlnode.attributes['value'].to_f
+      end
+    elsif @mode == :outbound # needs to check whether it is still unbound
+      if parent_row.still_out_of_used_range?
+        nil
+      else
+        parent_row.normalize.cells(@col).value
+      end  
+    else
+      raise "Unknown cell mode #{@mode}"
     end
   end
   def value=(avalue)
-    if readonly then raise 'Cell is read only' end
-    gt = guess_cell_type(avalue)
-    case
-      when gt == nil then raise 'This value type is not storable to cell'
-      when gt == Float 
-        set_type_attribute('float')
-        set_ns_attribute(@xmlnode,'office','value', avalue.to_s) 
-        @xmlnode.content=''
-        @xmlnode << LibXML::XML::Node.new('p', avalue.to_f.to_s, ns_text)
-      when gt == String then
-        set_type_attribute('string')
-        @xmlnode.attributes.get_attribute_ns(ns_office.href,'value').remove!
-        @xmlnode.content=''
-        @xmlnode << LibXML::XML::Node.new('p', avalue.to_s, ns_text)
-      when gt == Date then 
-        Date.strptime(@xmlnode.attributes['date-value'].to_s, '%Y-%m-%d')
-        set_type_attribute('date')
-        @xmlnode.attributes.get_attribute_ns(ns_office.href,'date-value').value = avalue.strftime('%Y-%m-%d')
-        @xmlnode.content=''
-        @xmlnode << LibXML::XML::Node.new('p', avalue.strftime('%Y-%m-%d'), ns_text) 
-      when gt == 'percentage'
-        set_type_attribute('float')
-        @xmlnode.attributes.get_attribute_ns(ns_office.href,'value').value =avalue.to_f.to_s
-        @xmlnode.content=''
-        @xmlnode << LibXML::XML::Node.new('p', (avalue.to_f*100).round.to_s+'%', ns_text) 
+    if @mode == :regular
+      gt = guess_cell_type(avalue)
+      case
+        when gt == nil then raise 'This value type is not storable to cell'
+        when gt == Float 
+          set_type_attribute('float')
+          remove_all_value_attributes_and_content(@xmlnode)
+          Tools.set_ns_attribute(@xmlnode,'office','value', avalue.to_s) 
+          @xmlnode << LibXML::XML::Node.new('p', avalue.to_f.to_s, ns_text)
+        when gt == String then
+          set_type_attribute('string')
+          remove_all_value_attributes_and_content(@xmlnode)
+          @xmlnode << LibXML::XML::Node.new('p', avalue.to_s, ns_text)
+        when gt == Date then 
+          set_type_attribute('date')
+          remove_all_value_attributes_and_content(@xmlnode)
+          Tools.set_ns_attribute(@xmlnode,'office','date-value', avalue.strftime('%Y-%m-%d'))
+          @xmlnode << LibXML::XML::Node.new('p', avalue.strftime('%Y-%m-%d'), ns_text) 
+        when gt == 'percentage'
+          set_type_attribute('float')
+          remove_all_value_attributes_and_content(@xmlnode)
+          Tools.set_ns_attribute(@xmlnode,'office','value', avalue.to_f.to_s) 
+          @xmlnode << LibXML::XML::Node.new('p', (avalue.to_f*100).round.to_s+'%', ns_text)
+      end
+    elsif (@mode == :repeated) or (@mode == :outbound ) # Cell did not exist individually yet, detach row and create editable cell
+      row = @parent_row.detach
+      row.cells(@col).value = avalue
+    else
+      raise "Unknown cell mode #{@mode}"
     end
   end
-  def set_ns_attribute(node,ns_prefix,key,value)
-    ns = Tools.get_namespace(ns_prefix)
-    attr = node.attributes.get_attribute_ns(ns.href, key)
-    if attr.nil?
-      attr = LibXML::XML::Attr.new(node, key,'temporarilyempty')
-      attr.namespaces.namespace = ns
-    end
-    attr.value = value
+  def remove_all_value_attributes_and_content(node)
+    if att = Tools.get_ns_attribute(@xmlnode, 'office','value') then att.remove! end
+    if att = Tools.get_ns_attribute(@xmlnode, 'office','date-value') then att.remove! end
+    @xmlnode.content=''
   end
   def set_type_attribute(typestring)
-    set_ns_attribute(@xmlnode,'office','value-type',typestring)
+    Tools.set_ns_attribute(@xmlnode,'office','value-type',typestring)
   end
   
   # based on @xmlnode and optionally value which is about to be assigned, guesses which type the result should be
@@ -99,21 +114,32 @@ class Cell
             raise "Unknown type from #{@xmlnode.to_s} / children size=#{@xmlnode.children.size.to_s} / type=#{type}"
           end
       end
-      # if not certain by value, but value present, then try converting to typeguess
-      result = if !avalue.nil? and !typeguess.nil?
-        if (typeguess(avalue) rescue false) # if convertible
+      
+      result =
+      if !typeguess.nil? # if not certain by value, but have a typeguess
+        if !avalue.nil?  # with value we may try converting
+          if (typeguess(avalue) rescue false) # if convertible then it is typeguess
+            typeguess
+          elsif (String(avalue) rescue false) # otherwise try string
+            String
+          else # if not convertible to anyhing concious then nil
+            nil 
+          end
+        else             # without value we just beleive typeguess
           typeguess
-        elsif (String(avalue) rescue false)
+        end
+      else # it not have a typeguess
+        if (String(avalue) rescue false) # convertible to String
           String
         else
-          nil # not convertible to anyhing concious
+          nil
         end
-      else
-        typeguess
       end
     end
-
     result
+  end
+  def inspect
+    "#<Cell:[#{row},#{col}]=#{value}(#{guess_cell_type.to_s})"
   end
 end
 
