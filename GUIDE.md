@@ -13,13 +13,13 @@ p sheet[1,1].class           # => String
 p sheet[1,1]                 # => "My top 5"
 
 # These are all the same values - alternative syntax
+p sheet.rows(1).cells(0).value   
+p sheet.cells(1,1).value
 p sheet.A1
 p sheet[1,1]
-p sheet.cells(0,0).value
-p sheet.rows(0).cells(0).value   
 
 # How to inspect/manipulate the Cell object
-sheet.cells(1,1)            # => Rspreadsheet::Cell
+sheet.cells(1,1)                 # => Rspreadsheet::Cell
 sheet.cells(1,1).format
 sheet.cells(1,1).format.size = 15
 sheet.cells(1,1).format.weight = bold
