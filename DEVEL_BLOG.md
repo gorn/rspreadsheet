@@ -20,7 +20,7 @@ Guiding ideas
 
 ### Automated testing
 
-  * ``guard`` will get tested any changes as soon as they are summitted
+  * ``budele exec guard`` will get tested any changes as soon as they are summitted
   * ``rake spec`` runs all test manually
 
 ### Automated utilities
