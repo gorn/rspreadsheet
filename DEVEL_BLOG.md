@@ -2,6 +2,7 @@ See [GUIDE.md](GUIDE.md#conventions) for syntax conventions.
 
 ## Ideas/wishlist
 
+  * What should be returned when asking for row/cell outside udes range? Currently it creates new row/cell on fly, but maybe it should only return nil, so the user needs to insert apropriate rows/cells himself before using them. However it spoils little bit syntax like spreadsheet.rows(5).cells(3) because if rows returns nil, that would fail and ugly constructs like spreadsheet.andand.rows(5).andand.cells(3) would be needed. The only way this could be acoided is by using something like "UncreatedRow" object. This concern falls to category "clash of worlds" like the indexing issue (0 vs 1 based) and many others.
   * In future inntroduce syntax like ``sheet.range('C3:E4')`` for mass operations. Also maybe ``sheet.cells('C3')`` or ``sheet.cells(3, 'C')`` etc.
   * Trying to make row Enumerable - perhaps skipping empty or undefined cells.
   * Accessors for nonempty/defined cells.
@@ -9,7 +10,12 @@ See [GUIDE.md](GUIDE.md#conventions) for syntax conventions.
   * Allow any of these:
     * ``book['Spring 2014']`` as alternative to ``book.worksheets('Spring 2014')`` ?
     * ``sheet.cells.F13`` as alternative to ``sheet.cells[14,5]`` ?
- 
+
+Guiding ideas
+  * xml document is always synchronized with the data. So the save is trivial.
+  * no duplication of data. Objects like RowArray should containg minimum information. This one exists solely to speed up cell search. Taken to extream it is questionable, whether we need such objects at all, it might be possible to always work with xml directly.
+
+    
 ## Developing this gem
 
 ### Automated testing
@@ -37,3 +43,7 @@ alternative way using ``gem`` command
     gem push rspreadsheet-x.y.z.gem
 
 
+### Naming conventions
+
+  * create_xxx - creates object and inserts it where necessary
+  * prepare_xxx - create object, but does not insert it anywhere
