@@ -23,10 +23,11 @@ class Cell
   def ns_office; @parent_row.xmlnode.doc.root.namespaces.find_by_prefix('office') end
   def ns_text; @parent_row.xmlnode.doc.root.namespaces.find_by_prefix('text') end
   def to_s; value end
-  def xml; self.source_node.to_s; end
-  def value_xml; self.source_node.children.first.children.first.to_s; end
+  def cell_xml; self.xmlnode.to_s; end
+  def xml; self.xmlnode.children.first.andand.inner_xml end
   def coordinates; [row,col]; end
   def row; @parent_row.row; end
+  def worksheet; @parent_row.worksheet; end
   def value
     gt = guess_cell_type
     if (@mode == :regular) or (@mode == @repeated)
@@ -87,7 +88,23 @@ class Cell
   def set_type_attribute(typestring)
     Tools.set_ns_attribute(@xmlnode,'office','value-type',typestring)
   end
-  
+  def type
+    case 
+      when guess_cell_type == Float  then :float
+      when guess_cell_type == String then :string
+      when guess_cell_type == Date   then :date
+      when guess_cell_type == 'percentage' then :percentage
+      when guess_cell_type == nil then :empty
+      else :unknown
+    end
+  end
+  # use this to find node in cell xml. ex. xmlfind('.//text:a') finds all link nodes
+  def xmlfindall(path)
+    xmlnode.find(path)
+  end
+  def xmlfindfirst(path)
+    xmlfindall(path).first
+  end
   # based on @xmlnode and optionally value which is about to be assigned, guesses which type the result should be
   def guess_cell_type(avalue=nil)
     # try guessing by value
@@ -106,7 +123,7 @@ class Cell
         when 'float' then Float
         when 'string' then String
         when 'date' then Date
-        when 'percentage' then 'percentage'
+        when 'percentage' then :percentage
         else 
           if @xmlnode.children.size == 0
             nil
@@ -141,26 +158,21 @@ class Cell
   def inspect
     "#<Cell:[#{row},#{col}]=#{value}(#{guess_cell_type.to_s})"
   end
+  def relative(rowdiff,coldiff)
+    worksheet.cells(self.row+rowdiff, self.col+coldiff)
+  end
 end
 
 end
 
-# ## initialize cells
-#   @cells = Hash.new do |hash, coords|
-#     # we create empty cell and place it to hash, we do not have to check whether there is a cell in XML already, because it would be in hash as well
-#     hash[coords]=Cell.new(coords[0],coords[1])
-#     # TODO: create XML empty node here or upon save?
-#   end
-#   rowi = 1
-#   unless @xmlnode.nil?
-#     @xmlnode.elements.select{ |node| node.name == 'table-row'}.each do |row_source_node|
-#       coli = 1
-#       row_source_node.elements.select{ |node| node.name == 'table-cell'}.each do |cell_source_node|
-#         initialize_cell(rowi,coli,cell_source_node)
-#         coli += 1
-#       end
-#       rowi += 1
-#     end
-#   end
+
+
+
+
+
+
+
+
+
 
 

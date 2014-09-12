@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Rspreadsheet::Tools do
   it 'converts correctly cell adresses' do
-    Rspreadsheet::Tools.convert_cell_address('A1') [0].should == 1
+    Rspreadsheet::Tools.convert_cell_address('A1')[0].should == 1
     Rspreadsheet::Tools.convert_cell_address('A1')[1].should == 1
     Rspreadsheet::Tools.convert_cell_address('C5')[0].should == 5
     Rspreadsheet::Tools.convert_cell_address('C5')[1].should == 3

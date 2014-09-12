@@ -32,6 +32,9 @@ sheet.cells(1,1).value = value
 
 p sheet.A1.class          # => Rspreadsheet::Cell
 
+# relative cells
+sheet.cells(4,7).relative(-1,0) # => cell 3,7
+
 # build the top five list
 (1..5).each { |i| sheet[i,1] = i }
 sheet.columns(1).format.bold = true

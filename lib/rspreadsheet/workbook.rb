@@ -26,7 +26,7 @@ class Workbook
     Zip::File.open(@filename) do |zip|
       # it is easy, because @xmlnode in in sync with contents all the time
       zip.get_output_stream('content.xml') do |f|
-        f.write @content_xml
+        f.write @content_xml.to_s(:indent => false)
       end
     end
   end

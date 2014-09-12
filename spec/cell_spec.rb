@@ -46,4 +46,17 @@ describe Rspreadsheet::Cell do
     @sheet2.cells(2,-5).should be(nil)
     @sheet2.cells(-2,-5).should be(nil)
   end
+  it 'has nonempty parents' do
+    @cell = @sheet2.cells(13,5)
+    @cell.parent_row.should_not be_nil
+    @cell.worksheet.should_not be_nil
+
+    @cell = @sheet1.cells(2,2)
+    @cell.parent_row.should_not be_nil
+    @cell.worksheet.should_not be_nil
+  end
+  it 'handles relative correctly' do
+    @sheet2.cells(3,3).relative(-1,+2).coordinates.should == [2,5]
+    @sheet2.cells(3,3).relative(0,0).coordinates.should == [3,3]
+  end
 end

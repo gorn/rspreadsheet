@@ -23,7 +23,7 @@ class Worksheet
     end
       
     ## initialize rows
-    @spredsheetrows=RowArray.new(@xmlnode)
+    @spredsheetrows=RowArray.new(self,@xmlnode)
   end
   def cells(r,c)
     rows(r).andand.cells(c)
@@ -36,10 +36,10 @@ class Worksheet
   end
   ## syntactic sugar follows
   def [](r,c)
-    cells(r,c).value
+    cells(r,c).andand.value
   end
   def []=(r,c,avalue)
-    cells(r,c).value=avalue
+    cells(r,c).andand.value=avalue
   end
   # allows syntax like sheet.F15
   def method_missing method_name, *args, &block

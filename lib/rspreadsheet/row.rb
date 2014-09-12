@@ -1,12 +1,14 @@
 require('rspreadsheet/cell')
-include Forwardable
+require('forwardable')
+
 
 # Currently this is only syntax sugar for cells and contains no functionality
 
 module Rspreadsheet
 
 class RowArray
-  def initialize(aworksheet_node)
+  def initialize(aworksheet,aworksheet_node)
+    @worksheet = aworksheet
     @worksheet_node = aworksheet_node
 
     # initialize @rowgroups from @worksheet_node
@@ -106,7 +108,7 @@ class RowArray
     @rowgroups[index..index]=replaceby
     result
   end
-  
+  def worksheet; @worksheet end
  private
   def get_row_group_index(rowi)
     @rowgroups.find_index{ |rowgroup| rowgroup.range.cover?(rowi) }
@@ -119,6 +121,8 @@ class Row
   def self.empty_row_node
     LibXML::XML::Node.new('table-row',nil, Tools.get_namespace('table'))
   end
+  def worksheet; @parent_array.worksheet end
+  def parent_array; @parent_array end  # for debug only
 end
 
 class RowWithXMLNode < Row

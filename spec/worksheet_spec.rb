@@ -47,4 +47,9 @@ describe Rspreadsheet::Worksheet do
     @sheet.name = 'Cofee'
     @sheet.name.should == 'Cofee'    
   end
+  it 'out of range indexes return nil value' do
+    @sheet[-1,-1].should == nil
+    @sheet[0,0].should == nil
+    @sheet[999,999].should == nil
+  end
 end
