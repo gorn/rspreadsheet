@@ -5,7 +5,7 @@ require 'rspreadsheet/tools'
 module Rspreadsheet
 
 class Worksheet
-  attr_accessor :name, :xmlnode
+  attr_accessor :name, :xmlnode, :spredsheetrows
 #   extend Forwardable
 #   def_delegators :nonemptycells
 
@@ -44,7 +44,7 @@ class Worksheet
   # allows syntax like sheet.F15
   def method_missing method_name, *args, &block
     if method_name.to_s.match(/^([A-Z]{1,3})(\d{1,8})(=?)$/)
-      row,col = Rspreadsheet::Tools.convert_cell_address($~[1],$~[2])
+      row,col = Rspreadsheet::Tools.convert_cell_address_to_coordinates($~[1],$~[2])
       assignchar = $~[3]
       if assignchar == '='
         self.cells(row,col).value = args.first

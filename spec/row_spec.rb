@@ -9,21 +9,57 @@ describe Rspreadsheet::Row do
     @row = @sheet2.rows(1)
     @c = @row.cells(1)
     @c.value = 3
-    @c.value.should == 3
+    @c.value.should == 3 
   end
-  it 'creates minimal row on demand, which contains correctly namespaced attributes only'do
-    @sheet1.rows(1).cells(2).value = 'nejakydata'
-    @row = @sheet1.rows(1)
-    @xmlnode = @row.xmlnode
-    @xmlnode.namespaces.to_a.size.should >5
-    @xmlnode.namespaces.namespace.should_not be_nil
-    @xmlnode.namespaces.namespace.prefix.should == 'table'
+  it 'can be detached and changes to unrepeated if done' do
+    @row = @sheet1.rows(5)
+    @row2 = @row.detach
+    @row2.repeated?.should == false    
+  end
+  it 'is the synchronized object, now matter how you access it' do
+#     @row1 = @sheet1.rows(5)
+#     @row2 = @sheet1.rows(5)
+#     @row1.should equal(@row2)
+    
+    @sheet1.rows(5).cells(2).value = 'nejakydata'
+    @row1 = @sheet1.rows(5)
+    @row2 = @sheet1.rows(5)
+    @row1.should equal(@row2)
+  
+  end
+  it 'creates minimal row on demand, which contains correctly namespaced attributes', focus: true do
+#     @sheet1.rows(5).cells(2).value = 'nejakydata'
+#     @row = @sheet1.rows(5)
+#     @xmlnode = @row.xmlnode 
+#     @xmlnode.namespaces.to_a.size.should >5
+#     @xmlnode.namespaces.namespace.should_not be_nil
+#     @xmlnode.namespaces.namespace.prefix.should == 'table'
+#     @row.repeated?.should == false
+    
+#     @sheet1.rows(5).cells(2).value = 'nejakydata'
+    @row2 = @sheet1.rows(5)
+    @row2.cells(2).value = 'nejakydata'
+#     @row2.detach
+    @sheet1.rows(5).repeated?.should == false
+    @row2.detach
+#     @row2.repeated?.should == false
+    binding.pry
+    
+#     @sheet1.rows(1).detach
+#     @sheet1.rows(1).repeated?.should == false 
+# 
+#     @sheet1.rows(2).cells(2).value = 'nejakydata'
+#     @sheet1.rows(2).repeated?.should == false
+# 
+#     @sheet1.rows(3).add_cell
+#     @sheet1.rows(2).repeated?.should == false    
   end
   it 'cells in row are settable through sheet' do
     @sheet1.rows(9).add_cell
     @sheet1.rows(9).cells(1).value = 2
     @sheet1.rows(9).cells(1).value.should == 2
     
+#     binding.pry
     @sheet1.rows(7).add_cell
     @sheet1.rows(7).cells(1).value = 7
     @sheet1.rows(7).cells(1).value.should == 7

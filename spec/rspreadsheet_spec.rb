@@ -1,14 +1,5 @@
 require 'spec_helper'
 
-describe Rspreadsheet::Tools do
-  it 'converts correctly cell adresses' do
-    Rspreadsheet::Tools.convert_cell_address('A1')[0].should == 1
-    Rspreadsheet::Tools.convert_cell_address('A1')[1].should == 1
-    Rspreadsheet::Tools.convert_cell_address('C5')[0].should == 5
-    Rspreadsheet::Tools.convert_cell_address('C5')[1].should == 3
-  end
-end
-
 describe Rspreadsheet do
   it 'can open ods testfile and reads its content correctly' do
     book = Rspreadsheet.new($test_filename)

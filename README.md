@@ -53,6 +53,12 @@ Or install it yourself as:
     
 gem is hosted on Rubygems - https://rubygems.org/gems/rspreadsheet
 
+If you get this or similar error
+
+    mkmf.rb can't find header files for ruby at /usr/lib/ruby/include/ruby.h 
+    
+then you might not have installed libxml for ruby. I.e. in debian something like <code>sudo aptitude install ruby-libxml</code> or using equivalent command in other package managers.
+
 ## Motivation and Ideas
 
 This project arised from the necessity. Alhought it is not true that there are no ruby gems allowing to acess OpenDOcument spreadsheet, I did not find another decent one which would suit my needs. Most of them also look abandoned and inactive. I have investigated these options:

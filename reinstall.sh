@@ -2,5 +2,5 @@
 
 cd rspreadsheet
 gem build rspreadsheet.gemspec
-gem install rspreadsheet-0.1.0.gem
+sudo gem install rspreadsheet-0.1.*.gem
 cd ..

@@ -3,14 +3,14 @@ module Rspreadsheet
 # this module contains methods used bz several objects
 module Tools
   # converts cell adress like 'F12' to pair od integers [row,col]
-  def self.convert_cell_address(*coords)
-    if coords.length == 1
-      coords[0].match(/^([A-Z]{1,3})(\d{1,8})$/)
+  def self.convert_cell_address_to_coordinates(*addr)
+    if addr.length == 1
+      addr[0].match(/^([A-Z]{1,3})(\d{1,8})$/)
       colname = $~[1]
       rowname = $~[2]
-    elsif coords.length == 2
-      colname = coords[0]
-      rowname = coords[1]
+    elsif addr.length == 2
+      colname = addr[0]
+      rowname = addr[1]
     else
       raise 'Wrong number of arguments'
     end
@@ -20,6 +20,27 @@ module Tools
     row = rowname.to_i
     return [row,col]
   end
+  def self.convert_cell_coordinates_to_address(*coords)
+    coords = coords[0] if coords.length == 1
+    raise 'Wrong number of arguments' if coords.length != 2
+    row = coords[0].to_i # security against string arguments
+    col = coords[1].to_i
+    colstring = ''
+    if col > 702
+      pom = (col-703).div(26*26)+1
+      colstring += (pom+64).chr
+      col -= pom*26*26
+    end
+    if col > 26
+      pom = (col-27).div(26)+1
+      colstring += (pom+64).chr
+      col -= pom*26
+    end
+    colstring += (col+64).chr
+    return colstring+row.to_s
+  end
+  def self.c2a(*x); convert_cell_coordinates_to_address(*x) end
+  def self.a2c(*x); convert_cell_address_to_coordinates(*x) end
   def self.get_namespace(prefix)
     ns_array = {
       'office'=>"urn:oasis:names:tc:opendocument:xmlns:office:1.0",
@@ -93,6 +114,9 @@ module Tools
   def self.remove_ns_attribute(node,ns_prefix,key)
     node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key)
     attr.remove! unless attr.nil? 
+  end
+  def self.create_ns_node(nodename,ns_prefix)
+    LibXML::XML::Node.new(nodename,nil, Tools.get_namespace(ns_prefix))
   end
 end
  

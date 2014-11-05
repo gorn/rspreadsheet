@@ -9,28 +9,35 @@ class Cell
   def self.empty_cell_node
     LibXML::XML::Node.new('table-cell',nil, Tools.get_namespace('table'))
   end
-  def initialize(aparent_row,coli,asource_node=nil)
+  def initialize(aparent_row,coli,axmlnode=nil)
     raise "First parameter should be Row object not #{aparent_row.class}" unless aparent_row.kind_of?(Rspreadsheet::Row)
-    @mode = :regular
     @parent_row = aparent_row
-    if asource_node.nil?
-      asource_node = Cell.empty_cell_node
+    if axmlnode.nil?
+      axmlnode = Cell.empty_cell_node
     end
-    @xmlnode = asource_node
+    @xmlnode = axmlnode
     @col = coli
+    # set @mode
+    @mode = case
+      when !@parent_row.used_col_range.include?(coli) then :outbound
+      when Tools.get_ns_attribute_value(@xmlnode, 'table', 'number-columns-repeated').to_i>1  then :repeated
+      else:regular
+    end
   end
   def ns_table; @parent_row.xmlnode.doc.root.namespaces.find_by_prefix('table') end
   def ns_office; @parent_row.xmlnode.doc.root.namespaces.find_by_prefix('office') end
   def ns_text; @parent_row.xmlnode.doc.root.namespaces.find_by_prefix('text') end
   def to_s; value end
-  def cell_xml; self.xmlnode.to_s; end
+  def cell_xml; self.xmlnode.to_s end
   def xml; self.xmlnode.children.first.andand.inner_xml end
-  def coordinates; [row,col]; end
-  def row; @parent_row.row; end
-  def worksheet; @parent_row.worksheet; end
+  def coordinates; [row,col] end
+  def address; Rspreadsheet::Tools.c2a(row,col) end
+  def row; @parent_row.row end
+  def worksheet; @parent_row.worksheet end
+  def is_repeated?; @mode == :repeated end
   def value
     gt = guess_cell_type
-    if (@mode == :regular) or (@mode == @repeated)
+    if (@mode == :regular) or (@mode == :repeated)
       case 
         when gt == nil then nil
         when gt == Float then @xmlnode.attributes['value'].to_f
@@ -74,8 +81,8 @@ class Cell
           @xmlnode << LibXML::XML::Node.new('p', (avalue.to_f*100).round.to_s+'%', ns_text)
       end
     elsif (@mode == :repeated) or (@mode == :outbound ) # Cell did not exist individually yet, detach row and create editable cell
-      row = @parent_row.detach
-      row.cells(@col).value = avalue
+      @parent_row = @parent_row.detach  # TODO tohle by melo bejt inplace !
+      @parent_row.cells(@col).value = avalue
     else
       raise "Unknown cell mode #{@mode}"
     end
@@ -139,7 +146,7 @@ class Cell
             typeguess
           elsif (String(avalue) rescue false) # otherwise try string
             String
-          else # if not convertible to anyhing concious then nil
+          else # if not convertible to anything concious then nil
             nil 
           end
         else             # without value we just beleive typeguess
@@ -156,7 +163,7 @@ class Cell
     result
   end
   def inspect
-    "#<Cell:[#{row},#{col}]=#{value}(#{guess_cell_type.to_s})"
+    "#<Rspreadsheet::Cell:Cell\n row:#{row}, col:#{col} address:#{address}\n type: #{guess_cell_type.to_s}, value:#{value}\n mode: #{mode}\n>"
   end
   def relative(rowdiff,coldiff)
     worksheet.cells(self.row+rowdiff, self.col+coldiff)

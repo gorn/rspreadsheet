@@ -1,28 +1,57 @@
 require('rspreadsheet/cell')
 require('forwardable')
 
-
 # Currently this is only syntax sugar for cells and contains no functionality
 
 module Rspreadsheet
 
-class RowArray
-  def initialize(aworksheet,aworksheet_node)
-    @worksheet = aworksheet
-    @worksheet_node = aworksheet_node
+# XmlTiedArrayItemGroup is internal representation of repeated items in XmlTiedArray.
+class XmlTiedArrayItemGroup
+#   extend Forwardable
+#   delegate [:normalize ] => :@row_group
 
-    # initialize @rowgroups from @worksheet_node
-    @rowgroups = []
-    unless @worksheet_node.nil?
-      @worksheet_node.elements.select{|node| node.name == 'table-row'}.each do |row_source_node|
-        @rowgroups << prepare_row_group(row_source_node) # it is in @worksheet_node so suffices to add object to @rowgroups
+  def normalize; @rowgroup.normalize  end
+  def range; @rowgroup.range end
+  def repeated?; self.range.size>1 end
+  def xmlnode; @rowgroup.xmlnode end
+
+  def initialize(aparent_array,arange,axmlnode=nil)
+    @rowgroup = RowGroup.new(aparent_array,arange,axmlnode)
+  end
+  def self.new_from_xml
+  end
+  def to_rowgroup
+    @rowgroup
+  end
+  def range=(arange)
+    
+  end
+end
+
+# array which synchronizes with xml structure and reflects. number-xxx-repeated attributes
+# also caches returned objects for indexes.
+# options must contain
+#   :xml_items, :xml_repeated_attribute, :object_type
+
+class XmlTiedArray < Array
+  def initialize(axmlnode, options={}) # TODO get rid of XmlTiedArray
+    @xmlnode = axmlnode
+    @options = options
+    
+    missing_options = [:xml_repeated_attribute,:xml_items_node_name,:object_type]-@options.keys
+    raise "Some options missing (#{missing_options.inspect})" unless missing_options.empty?
+    
+    unless @xmlnode.nil?
+      @xmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |group_source_node|
+        self << parse_xml_to_group(group_source_node) # it is in @xmlnode so suffices to add object to @rowgroups
       end
     end
+    @itemcache=Hash.new()
   end
-  def prepare_row_group(size_or_xmlnode)  # appends new RowGroup at the end
+  def parse_xml_to_group(size_or_xmlnode) # parses xml to new RowGroup which can be added at the end
     # reading params
     if size_or_xmlnode.kind_of? LibXML::XML::Node
-      size = (size_or_xmlnode['number-rows-repeated'] || 1).to_i
+      size = (size_or_xmlnode[@options[:xml_repeated_attribute]] || 1).to_i
       node = size_or_xmlnode
     elsif size_or_xmlnode.to_i>0
       size = size_or_xmlnode.to_i
@@ -30,66 +59,61 @@ class RowArray
     else
       return nil
     end
-    index = first_unused_row_index
-    
+    index = first_unused_index
     # construct result
-    RowGroup.new(self,index..index+size-1,node).normalize
+    Rspreadsheet::XmlTiedArrayItemGroup.new(self,index..index+size-1,node)
   end
-  def add_row_group(size_or_xmlnode)
-    result = prepare_row_group(size_or_xmlnode)
-    @rowgroups << result
-    @worksheet_node << result.xmlnode
+  def add_item_group(size_or_xmlnode)
+    result = parse_xml_to_group(size_or_xmlnode)
+    self << result
+    @xmlnode << result.xmlnode
     result
   end
-  def get_row_group(rowi)
-    @rowgroups.find{ |rowgroup| rowgroup.range.cover?(rowi) }
-  end
-  def get_row(rowi)
-    rg = get_row_group(rowi).andand.normalize
-    case rg
-      when SingleRow then rg
-      when RowGroup then MemberOfRowGroup.new(rowi, rg)
-      when nil
-       if rowi>0 then UninitializedEmptyRow.new(self,rowi) else nil end
-      else raise
-    end
+  def first_unused_index
+    empty? ? 1 : last.range.end+1
   end
   # prolonges the RowArray to cantain rowi and returns it
-  def detach_of_bound_row_group(rowi)
-    fill_row_group_size = rowi-first_unused_row_index
+  def detach_of_bound_item(index)
+    fill_row_group_size = index-first_unused_index
     if fill_row_group_size>0
-      add_row_group(fill_row_group_size) 
+      add_item_group(fill_row_group_size) 
     end
-    add_row_group(1)
-    return get_row(rowi)
+    add_item_group(1)
+    get_item(index)   # aby se odpoved nacacheovala
   end
-  def first_unused_row_index
-    if @rowgroups.empty? 
-      1
+  def get_item_group(index)
+    find{ |item_group| item_group.range.cover?(index) }
+  end
+  def detach_item(index); get_item(index) end # TODO předělat do lazy podoby, kdy tohle nebude stejny
+  def get_item(index)
+    if index>= first_unused_index
+      nil
     else
-      @rowgroups.last.range.end+1
+      @itemcache[index] ||= Rspreadsheet::XmlTiedArrayItem.new(self,index)
     end
   end
-  # This detaches row rowi from the group and perhaps splits the RowGroup
+  # This detaches item index from the group and perhaps splits the RowGroup
   # into two pieces. This makes the row individually editable.
-  def detach(rowi)
-    index = get_row_group_index(rowi)
-    row_group = @rowgroups[index]
-    range = row_group.range
+  def detach(index)
+    group_index = get_group_index(index)
+    item_group = self[group_index]
+    range = item_group.range
+    return self if range==(index..index)
 
     # prepare new components
     replaceby = []
-    replaceby << RowGroup.new(self,range.begin..rowi-1)
-    replaceby << (result = SingleRow.new(self,rowi))
-    replaceby << RowGroup.new(self,rowi+1..range.end)
+    replaceby << RowGroup.new(self,range.begin..index-1)
+    replaceby << (result = SingleRow.new(self,index))
+    replaceby << RowGroup.new(self,index+1..range.end)
     
     # put original range somewhere in replaceby and shorten it
-    if rowi>range.begin
-      replaceby[0] = row_group
-      row_group.range = range.begin..rowi-1
+    
+    if index>range.begin
+      replaceby[0] = item_group
+      item_group.range = range.begin..index-1
     else
-      replaceby[2] = row_group
-      row_group.range = rowi+1..range.end
+      replaceby[2] = item_group
+      item_group.range = index+1..range.end
     end
     
     # normalize and delete empty parts
@@ -97,40 +121,98 @@ class RowArray
     
     # do the replacement in xml
     marker = LibXML::XML::Node.new('temporarymarker')
-    row_group.xmlnode.next = marker
-    row_group.xmlnode.remove!
+    item_group.xmlnode.next = marker
+    item_group.xmlnode.remove!
     replaceby.each{ |rg| 
       marker.prev = rg.xmlnode
     } 
     marker.remove!
     
     # do the replacement in array
-    @rowgroups[index..index]=replaceby
+    self[group_index..group_index]=replaceby
     result
   end
+  private
+  def get_group_index(index)
+    self.find_index{ |rowgroup| rowgroup.range.cover?(index) }
+  end
+end
+
+class XmlTiedArrayItem
+  attr_reader :index
+  def initialize(aarray,aindex)
+    @array = aarray
+    @index = aindex
+    if self.virtual?
+      @object = nil
+    else
+      @object = @array.options[:object_type].new(group.xmlnode)
+    end
+  end
+  def group; @array.get_item_group(index) end
+  def repeated?; group.repeated? end
+  def virtual?; ! self.repeated? end
+  def array
+    raise 'Group empty' if @group.nil? 
+    @array
+  end
+end
+
+class RowArray < XmlTiedArray
+  attr_reader :row_array_cache
+  def initialize(aworksheet,aworksheet_node)
+    @worksheet = aworksheet
+    @row_array_cache = Hash.new()
+    super(aworksheet_node, :xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated', :object_type=>Row)
+  end
+  def get_row(rowi)
+    if @row_array_cache.has_key?(rowi)
+      return @row_array_cache[rowi]
+    end
+    item = self.get_item(rowi)
+    @row_array_cache[rowi] = if item.nil?
+      if rowi>0 then Rspreadsheet::UninitializedEmptyRow.new(self,rowi) else nil end
+    else
+      if item.repeated?
+	Rspreadsheet::MemberOfRowGroup.new(item.index, item.group.to_rowgroup)
+      else
+	Rspreadsheet::SingleRow.new_from_rowgroup(item.group.to_rowgroup)
+      end
+    end
+  end
+  # aliases
+  def first_unused_row_index; first_unused_index end
   def worksheet; @worksheet end
- private
-  def get_row_group_index(rowi)
-    @rowgroups.find_index{ |rowgroup| rowgroup.range.cover?(rowi) }
+  def detach_of_bound_row_group(index)
+    super(index)
+    return get_row(index)
   end
 end
 
 class Row
-  @readonly = :unknown
-  # ? @rowindex 
+  def initialize
+    @readonly = :unknown
+    @cells = {}
+  end
   def self.empty_row_node
     LibXML::XML::Node.new('table-row',nil, Tools.get_namespace('table'))
   end
   def worksheet; @parent_array.worksheet end
   def parent_array; @parent_array end  # for debug only
+  def used_col_range; 1..first_unused_column_index-1  end
+  def used_range; used_col_range  end
+  def first_unused_column_index; raise 'this should be redefined in subclasses' end
+  def cells(coli)
+    coli = coli.to_i
+    return nil if coli.to_i<=0
+    @cells[coli] ||= get_cell(coli)
+  end
 end
 
 class RowWithXMLNode < Row
   attr_accessor :xmlnode
   def style_name=(value); Tools.set_ns_attribute(@xmlnode,'table','style-name',value)  end
-  def cells(coli)
-    coli = coli.to_i
-    return nil if coli.to_i<=0
+  def get_cell(coli)
     Cell.new(self,coli,cellnodes(coli))
   end
   def nonemptycells
@@ -142,9 +224,6 @@ class RowWithXMLNode < Row
       !(cellnode.content.nil? or cellnode.content.empty? or cellnode.content =='') or
       !cellnode.attributes.to_a.reject{ |attr| attr.name == 'number-columns-repeated'}.empty?
     end
-  end
-  def used_col_range
-    1..first_unused_column_index-1
   end
   def cellnodes(coli)
     cellnode = nil
@@ -167,10 +246,6 @@ class RowWithXMLNode < Row
     @xmlnode << cell.xmlnode
     cell
   end
-  def used_range
-    fu = first_unused_column_index
-    (fu>1) ? 1..fu : nil
-  end
   def first_unused_column_index
     1 + @xmlnode.elements.select{|n| n.name=='table-cell'}.reduce(0) do |sum, el|
       sum + (Tools.get_ns_attribute_value(el, 'table', 'number-columns-repeated') || 1).to_i
@@ -183,6 +258,7 @@ class RowGroup < RowWithXMLNode
   attr_reader :range
   attr_accessor :parent_array, :xmlnode
   def initialize(aparent_array,arange,axmlnode=nil)
+    super()
     @parent_array = aparent_array
     @range = arange
     if axmlnode.nil?
@@ -212,6 +288,7 @@ class SingleRow < RowWithXMLNode
   attr_accessor :xmlnode
   # index  Integer
   def initialize(aparent_array,aindex,axmlnode=nil)
+    super()
     @parent_array = aparent_array
     @index = aindex
     if axmlnode.nil?
@@ -222,21 +299,21 @@ class SingleRow < RowWithXMLNode
   def self.new_from_rowgroup(rg)
     anode = rg.xmlnode
     Tools.remove_ns_attribute(anode,'table','number-rows-repeated')
-    
     SingleRow.new(rg.parent_array,rg.range.begin,anode)
   end
   def normalize; self end
   def repeated?; false end
   def repeated; 1 end
   def range; (@index..@index) end
-  def detach; true end
+  def detach; self end
   def row; @index end
-  
+  def still_out_of_used_range?; false end
 end
 
 class LazyDetachableRow < Row
   @readonly = :yes_but_detachable
   def initialize(rowi)
+    super()
     @index = rowi.to_i
   end
   def add_cell; detach.add_cell end
@@ -256,13 +333,18 @@ class MemberOfRowGroup < LazyDetachableRow
   def initialize(arowi,arow_group)
     super(arowi)
     @row_group = arow_group
-    raise 'Wrong parameter given' unless @row_group.is_a? RowGroup
+    raise 'Wrong parameter given - class is '+@row_group.class.to_a unless @row_group.is_a? RowGroup
   end
   def detach  # detaches MemberOfRowGroup from its RowGroup perhaps splitting RowGroup
     @row_group.parent_array.detach(@index)
   end
-  def cells(coli)
-    Cell.new(self,coli,@row_group.cellnodes(coli)).tap{|n| n.mode = :repeated}
+  def get_cell(coli)
+    c = Cell.new(self,coli,@row_group.cellnodes(coli))
+    c.mode = :repeated
+    c
+  end
+  def first_unused_column_index
+    @row_group.first_unused_column_index
   end
   def nonemptycells
     @row_group.nonemptycellsindexes.collect{ |coli| cells(coli) }
@@ -277,9 +359,9 @@ class UninitializedEmptyRow < LazyDetachableRow
     super(arowi)
     @parent_array = aparent_array
   end
-  def cells(coli)
+  def get_cell(coli)
     if still_out_of_used_range?
-      Cell.new(self,coli,Cell.empty_cell_node).tap{|n| n.mode = :outbound}
+      Cell.new(self,coli,nil)
     else
       @parent_array.get_row(@index).cells(coli)
     end
@@ -291,10 +373,13 @@ class UninitializedEmptyRow < LazyDetachableRow
       @parent_array.get_row(@index)
     end
   end
-  def detach; @parent_array.detach_of_bound_row_group(@index) end
+  def detach; @parent_array.detach_item(@index) end
+  def detach_cell(col)
+    self.detach.detach_cell(col)
+  end
   def still_out_of_used_range?; @index >= @parent_array.first_unused_row_index end
   def xmlnode; Row.empty_row_node end
-  def nonemptycells; [] end
+  def first_unused_column_index; 1 end
 end
 
 end

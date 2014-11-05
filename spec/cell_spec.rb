@@ -59,4 +59,20 @@ describe Rspreadsheet::Cell do
     @sheet2.cells(3,3).relative(-1,+2).coordinates.should == [2,5]
     @sheet2.cells(3,3).relative(0,0).coordinates.should == [3,3]
   end
+  it 'is automatically "unrepeated" on value assignement' do
+    @cell = @sheet2.cells(13,2)
+    @cell.is_repeated?.should == true
+#     binding.pry
+#     @cell.value = 'cokoli'
+#     @cell.is_repeated?.should == false
+#     @cell.value.should == 'cokoli'
+#     @sheet2.cells(13,1).should_not == 'cokoli'
+#     @sheet2.cells(13,3).should_not == 'cokoli'
+#     @sheet2.cells(13,4).should_not == 'cokoli'
+  end
 end
+
+
+
+
+
