@@ -106,7 +106,7 @@ module Tools
     end
   end
   def self.get_ns_attribute(node,ns_prefix,key)
-    node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key)
+    node.nil? ? nil : node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key)
   end
   def self.get_ns_attribute_value(node,ns_prefix,key)
     Tools.get_ns_attribute(node,ns_prefix,key).andand.value

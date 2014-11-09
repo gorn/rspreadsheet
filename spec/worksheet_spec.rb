@@ -7,23 +7,25 @@ describe Rspreadsheet::Worksheet do
   it 'contains nonempty xml in rows for testfile' do
     @sheet.rows(1).xmlnode.elements.size.should be >1
   end
-  it 'freshly created has correctly namespaced xmlnode' do
-    @spreadsheet = Rspreadsheet.new
-    @spreadsheet.create_worksheet
-    @xmlnode = @spreadsheet.worksheets[1].xmlnode
-    @xmlnode.namespaces.to_a.size.should >5
-    @xmlnode.namespaces.find_by_prefix('office').should_not be_nil
-    @xmlnode.namespaces.find_by_prefix('table').should_not be_nil
-    @xmlnode.namespaces.namespace.should_not be_nil
-    @xmlnode.namespaces.namespace.prefix.should == 'table'
+  it 'uses detach_subnode_respect_repeated well' do
+    @xmlnode = @sheet.xmlnode
+    nod = @sheet.detach_subnode_respect_repeated(@xmlnode, 50, {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
+    @sheet.detach_subnode_respect_repeated(nod, 12, {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'})
   end
- 
 end
 
 describe Rspreadsheet::Worksheet do
   before do
     book = Rspreadsheet.new
     @sheet = book.create_worksheet
+  end
+  it 'freshly created has correctly namespaced xmlnode' do
+    @xmlnode = @sheet.xmlnode
+    @xmlnode.namespaces.to_a.size.should >5
+    @xmlnode.namespaces.find_by_prefix('office').should_not be_nil
+    @xmlnode.namespaces.find_by_prefix('table').should_not be_nil
+    @xmlnode.namespaces.namespace.should_not be_nil
+    @xmlnode.namespaces.namespace.prefix.should == 'table'
   end
   it 'remembers the value stored to A1 cell' do
     @sheet[1,1].should == nil
@@ -52,4 +54,4 @@ describe Rspreadsheet::Worksheet do
     @sheet[0,0].should == nil
     @sheet[999,999].should == nil
   end
-end
+end 

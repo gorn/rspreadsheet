@@ -9,13 +9,13 @@ describe Rspreadsheet::Cell do
   end
   it 'contains good row and col coordinates' do
     @cell = @sheet1.cells(1,3)
-    @cell.row.should == 1
-    @cell.col.should == 3
+    @cell.rowi.should == 1
+    @cell.coli.should == 3
     @cell.coordinates.should == [1,3]
     
     @cell = @sheet2.cells(7,2)
-    @cell.row.should == 7
-    @cell.col.should == 2
+    @cell.rowi.should == 7
+    @cell.coli.should == 2
     @cell.coordinates.should == [7,2]
   end
   it 'can be referenced by more vars and both are synchronized' do
@@ -38,8 +38,8 @@ describe Rspreadsheet::Cell do
   it 'contains good row and col coordinates even after table:number-columns-repeated cells' do
     @cell = @sheet2.cells(13,5)
     @cell.value.should == 'afterrepeated'
-    @cell.row.should == 13
-    @cell.col.should == 5
+    @cell.rowi.should == 13
+    @cell.coli.should == 5
   end
   it 'does not accept negative and zero coordinates' do
     @sheet2.cells(0,5).should be(nil)
@@ -48,11 +48,11 @@ describe Rspreadsheet::Cell do
   end
   it 'has nonempty parents' do
     @cell = @sheet2.cells(13,5)
-    @cell.parent_row.should_not be_nil
+    @cell.row.should_not be_nil
     @cell.worksheet.should_not be_nil
 
     @cell = @sheet1.cells(2,2)
-    @cell.parent_row.should_not be_nil
+    @cell.row.should_not be_nil
     @cell.worksheet.should_not be_nil
   end
   it 'handles relative correctly' do
@@ -62,13 +62,12 @@ describe Rspreadsheet::Cell do
   it 'is automatically "unrepeated" on value assignement' do
     @cell = @sheet2.cells(13,2)
     @cell.is_repeated?.should == true
-#     binding.pry
-#     @cell.value = 'cokoli'
-#     @cell.is_repeated?.should == false
-#     @cell.value.should == 'cokoli'
-#     @sheet2.cells(13,1).should_not == 'cokoli'
-#     @sheet2.cells(13,3).should_not == 'cokoli'
-#     @sheet2.cells(13,4).should_not == 'cokoli'
+    @cell.value = 'cokoli'
+    @cell.is_repeated?.should == false
+    @cell.value.should == 'cokoli'
+    @sheet2.cells(13,1).should_not == 'cokoli'
+    @sheet2.cells(13,3).should_not == 'cokoli'
+    @sheet2.cells(13,4).should_not == 'cokoli'
   end
 end
 

@@ -14,12 +14,12 @@ describe Rspreadsheet::Row do
   it 'can be detached and changes to unrepeated if done' do
     @row = @sheet1.rows(5)
     @row2 = @row.detach
-    @row2.repeated?.should == false    
+    @row2.is_repeated?.should == false    
   end
   it 'is the synchronized object, now matter how you access it' do
-#     @row1 = @sheet1.rows(5)
-#     @row2 = @sheet1.rows(5)
-#     @row1.should equal(@row2)
+    @row1 = @sheet1.rows(5)
+    @row2 = @sheet1.rows(5)
+    @row1.should equal(@row2)
     
     @sheet1.rows(5).cells(2).value = 'nejakydata'
     @row1 = @sheet1.rows(5)
@@ -27,40 +27,10 @@ describe Rspreadsheet::Row do
     @row1.should equal(@row2)
   
   end
-  it 'creates minimal row on demand, which contains correctly namespaced attributes', focus: true do
-#     @sheet1.rows(5).cells(2).value = 'nejakydata'
-#     @row = @sheet1.rows(5)
-#     @xmlnode = @row.xmlnode 
-#     @xmlnode.namespaces.to_a.size.should >5
-#     @xmlnode.namespaces.namespace.should_not be_nil
-#     @xmlnode.namespaces.namespace.prefix.should == 'table'
-#     @row.repeated?.should == false
-    
-#     @sheet1.rows(5).cells(2).value = 'nejakydata'
-    @row2 = @sheet1.rows(5)
-    @row2.cells(2).value = 'nejakydata'
-#     @row2.detach
-    @sheet1.rows(5).repeated?.should == false
-    @row2.detach
-#     @row2.repeated?.should == false
-    binding.pry
-    
-#     @sheet1.rows(1).detach
-#     @sheet1.rows(1).repeated?.should == false 
-# 
-#     @sheet1.rows(2).cells(2).value = 'nejakydata'
-#     @sheet1.rows(2).repeated?.should == false
-# 
-#     @sheet1.rows(3).add_cell
-#     @sheet1.rows(2).repeated?.should == false    
-  end
   it 'cells in row are settable through sheet' do
-    @sheet1.rows(9).add_cell
     @sheet1.rows(9).cells(1).value = 2
     @sheet1.rows(9).cells(1).value.should == 2
     
-#     binding.pry
-    @sheet1.rows(7).add_cell
     @sheet1.rows(7).cells(1).value = 7
     @sheet1.rows(7).cells(1).value.should == 7
     
@@ -82,27 +52,44 @@ describe Rspreadsheet::Row do
     @sheet1.rows(10).should be_kind_of(Rspreadsheet::Row)
     @sheet1.rows(11).should be_kind_of(Rspreadsheet::Row)
   end
-  it 'detachment works as expected' do
+  it 'detachment creates correct repeated groups' do
     @sheet1.rows(5).detach
     @sheet1.rows(5).repeated?.should == false
     @sheet1.rows(5).repeated.should == 1
     @sheet1.rows(5).xmlnode.should_not == nil
+
     @sheet1.rows(3).repeated?.should == true
     @sheet1.rows(3).repeated.should == 4
     @sheet1.rows(3).xmlnode.should_not == nil
-    @table_ns_href = "urn:oasis:names:tc:opendocument:xmlns:table:1.0"
-    @sheet1.rows(3).xmlnode.attributes.get_attribute_ns(@table_ns_href,'number-rows-repeated').value.should == '4'
+    @sheet1.rows(3).xmlnode.attributes.get_attribute_ns("urn:oasis:names:tc:opendocument:xmlns:table:1.0",'number-rows-repeated').value.should == '4'
+  end
+  it 'detachment assigns correct namespaces to node' do
+    @sheet1.rows(5).detach
+    @xmlnode = @sheet1.rows(5).xmlnode 
+    @xmlnode.namespaces.to_a.size.should >5
+    @xmlnode.namespaces.namespace.should_not be_nil
+    @xmlnode.namespaces.namespace.prefix.should == 'table'   
   end
   it 'by assigning value, the repeated row is automatically detached' do
-    row = @sheet1.rows(5)
-    row.detach
-    @table_ns_href = "urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+    @sheet1.rows(15).detach
+  
+    @sheet1.rows(2).repeated?.should == true
+    @sheet1.rows(2).cells(2).value = 'nejakydata'
+    @sheet1.rows(2).repeated?.should == false
+    
+    @sheet1.rows(22).repeated?.should == true
+    @sheet1.rows(22).cells(7).value = 'nejakydata'
+    @sheet1.rows(22).repeated?.should == false
+  end    
+  it 'styles can be assigned to rows' do
+    @sheet1.rows(5).detach
+    table_ns_href = "urn:oasis:names:tc:opendocument:xmlns:table:1.0"
     
     @sheet1.rows(5).style_name = 'newstylename'
-    @sheet1.rows(5).xmlnode.attributes.get_attribute_ns(@table_ns_href,'style-name').value.should == 'newstylename'
+    @sheet1.rows(5).xmlnode.attributes.get_attribute_ns(table_ns_href,'style-name').value.should == 'newstylename'
 
     @sheet1.rows(17).style_name = 'newstylename2'
-    @sheet1.rows(17).xmlnode.attributes.get_attribute_ns(@table_ns_href,'style-name').value.should == 'newstylename2'
+    @sheet1.rows(17).xmlnode.attributes.get_attribute_ns(table_ns_href,'style-name').value.should == 'newstylename2'
   end
   it 'ignores negative any zero row indexes' do
     @sheet1.rows(0).should be_nil
@@ -111,7 +98,7 @@ describe Rspreadsheet::Row do
   it 'has correct rowindex' do
     @sheet1.rows(5).detach
     (4..6).each do |i|
-      @sheet1.rows(i).row.should == i
+      @sheet1.rows(i).rowi.should == i
     end
   end
   it 'can open ods testfile and read its content' do
@@ -125,12 +112,12 @@ describe Rspreadsheet::Row do
     s[1,2].should === 'text'
     s[2,2].should === Date.new(2014,1,1)
   end
-  it 'normalizes to itself if single line' do
-    @sheet1.rows(5).detach
-    @sheet1.rows(5).cells(4).value='test'
-    @sheet1.rows(5).normalize
-    @sheet1.rows(5).cells(4).value.should == 'test'
-  end
+#   it 'normalizes to itself if single line' do
+#     @sheet1.rows(5).detach
+#     @sheet1.rows(5).cells(4).value='test'
+#     @sheet1.rows(5).normalize
+#     @sheet1.rows(5).cells(4).value.should == 'test'
+#   end
   it 'cell manipulation does not contain attributes without namespace nor doubled attributes' do # inspired by a real bug regarding namespaces manipulation
     @sheet2.rows(1).xmlnode.attributes.each { |attr| attr.ns.should_not be_nil}
     @sheet2.rows(1).cells(1).value.should_not == 'xyzxyz'
@@ -152,11 +139,15 @@ describe Rspreadsheet::Row do
     @row1.cells(5).value.should == 'hojala'
   end
   it 'nonempty cells work properly' do
+    binding.pry
+    @sheet2.find_nonempty_subnode_indexes(@sheet2.rowxmlnode(1), {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'}).should == [[1,1],[1,2]]
+    @sheet2.row_nonempty_cells_coordinates(1).should == [[1,1],[1,2]]
+    
     nec = @sheet2.rows(1).nonemptycells
-    nec.collect{ |c| [c.row,c.col]}.should == [[1,1],[1,2]]
+    nec.collect{ |c| c.coordinates}.should == [[1,1],[1,2]]
     
     nec = @sheet2.rows(19).nonemptycells
-    nec.collect{ |c| [c.row,c.col]}.should == [[19,6]]
+    nec.collect{ |c| c.coordinates}.should == [[19,6]]
   end
 end
 

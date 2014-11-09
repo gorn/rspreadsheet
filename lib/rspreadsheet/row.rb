@@ -5,6 +5,69 @@ require('forwardable')
 
 module Rspreadsheet
 
+class Row < RowOrNode
+  attr_reader :worksheet, :rowi
+  def initialize(aworksheet,arowi)
+    @worksheet = aworksheet
+    @rowi = arowi
+  end
+  def xmlnode; @worksheet.rowxmlnode(@rowi) end
+  def cells(coli)
+    coli = coli.to_i
+    if coli.to_i<=0
+      nil 
+    else 
+      Cell.new(@worksheet,@rowi,coli)
+    end
+  end
+  def self.empty_xmlnode(repeats=1)
+    node = LibXML::XML::Node.new('table-row',nil, Tools.get_namespace('table'))
+    Tools.set_ns_attribute(node,'table','number-rows-repeated',repeats, 1)
+    node
+  end
+  def detach_if_needed; 
+    detach if repeated?
+  end
+  def detach
+    @worksheet.detach_row_in_xml(@rowi)
+    self
+  end
+  def repeated
+    (Tools.get_ns_attribute_value(self.xmlnode, 'table', 'number-rows-repeated') || 1).to_i
+  end
+  def repeated?; mode==:repeated || mode==:outbound end
+  alias :is_repeated? :repeated?
+  def style_name=(value); 
+    detach_if_needed
+    Tools.set_ns_attribute(xmlnode,'table','style-name',value)
+  end
+  def used_range
+    @worksheet.rowrange(@rowi)
+  end
+  def nonemptycells
+    nonemptycellsindexes.collect{ |index| cells(index) }
+  end
+  def nonemptycellsindexes
+    @worksheet.row_nonempty_cells_coordinates(@rowi)
+  end
+end
+
+# class Row
+#   def initialize
+#     @readonly = :unknown
+#     @cells = {}
+#   end
+#   def worksheet; @parent_array.worksheet end
+#   def parent_array; @parent_array end  # for debug only
+#   def used_col_range; 1..first_unused_column_index-1  end
+#   def used_range; used_col_range  end
+#   def first_unused_column_index; raise 'this should be redefined in subclasses' end
+# end
+
+  
+#  -------------------------- 
+  
+  
 # XmlTiedArrayItemGroup is internal representation of repeated items in XmlTiedArray.
 class XmlTiedArrayItemGroup
 #   extend Forwardable
@@ -189,25 +252,25 @@ class RowArray < XmlTiedArray
   end
 end
 
-class Row
-  def initialize
-    @readonly = :unknown
-    @cells = {}
-  end
-  def self.empty_row_node
-    LibXML::XML::Node.new('table-row',nil, Tools.get_namespace('table'))
-  end
-  def worksheet; @parent_array.worksheet end
-  def parent_array; @parent_array end  # for debug only
-  def used_col_range; 1..first_unused_column_index-1  end
-  def used_range; used_col_range  end
-  def first_unused_column_index; raise 'this should be redefined in subclasses' end
-  def cells(coli)
-    coli = coli.to_i
-    return nil if coli.to_i<=0
-    @cells[coli] ||= get_cell(coli)
-  end
-end
+# class Row
+#   def initialize
+#     @readonly = :unknown
+#     @cells = {}
+#   end
+#   def self.empty_row_node
+#     LibXML::XML::Node.new('table-row',nil, Tools.get_namespace('table'))
+#   end
+#   def worksheet; @parent_array.worksheet end
+#   def parent_array; @parent_array end  # for debug only
+#   def used_col_range; 1..first_unused_column_index-1  end
+#   def used_range; used_col_range  end
+#   def first_unused_column_index; raise 'this should be redefined in subclasses' end
+#   def cells(coli)
+#     coli = coli.to_i
+#     return nil if coli.to_i<=0
+#     @cells[coli] ||= get_cell(coli)
+#   end
+# end
 
 class RowWithXMLNode < Row
   attr_accessor :xmlnode
