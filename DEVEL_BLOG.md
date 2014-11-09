@@ -11,6 +11,7 @@ See [GUIDE.md](GUIDE.md#conventions) for syntax conventions.
     * ``book['Spring 2014']`` as alternative to ``book.worksheets('Spring 2014')`` ?
     * ``sheet.cells.F13`` as alternative to ``sheet.cells[14,5]`` ?
   * We may have problem with the @parent_row concept in cells. If cell has repeated row as parent and it is detached in some other code, the cell never finds out that its parent_row was changed. A cure to this might be, when there are no "unatacched" cells, and when all cells belong to some row. This way if row detaches it can let know to all its cells.
+  * Document that there is a little distinction betwean RSpreadsheet and RSpreadsheet::Workbook. The former delegates everythink to the other.
 
 Guiding ideas
   * xml document is always synchronized with the data. So the save is trivial.

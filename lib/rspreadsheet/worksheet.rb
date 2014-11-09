@@ -32,7 +32,7 @@ class Worksheet
     find_subnode_range_respect_repeated(@xmlnode, rowi, {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
   end
 
-  def row_nonempty_cells_coordinates(rowi)
+  def row_nonempty_cells_col_indexes(rowi)
     arowxmlnode = rowxmlnode(rowi)
     if arowxmlnode.nil?
       []
@@ -52,6 +52,10 @@ class Worksheet
  
   def cellrange(coli)
     find_subnode_range_respect_repeated(@xmlnode, rowi, {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
+  end
+  
+  def first_unused_row_index
+    find_first_unused_index_respect_repeated(xmlnode, {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
   end
   
   def detach_row_in_xml(rowi)
@@ -109,17 +113,26 @@ class Worksheet
     end
     return (index+1..Float::INFINITY)
   end
+  
   def find_nonempty_subnode_indexes(axmlnode, options)
     index = 0
     result = []
     axmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
       repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
-      if !(node.content.nil? or node.content.empty? or node.content =='') or repeated==1
-	repeated==1
+      index = index + repeated
+      if !(node.content.nil? or node.content.empty? or node.content =='') and (repeated==1)
         result << index
       end
     end
     return result
+  end
+  def find_first_unused_index_respect_repeated(axmlnode, options)
+    index = 0
+    axmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
+      repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
+      index = index+repeated
+    end
+    return index+1
   end
   
   def cells(r,c)
@@ -153,7 +166,7 @@ class Worksheet
     end
   end
   def used_rows_range
-    1..@spredsheetrows.first_unused_row_index-1
+    1..self.first_unused_row_index-1
   end
 end
 

@@ -139,10 +139,6 @@ describe Rspreadsheet::Row do
     @row1.cells(5).value.should == 'hojala'
   end
   it 'nonempty cells work properly' do
-    binding.pry
-    @sheet2.find_nonempty_subnode_indexes(@sheet2.rowxmlnode(1), {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'}).should == [[1,1],[1,2]]
-    @sheet2.row_nonempty_cells_coordinates(1).should == [[1,1],[1,2]]
-    
     nec = @sheet2.rows(1).nonemptycells
     nec.collect{ |c| c.coordinates}.should == [[1,1],[1,2]]
     

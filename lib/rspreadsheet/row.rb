@@ -48,7 +48,7 @@ class Row < RowOrNode
     nonemptycellsindexes.collect{ |index| cells(index) }
   end
   def nonemptycellsindexes
-    @worksheet.row_nonempty_cells_coordinates(@rowi)
+    @worksheet.row_nonempty_cells_col_indexes(@rowi)
   end
 end
 

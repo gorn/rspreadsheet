@@ -22,7 +22,7 @@ describe Rspreadsheet do
     @sheet2 = book2.worksheets[1]
     
     @sheet1.nonemptycells.each do |cell|       # and test identity
-      @sheet2[cell.row,cell.col].should == cell.value
+      @sheet2[cell.rowi,cell.coli].should == cell.value
     end
   end
   it 'can open and save file, and saved file is exactly same as original' do
