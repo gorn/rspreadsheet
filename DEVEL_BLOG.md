@@ -33,15 +33,17 @@ Guiding ideas
 
 ### Local manual testing and releasing (to github released, ).
 
-    gem build rspreadsheet.gemspec
-    sudo gem install rspreadsheet-x.y.z.gem
-    gem push rspreadsheet-x.y.z.gem
+    gem build rspreadsheet.gemspec              -\   These two lines together are in install.sh
+    sudo gem install rspreadsheet-x.y.z.gem     -/   which should be invoked from parent directory
+    gem push rspreadsheet-x.y.z.gem             releases the gem, do not forgot to update version in rspreadsheet.gemspec before doing this
 
 alternative way using ``rake`` command - release is more automatic
 
-  * ``rake build`` - builds the gem to pkg directory. 
-  * ``sudo rake install`` - If this fails with "mkmf.rb can't find header files for ruby at /usr/lib/ruby/include/ruby.h" you may want to ``sudo aptitude install ruby-dev``
-  * Now can locally and manually use/test the gem. This should not be replacement for automated testing. 
+  1. build and install locally
+    * ``rake build`` - builds the gem to pkg directory. 
+    * ``sudo rake install`` - If this fails with "mkmf.rb can't find header files for ruby at /usr/lib/ruby/include/ruby.h" you may want to ``sudo aptitude install ruby-dev``
+  * Now can locally and manually use/test the gem. This should not be replacement for automated testing. If you make some changes, repeat step 1.
+  * When happy, increment the version number and deploy in next step.
   * ``rake release`` - creates a version tag in git and pushes the code to github + Rubygems. After this is succesfull the new version appears as release in Github and RubyGems.
 
 
