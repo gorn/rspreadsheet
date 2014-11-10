@@ -51,19 +51,20 @@ class Cell < RowOrNode
     result = valueguess
 
     if valueguess.nil? # valueguess is most important
-      # if not succesfull then try guessing by type
-      type = xmlnode.nil? ? nil : xmlnode.attributes['value-type'].to_s 
-      typeguess = case type
+      # if not succesfull then try guessing by type from node xml
+      typ = xmlnode.nil? ? 'N/A' : xmlnode.attributes['value-type']
+      typeguess = case typ
         when nil then nil
         when 'float' then Float
         when 'string' then String
         when 'date' then Date
         when 'percentage' then :percentage
+        when 'N/A' then :unassigned
         else 
           if xmlnode.children.size == 0
             nil
           else 
-            raise "Unknown type from #{@xmlnode.to_s} / children size=#{@xmlnode.children.size.to_s} / type=#{type}"
+            raise "Unknown type at #{coordinates.to_s} from #{xmlnode.to_s} / children size=#{xmlnode.children.size.to_s} / type=#{xmlnode.attributes['value-type'].to_s}"
           end
       end
 
@@ -140,7 +141,18 @@ class Cell < RowOrNode
     @worksheet.cells(self.rowi+rowdiff, self.coli+coldiff)
   end
   def is_repeated?; mode == :repeated end
-
+  def type
+    gct = guess_cell_type
+    case 
+      when gct == Float  then :float
+      when gct == String then :string
+      when gct == Date   then :date
+      when gct == :percentage then :percentage
+      when gct == :unassigned then :unassigned
+      when gct == nil then :unknown
+      else :unknown
+    end
+  end
 end
   
   
@@ -172,16 +184,6 @@ end
 #   def address; Rspreadsheet::Tools.c2a(row,col) end
 #   def row; @parent_row.row end
 #   def worksheet; @parent_row.worksheet end
-#   def type
-#     case 
-#       when guess_cell_type == Float  then :float
-#       when guess_cell_type == String then :string
-#       when guess_cell_type == Date   then :date
-#       when guess_cell_type == 'percentage' then :percentage
-#       when guess_cell_type == nil then :empty
-#       else :unknown
-#     end
-#   end
 #   # use this to find node in cell xml. ex. xmlfind('.//text:a') finds all link nodes
 #   def xmlfindall(path)
 #     xmlnode.find(path)

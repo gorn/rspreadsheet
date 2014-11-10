@@ -52,9 +52,6 @@ describe Rspreadsheet do
     book.worksheets[1].rows(1).cells(1).value ='xyzxyz'
     book.worksheets[1].rows(1).cells(1).value.should == 'xyzxyz'
     
-#     book.worksheets[1][1,1].should_not == 'xyzxyz'
-#     book.worksheets[1][1,1]='xyzxyz'
-#     book.worksheets[1][1,1].should == 'xyzxyz'
     book.save(tmp_filename)                    # and save it as temp file
     
     # now compare them

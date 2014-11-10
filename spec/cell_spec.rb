@@ -69,6 +69,17 @@ describe Rspreadsheet::Cell do
     @sheet2.cells(13,3).should_not == 'cokoli'
     @sheet2.cells(13,4).should_not == 'cokoli'
   end
+  it 'returns type for the cell' do
+    book = Rspreadsheet.new($test_filename)
+    s = book.worksheets[1]
+    s.cells(1,2).type.should === :string
+    s.cells(2,2).type.should === :date
+    s.cells(3,1).type.should === :float
+    s.cells(3,2).type.should === :percentage
+    s.cells(4,2).type.should === :string
+    s.cells(200,200).type.should === :unassigned
+  end
+
 end
 
 
