@@ -1,6 +1,6 @@
 guard 'rspec' do
-  # watch /lib/ files
-  watch(%r{^lib/(.+).rb$}) do |m|
+  # watch /lib/rspreadsheet/ files
+  watch(%r{^lib/rspreadsheet/(.+).rb$}) do |m|
     "spec/#{m[1]}_spec.rb"
   end
 

@@ -13,7 +13,10 @@ describe Rspreadsheet::Row do
   end
   it 'can be detached and changes to unrepeated if done' do
     @row = @sheet1.rows(5)
+    @row.xmlnode.andand.name.should_not == 'table-row'
+    
     @row2 = @row.detach
+    @row2.xmlnode.name.should == 'table-row'
     @row2.is_repeated?.should == false    
   end
   it 'is the synchronized object, now matter how you access it' do
@@ -112,12 +115,6 @@ describe Rspreadsheet::Row do
     s[1,2].should === 'text'
     s[2,2].should === Date.new(2014,1,1)
   end
-#   it 'normalizes to itself if single line' do
-#     @sheet1.rows(5).detach
-#     @sheet1.rows(5).cells(4).value='test'
-#     @sheet1.rows(5).normalize
-#     @sheet1.rows(5).cells(4).value.should == 'test'
-#   end
   it 'cell manipulation does not contain attributes without namespace nor doubled attributes' do # inspired by a real bug regarding namespaces manipulation
     @sheet2.rows(1).xmlnode.attributes.each { |attr| attr.ns.should_not be_nil}
     @sheet2.rows(1).cells(1).value.should_not == 'xyzxyz'
@@ -132,7 +129,7 @@ describe Rspreadsheet::Row do
     duplication_hash = xmlattrs.inject(Hash.new(0)){ |h,e| h[e] += 1; h }
     duplication_hash.each { |k,v| v.should_not >1 }  # should not contain duplicates
   end
-  it 'out of bount automagically generated row pick up values when created' do
+  it 'out of bound automagically generated row pick up values when created' do
     @row1 = @sheet1.rows(23)
     @row2 = @sheet1.rows(23)
     @row2.cells(5).value = 'hojala'
@@ -144,6 +141,37 @@ describe Rspreadsheet::Row do
     
     nec = @sheet2.rows(19).nonemptycells
     nec.collect{ |c| c.coordinates}.should == [[19,6]]
+  end
+  it 'is the same object no matter when you access it' do
+    @row1 = @sheet2.rows(5)
+    @row2 = @sheet2.rows(5)
+    @row1.should equal(@row2)
+  end
+  it 'reports good range of coordinates for repeated rows' do
+    @row2 = @sheet2.rows(15)
+    @row2.mode.should == :repeated
+    @row2.range.should == (14..18)
+    
+    @sheet1.rows(15).detach
+  
+    @sheet1.rows(2).repeated?.should == true
+    @sheet1.rows(2).range.should  == (1..14)
+    
+    @sheet1.rows(22).repeated?.should == true
+    @sheet1.rows(22).range.should  == (16..Float::INFINITY)
+  end
+  it 'shifts rows if new one is added in the middle' do
+    @sheet1.rows(15).detach
+    @sheet1.rows(20).detach
+    @row = @sheet1.rows(16)
+    
+    @row.range.should == (16..19)
+    
+#     binding.pry
+    @sheet1.insert_row_above(7)
+    @sheet1.rows(17).range.should == (17..20)
+    @row.range.should == (17..20)
+    @sheet1.rows(17).should equal(@row)    
   end
 end
 

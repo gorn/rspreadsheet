@@ -2,7 +2,7 @@ require 'andand'
 
 module Rspreadsheet
 
-class RowOrNode
+class XMLTiedItem
   def mode
    case
      when xmlnode.nil? then :outbound
@@ -10,10 +10,42 @@ class RowOrNode
      else :regular
    end
   end
+  def repeated; (Tools.get_ns_attribute_value(xmlnode, 'table', xml_repeated_attribute) || 1 ).to_i end
+  def repeated?; mode==:repeated || mode==:outbound end
+  def is_repeated?; mode == :repeated end
+  def xmlnode
+    parentnode = parent.xmlnode
+    if parentnode.nil?
+      nil
+    else
+      parent.find_my_subnode_respect_repeated(index, xml_options)
+    end
+  end
 end
 
-class Cell < RowOrNode
+module XMLTiedArray
+  def find_subnode_respect_repeated(axmlnode, aindex, options)
+    index = 0
+    axmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
+      repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
+      index = index+repeated
+      return node if index>= aindex
+    end
+    return nil
+  end
+  def find_my_subnode_respect_repeated(index, options)
+    find_subnode_respect_repeated(xmlnode,index, options)
+  end
+end
+
+class Cell < XMLTiedItem
   attr_accessor :worksheet, :rowi, :coli
+  def xml_repeated_attribute;  'number-columns-repeated' end
+  def xml_items_node_name; 'table-cell' end
+  def xml_options; {:xml_items_node_name => xml_items_node_name, :xml_repeated_attribute => xml_repeated_attribute} end
+  def parent; row end
+  def index; @coli end
+    
   def initialize(aworksheet,arowi,acoli)
     @worksheet = aworksheet
     @rowi = arowi
@@ -21,8 +53,6 @@ class Cell < RowOrNode
   end
   def row; @worksheet.rows(rowi) end
   def coordinates; [rowi,coli] end
-
-  def xmlnode; @worksheet.cellxmlnode(@rowi,@coli) end
   def value
     gt = guess_cell_type
     if (self.mode == :regular) or (self.mode == :repeated)
@@ -39,7 +69,6 @@ class Cell < RowOrNode
       raise "Unknown cell mode #{self.mode}"
     end
   end
-  def repeated; (Tools.get_ns_attribute_value(xmlnode, 'table', 'number-columns-repeated') || 1 ).to_i end
   def guess_cell_type(avalue=nil)
     # try guessing by value
     valueguess = case avalue
@@ -140,7 +169,6 @@ class Cell < RowOrNode
   def relative(rowdiff,coldiff)
     @worksheet.cells(self.rowi+rowdiff, self.coli+coldiff)
   end
-  def is_repeated?; mode == :repeated end
   def type
     gct = guess_cell_type
     case 
@@ -153,13 +181,17 @@ class Cell < RowOrNode
       else :unknown
     end
   end
+  def range
+    @worksheet.find_subnode_range_respect_repeated(row.xmlnode, coli, {:xml_items_node_name => xml_items_node_name, :xml_repeated_attribute => xml_repeated_attribute})
+  end
+  def shift_by(diff)
+    @coli = @coli + diff
+  end
 end
   
   
 # class Cell
-#   attr_reader :col, :xmlnode
 #   attr_reader  :parent_row  # for debug only
-#   attr_accessor :mode
 #   def self.empty_cell_node
 #     LibXML::XML::Node.new('table-cell',nil, Tools.get_namespace('table'))
 #   end
@@ -174,12 +206,11 @@ end
 #     # set @mode
 #     @mode = case
 #       when !@parent_row.used_col_range.include?(coli) then :outbound
-#       when Tools.get_ns_attribute_value(@xmlnode, 'table', 'number-columns-repeated').to_i>1  then :repeated
+#       when Tools.get_ns_attribute_value(@xmlnode, 'table', @@xml_repeated_attribute).to_i>1  then :repeated
 #       else:regular
 #     end
 #   end
 #   def to_s; value end
-#   def cell_xml; self.xmlnode.to_s end
 #   def xml; self.xmlnode.children.first.andand.inner_xml end
 #   def address; Rspreadsheet::Tools.c2a(row,col) end
 #   def row; @parent_row.row end

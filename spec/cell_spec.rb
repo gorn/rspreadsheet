@@ -41,6 +41,11 @@ describe Rspreadsheet::Cell do
     @cell.rowi.should == 13
     @cell.coli.should == 5
   end
+  it 'reports good range of coordinates for repeated cells' do
+    @cell = @sheet2.cells(13,2)
+    @cell.range.should == (1..4)
+    @cell.mode.should == :repeated
+  end
   it 'does not accept negative and zero coordinates' do
     @sheet2.cells(0,5).should be(nil)
     @sheet2.cells(2,-5).should be(nil)
@@ -79,7 +84,66 @@ describe Rspreadsheet::Cell do
     s.cells(4,2).type.should === :string
     s.cells(200,200).type.should === :unassigned
   end
+  it 'is the same object no matter how you access it' do
+    @cell1 = @sheet2.cells(5,5)
+    @cell2 = @sheet2.rows(5).cells(5)
+    @cell1.should equal(@cell2)
+  end
+  it 'splits correctly cells if written in the middle of repeated group' do
+    @cell = @sheet2.cells(4,6)
+    @cell.range.should == (4..7)
+    @cell.value.should == 7
+    
+    @cell.value = 'nebesa'
+    @cell.range.should == (6..6)
+    @cell.value.should == 'nebesa'
+    
+    @cellA = @sheet2.cells(4,5)
+    @cellA.range.should == (4..5)
+    @cellA.value.should == 7
+    
+    @cellB = @sheet2.cells(4,7)
+    @cellB.range.should == (7..7)
+    @cellB.value.should == 7
+  end
+  it 'inserts correctly cell in the middle of repeated group' do
+    @cell = @sheet2.cells(4,6)
+    @cell.range.should == (4..7)
+    @cell.value.should == 7
+    
+    @sheet2.insert_cell(4,6,:shift_right)
+    
+    @cellA = @sheet2.cells(4,5)
+    @cellA.range.should == (4..5)
+    @cellA.value.should == 7
+    
+    @cellB = @sheet2.cells(4,7)
+    @cellB.range.should == (7..8)
+    @cellB.value.should == 7
+    
+    @cell = @sheet2.cells(16,4)
+    @cell.range.should == (1..7)
+    @cell.value.should == ""
+    
+    @sheet2.rows(15).range.should == (14..18)
+    @sheet2.rows(16).range.should == (14..18)
+    @sheet2.rows(17).range.should == (14..18)
+    @sheet2.insert_cell(16,3,:shift_right)
+    @sheet2.cells(16,3).value = 'baf'
+    @sheet2.cells(17,3).value.should_not == 'baf'
+    @sheet2.rows(15).range.should == (14..15)
+    @sheet2.rows(16).range.should == (16..16)
+    @sheet2.rows(17).range.should == (17..18)
+    
+    @cellA = @sheet2.cells(16,1)
+    @cellA.range.should == (1..2)
+    @cellA.value.should == ""
+    
+    @cellB = @sheet2.cells(16,5)
+    @cellB.range.should == (4..8)
+    @cellB.value.should == ""
 
+  end
 end
 
 
