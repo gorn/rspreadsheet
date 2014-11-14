@@ -7,10 +7,9 @@ describe Rspreadsheet::Worksheet do
   it 'contains nonempty xml in rows for testfile' do
     @sheet.rows(1).xmlnode.elements.size.should be >1
   end
-  it 'uses detach_subnode_respect_repeated well' do
-    @xmlnode = @sheet.xmlnode
-    nod = @sheet.detach_subnode_respect_repeated(@xmlnode, 50, {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
-    @sheet.detach_subnode_respect_repeated(nod, 12, {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'})
+  it 'uses detach_my_subnode_respect_repeated well' do
+    @sheet.detach_my_subnode_respect_repeated(50, {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
+    @sheet.rows(50).detach_my_subnode_respect_repeated(12, {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'})
   end
 end
 
@@ -53,5 +52,8 @@ describe Rspreadsheet::Worksheet do
     @sheet[-1,-1].should == nil
     @sheet[0,0].should == nil
     @sheet[999,999].should == nil
+  end
+  it 'returns nil with negative index' do
+    @sheet.rows(-1).should == nil
   end
 end 

@@ -1,4 +1,4 @@
-require "rspreadsheet/version"
+require 'rspreadsheet/version'
 require 'rspreadsheet/workbook'
 require 'rspreadsheet/worksheet'
 require 'class_extensions'

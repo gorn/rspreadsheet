@@ -1,43 +1,8 @@
 require 'andand'
+require 'rspreadsheet/xml_tied'
 
 module Rspreadsheet
-
-class XMLTiedItem
-  def mode
-   case
-     when xmlnode.nil? then :outbound
-     when repeated>1  then :repeated
-     else :regular
-   end
-  end
-  def repeated; (Tools.get_ns_attribute_value(xmlnode, 'table', xml_repeated_attribute) || 1 ).to_i end
-  def repeated?; mode==:repeated || mode==:outbound end
-  def is_repeated?; mode == :repeated end
-  def xmlnode
-    parentnode = parent.xmlnode
-    if parentnode.nil?
-      nil
-    else
-      parent.find_my_subnode_respect_repeated(index, xml_options)
-    end
-  end
-end
-
-module XMLTiedArray
-  def find_subnode_respect_repeated(axmlnode, aindex, options)
-    index = 0
-    axmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
-      repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
-      index = index+repeated
-      return node if index>= aindex
-    end
-    return nil
-  end
-  def find_my_subnode_respect_repeated(index, options)
-    find_subnode_respect_repeated(xmlnode,index, options)
-  end
-end
-
+  
 class Cell < XMLTiedItem
   attr_accessor :worksheet, :rowi, :coli
   def xml_repeated_attribute;  'number-columns-repeated' end
@@ -45,6 +10,7 @@ class Cell < XMLTiedItem
   def xml_options; {:xml_items_node_name => xml_items_node_name, :xml_repeated_attribute => xml_repeated_attribute} end
   def parent; row end
   def index; @coli end
+  def set_index(value); @coli=value end
     
   def initialize(aworksheet,arowi,acoli)
     @worksheet = aworksheet
@@ -53,6 +19,8 @@ class Cell < XMLTiedItem
   end
   def row; @worksheet.rows(rowi) end
   def coordinates; [rowi,coli] end
+  def to_s; value.to_s end
+
   def value
     gt = guess_cell_type
     if (self.mode == :regular) or (self.mode == :repeated)
@@ -67,6 +35,59 @@ class Cell < XMLTiedItem
       nil
     else
       raise "Unknown cell mode #{self.mode}"
+    end
+  end
+  def value=(avalue)
+    detach_if_needed
+    if self.mode == :regular
+      gt = guess_cell_type(avalue)
+      case
+        when gt == nil then raise 'This value type is not storable to cell'
+        when gt == Float 
+          set_type_attribute('float')
+          remove_all_value_attributes_and_content(xmlnode)
+          Tools.set_ns_attribute(xmlnode,'office','value', avalue.to_s) 
+          xmlnode << LibXML::XML::Node.new('p', avalue.to_f.to_s, Tools.get_namespace('text'))
+        when gt == String then
+          set_type_attribute('string')
+          remove_all_value_attributes_and_content(xmlnode)
+          xmlnode << LibXML::XML::Node.new('p', avalue.to_s, Tools.get_namespace('text'))
+        when gt == Date then 
+          set_type_attribute('date')
+          remove_all_value_attributes_and_content(xmlnode)
+          Tools.set_ns_attribute(xmlnode,'office','date-value', avalue.strftime('%Y-%m-%d'))
+          xmlnode << LibXML::XML::Node.new('p', avalue.strftime('%Y-%m-%d'), Tools.get_namespace('text')) 
+        when gt == 'percentage'
+          set_type_attribute('float')
+          remove_all_value_attributes_and_content(xmlnode)
+          Tools.set_ns_attribute(xmlnode,'office','value', avalue.to_f.to_s) 
+          xmlnode << LibXML::XML::Node.new('p', (avalue.to_f*100).round.to_s+'%', Tools.get_namespace('text'))
+      end
+    else
+      raise "Unknown cell mode #{self.mode}"
+    end
+  end
+  def set_type_attribute(typestring)
+    Tools.set_ns_attribute(xmlnode,'office','value-type',typestring)
+  end
+  def remove_all_value_attributes_and_content(node)
+    if att = Tools.get_ns_attribute(node, 'office','value') then att.remove! end
+    if att = Tools.get_ns_attribute(node, 'office','date-value') then att.remove! end
+    node.content=''
+  end
+  def relative(rowdiff,coldiff)
+    @worksheet.cells(self.rowi+rowdiff, self.coli+coldiff)
+  end
+  def type
+    gct = guess_cell_type
+    case 
+      when gct == Float  then :float
+      when gct == String then :string
+      when gct == Date   then :date
+      when gct == :percentage then :percentage
+      when gct == :unassigned then :unassigned
+      when gct == nil then :unknown
+      else :unknown
     end
   end
   def guess_cell_type(avalue=nil)
@@ -120,78 +141,9 @@ class Cell < XMLTiedItem
     end
     result
   end
-  def detach_if_needed
-    if (self.mode == :repeated) or (self.mode == :outbound ) # Cell did not exist individually yet, detach row and create editable cell
-      @worksheet.detach_cell_in_xml(rowi,coli)
-    end
- end
-  def value=(avalue)
-    detach_if_needed
-    if self.mode == :regular
-      gt = guess_cell_type(avalue)
-      case
-        when gt == nil then raise 'This value type is not storable to cell'
-        when gt == Float 
-          set_type_attribute('float')
-          remove_all_value_attributes_and_content(xmlnode)
-          Tools.set_ns_attribute(xmlnode,'office','value', avalue.to_s) 
-          xmlnode << LibXML::XML::Node.new('p', avalue.to_f.to_s, ns_text)
-        when gt == String then
-          set_type_attribute('string')
-          remove_all_value_attributes_and_content(xmlnode)
-          xmlnode << LibXML::XML::Node.new('p', avalue.to_s, ns_text)
-        when gt == Date then 
-          set_type_attribute('date')
-          remove_all_value_attributes_and_content(xmlnode)
-          Tools.set_ns_attribute(xmlnode,'office','date-value', avalue.strftime('%Y-%m-%d'))
-          xmlnode << LibXML::XML::Node.new('p', avalue.strftime('%Y-%m-%d'), ns_text) 
-        when gt == 'percentage'
-          set_type_attribute('float')
-          remove_all_value_attributes_and_content(xmlnode)
-          Tools.set_ns_attribute(xmlnode,'office','value', avalue.to_f.to_s) 
-          xmlnode << LibXML::XML::Node.new('p', (avalue.to_f*100).round.to_s+'%', ns_text)
-      end
-    else
-      raise "Unknown cell mode #{self.mode}"
-    end
-  end
-  def set_type_attribute(typestring)
-    Tools.set_ns_attribute(xmlnode,'office','value-type',typestring)
-  end
-  def remove_all_value_attributes_and_content(node)
-    if att = Tools.get_ns_attribute(node, 'office','value') then att.remove! end
-    if att = Tools.get_ns_attribute(node, 'office','date-value') then att.remove! end
-    node.content=''
-  end
-  def ns_table; xmlnode.doc.root.namespaces.find_by_prefix('table') end
-  def ns_office; xmlnode.doc.root.namespaces.find_by_prefix('office') end
-  def ns_text; xmlnode.doc.root.namespaces.find_by_prefix('text') end
-  def relative(rowdiff,coldiff)
-    @worksheet.cells(self.rowi+rowdiff, self.coli+coldiff)
-  end
-  def type
-    gct = guess_cell_type
-    case 
-      when gct == Float  then :float
-      when gct == String then :string
-      when gct == Date   then :date
-      when gct == :percentage then :percentage
-      when gct == :unassigned then :unassigned
-      when gct == nil then :unknown
-      else :unknown
-    end
-  end
-  def range
-    @worksheet.find_subnode_range_respect_repeated(row.xmlnode, coli, {:xml_items_node_name => xml_items_node_name, :xml_repeated_attribute => xml_repeated_attribute})
-  end
-  def shift_by(diff)
-    @coli = @coli + diff
-  end
 end
   
-  
 # class Cell
-#   attr_reader  :parent_row  # for debug only
 #   def self.empty_cell_node
 #     LibXML::XML::Node.new('table-cell',nil, Tools.get_namespace('table'))
 #   end
@@ -210,7 +162,6 @@ end
 #       else:regular
 #     end
 #   end
-#   def to_s; value end
 #   def xml; self.xmlnode.children.first.andand.inner_xml end
 #   def address; Rspreadsheet::Tools.c2a(row,col) end
 #   def row; @parent_row.row end

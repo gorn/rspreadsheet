@@ -111,7 +111,7 @@ describe Rspreadsheet::Cell do
     @cell.range.should == (4..7)
     @cell.value.should == 7
     
-    @sheet2.insert_cell(4,6,:shift_right)
+    @sheet2.insert_cell_before(4,6)
     
     @cellA = @sheet2.cells(4,5)
     @cellA.range.should == (4..5)
@@ -128,7 +128,7 @@ describe Rspreadsheet::Cell do
     @sheet2.rows(15).range.should == (14..18)
     @sheet2.rows(16).range.should == (14..18)
     @sheet2.rows(17).range.should == (14..18)
-    @sheet2.insert_cell(16,3,:shift_right)
+    @sheet2.insert_cell_before(16,3)
     @sheet2.cells(16,3).value = 'baf'
     @sheet2.cells(17,3).value.should_not == 'baf'
     @sheet2.rows(15).range.should == (14..15)
@@ -143,6 +143,10 @@ describe Rspreadsheet::Cell do
     @cellB.range.should == (4..8)
     @cellB.value.should == ""
 
+  end
+  it 'inserted has correct class' do # based on real error
+    @sheet2.insert_cell_before(1,1)
+    @sheet2.rows(1).cells(1).should be_kind_of(Rspreadsheet::Cell)
   end
 end
 

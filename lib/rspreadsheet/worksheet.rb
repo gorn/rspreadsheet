@@ -6,10 +6,11 @@ module Rspreadsheet
 
 class Worksheet
   include XMLTiedArray
-  attr_accessor :name, :xmlnode, :rowcache
+  attr_accessor :name, :xmlnode
+  def subitem_xml_options; {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'} end
 
   def initialize(xmlnode_or_sheet_name)
-    @rowcache=Hash.new    
+    @itemcache=Hash.new    
     # set up the @xmlnode according to parameter
     case xmlnode_or_sheet_name
       when LibXML::XML::Node
@@ -41,138 +42,35 @@ class Worksheet
     if arowxmlnode.nil?
       nil
     else
-      find_subnode_respect_repeated(arowxmlnode, coli, {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'})
+      rors(rowi).find_my_subnode_respect_repeated(coli, {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'})
     end
   end
  
   def first_unused_row_index
-    find_first_unused_index_respect_repeated(xmlnode, {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
+    find_first_unused_index_respect_repeated({:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
   end
+  
   def insert_row_above(arowi)
-    @rowcache.keys.sort.reverse.select{|i| i>=arowi }.each do |i| 
-      @rowcache[i+1]=@rowcache.delete(i)
-      @rowcache[i+1].shift_by(1)
-    end
-    @rowcache[arowi] =  insert_subnode_before_respect_repeated(xmlnode,arowi,{:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
+    insert_subitem_before(arowi)
   end
-  def insert_cell(arowi,acoli,shift_direction)
+  
+  def insert_cell_before(arowi,acoli)
     detach_row_in_xml(arowi)
-    @row = rows(arowi)
-    if shift_direction == :shift_right
-      @row.cellcache.keys.sort.reverse.select{|i| i>=acoli }.each do |i| 
-	@row.cellcache[i+1]=@row.cellcache.delete(i)
-	@row.cellcache[i+1].shift_by(1)
-      end
-      @row.cellcache[arowi] =  insert_subnode_before_respect_repeated(@row.xmlnode,acoli,{:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'})
-    else
-      raise 'Unrecognized shift direction. Available values: :shift_right'
-    end
+    rows(arowi).insert_subitem_before(acoli)
   end
   
   def detach_row_in_xml(rowi)
-    return detach_subnode_respect_repeated(xmlnode, rowi, {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
-  end
-  def detach_cell_in_xml(rowi,coli)
-    rownode = detach_row_in_xml(rowi)
-    return detach_subnode_respect_repeated(rownode, coli, {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'})
+    return detach_my_subnode_respect_repeated(rowi, {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
   end
   
-  def insert_subnode_before_respect_repeated(axmlnode,aindex, options)
-    index = 0
-    axmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
-      repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
-      oldindex = index
-      index = index+repeated
-      if index>= aindex  # found the node, now do the insert
-        ranges = [oldindex+1..aindex-1,aindex..index].reject {|range| range.size<1}
-        ranges.each do |range|
-          newnode = node.copy(true)
-          Tools.set_ns_attribute(newnode,'table',options[:xml_repeated_attribute],range.size,1)
-          node.prev = newnode
-        end
-        newnode = LibXML::XML::Node.new(options[:xml_items_node_name],nil, Tools.get_namespace('table'))
-	node.prev.prev = newnode
-        node.remove!
-        return find_subnode_respect_repeated(axmlnode, aindex, options)
-      end
-    end
-    # insert outbound xmlnode
-    [index+1..aindex-1,aindex..aindex].reject {|range| range.size<1}.each do |range|
-      node = LibXML::XML::Node.new(options[:xml_items_node_name],nil, Tools.get_namespace('table'))
-      Tools.set_ns_attribute(node,'table',options[:xml_repeated_attribute],range.size, 1)
-      axmlnode << node
-    end  
-    find_subnode_respect_repeated(axmlnode, aindex, options)
-  end
-  
-  def detach_subnode_respect_repeated(axmlnode,aindex, options)
-    index = 0
-    axmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
-      repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
-      oldindex = index
-      index = index+repeated
-      if index>= aindex  # found the node, now do the detachement
-        ranges = [oldindex+1..aindex-1,aindex..aindex,aindex+1..index].reject {|range| range.size<1}
-        ranges.each do |range|
-          newnode = node.copy(true)
-          Tools.set_ns_attribute(newnode,'table',options[:xml_repeated_attribute],range.size,1)
-          node.prev = newnode
-        end
-        node.remove!
-        return find_subnode_respect_repeated(axmlnode, aindex, options)
-      end
-    end
-    # add outbound xmlnode
-    [index+1..aindex-1,aindex..aindex].reject {|range| range.size<1}.each do |range|
-      node = LibXML::XML::Node.new(options[:xml_items_node_name],nil, Tools.get_namespace('table'))
-      Tools.set_ns_attribute(node,'table',options[:xml_repeated_attribute],range.size, 1)
-      axmlnode << node
-    end  
-    find_subnode_respect_repeated(axmlnode, aindex, options)
-  end
-
-  def find_nonempty_subnode_indexes(axmlnode, options)
-    index = 0
-    result = []
-    axmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
-      repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
-      index = index + repeated
-      if !(node.content.nil? or node.content.empty? or node.content =='') and (repeated==1)
-        result << index
-      end
-    end
-    return result
-  end
-  def find_first_unused_index_respect_repeated(axmlnode, options)
-    index = 0
-    axmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
-      repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
-      index = index+repeated
-    end
-    return index+1
-  end
-  def find_subnode_range_respect_repeated(axmlnode,aindex, options)
-    index = 0
-    axmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
-      repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
-      if index+repeated >= aindex
-        return (index+1..index+repeated)
-      else
-        index = index+repeated
-      end
-    end
-    return (index+1..Float::INFINITY)
-  end
-
-  def cells(r,c)
-    rows(r).andand.cells(c)
-  end
   def nonemptycells
     used_rows_range.collect{ |rowi| rows(rowi).nonemptycells }.flatten
   end
-  def rows(rowi)
-    @rowcache[rowi] ||= Row.new(self,rowi) unless rowi<=0
-  end
+  
+  # rozšíření XMLTiedArray
+  def rows(rowi); subitem(rowi) end
+  def prepare_subitem(rowi); Row.new(self,rowi) end
+  def rowcache; @itemcache end
   
   ## syntactic sugar follows
   def [](r,c)
@@ -180,6 +78,9 @@ class Worksheet
   end
   def []=(r,c,avalue)
     cells(r,c).andand.value=avalue
+  end
+  def cells(r,c)
+    rows(r).andand.cells(c)
   end
   # allows syntax like sheet.F15
   def method_missing method_name, *args, &block
