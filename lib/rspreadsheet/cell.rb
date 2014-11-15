@@ -4,14 +4,14 @@ require 'rspreadsheet/xml_tied'
 module Rspreadsheet
   
 class Cell < XMLTiedItem
-  attr_accessor :worksheet, :rowi, :coli
+  attr_accessor :worksheet, :coli, :rowi
   def xml_repeated_attribute;  'number-columns-repeated' end
   def xml_items_node_name; 'table-cell' end
   def xml_options; {:xml_items_node_name => xml_items_node_name, :xml_repeated_attribute => xml_repeated_attribute} end
   def parent; row end
   def index; @coli end
   def set_index(value); @coli=value end
-    
+  def set_rowi(arowi); @rowi = arowi end # this shoul ONLY be used by parent row
   def initialize(aworksheet,arowi,acoli)
     raise "First parameter should be Worksheet object not #{aworksheet.class}" unless aworksheet.kind_of?(Rspreadsheet::Worksheet)
     @worksheet = aworksheet
@@ -30,9 +30,8 @@ class Cell < XMLTiedItem
     xmlfindall(path).first
   end
   def inspect
-    "#<Rspreadsheet::Cell:Cell\n row:#{row}, col:#{col} address:#{address}\n type: #{guess_cell_type.to_s}, value:#{value}\n mode: #{mode}\n>"
+    "#<Rspreadsheet::Cell:Cell\n row:#{rowi}, col:#{coli} address:#{address}\n type: #{guess_cell_type.to_s}, value:#{value}\n mode: #{mode}\n>"
   end
-
   def value
     gt = guess_cell_type
     if (self.mode == :regular) or (self.mode == :repeated)
@@ -153,9 +152,51 @@ class Cell < XMLTiedItem
     end
     result
   end
+  def format
+    @format ||= CellFormat.new(self)
+  end
+  def address
+    Tools.convert_cell_coordinates_to_address(coordinates)
+  end
+end
+
+# proxy object to allow cell.format syntax. Also handles all logic for formats.
+class CellFormat
+  attr_reader :bold
+  def initialize(cell)
+    @bold = false
+    @cell = cell
+  end
+  def cellnode; @cell.xmlnode end
+  def bold=(value)
+    Rspreadsheet::Tools.set_ns_attribute(cellnode,'table','style-name','ce99')
+  end
+  def bold; Tools.get_ns_attribute_value(text_style_node,'fo','font-weight') == 'bold' end
+  def italic; Tools.get_ns_attribute_value(text_style_node,'fo','font-style') == 'italic' end
+  def color; Tools.get_ns_attribute_value(text_style_node,'fo','color') end
+  def font_size; Tools.get_ns_attribute_value(text_style_node,'fo','font-size') end
+  def background_color; Tools.get_ns_attribute_value(cell_style_node,'fo','background-color') end
+  
+  
+  def unused_cell_style_name
+    last = cellnode.doc.root.find('./office:automatic-styles/style:style').
+      collect {|node| node['name']}.
+      collect{ |name| /^ce(\d*)$/.match(name); $1.andand.to_i}.
+      compact.max
+    "ce#{last+1}"
+  end
+  def style_name; Tools.get_ns_attribute_value(cellnode,'table','style-name') end
+  def style_node; cellnode.doc.root.find("./office:automatic-styles/style:style[@style:name=\"#{style_name}\"]").first end
+  def text_style_node; cellnode.doc.root.find("./office:automatic-styles/style:style[@style:name=\"#{style_name}\"]/style:text-properties").first end
+  def cell_style_node; cellnode.doc.root.find("./office:automatic-styles/style:style[@style:name=\"#{style_name}\"]/style:table-cell-properties").first end
 end
 
 end
+
+
+
+
+
 
 
 

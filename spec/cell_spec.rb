@@ -110,8 +110,10 @@ describe Rspreadsheet::Cell do
     @cell = @sheet2.cells(4,6)
     @cell.range.should == (4..7)
     @cell.value.should == 7
+    @cell.coli.should == 6
     
     @sheet2.insert_cell_before(4,6)
+    @cell.coli.should == 7
     
     @cellA = @sheet2.cells(4,5)
     @cellA.range.should == (4..5)
@@ -148,6 +150,32 @@ describe Rspreadsheet::Cell do
     @sheet2.insert_cell_before(1,1)
     @sheet2.rows(1).cells(1).should be_kind_of(Rspreadsheet::Cell)
   end
+  it 'can be bold' do
+    @cell = @sheet2.cells(6,3)
+    @cell.format.bold.should == true
+    @cell = @sheet2.cells(6,4)
+    @cell.format.bold.should == false
+    @cell.format.italic.should == true
+    @cell = @sheet2.cells(6,5)
+    @cell.format.italic.should == false
+    @cell.format.color.should == '#ff3333'
+    @cell = @sheet2.cells(6,6)
+    @cell.format.color.should_not == '#ff3333'
+    @cell.format.background_color.should == '#6666ff'
+    @cell = @sheet2.cells(6,7)
+    @cell.format.font_size.should == '7pt'
+        
+    # after fresh create
+    @cell.xmlnode.attributes['style-name'].should_not be_nil
+  end
+  it 'changes coordinates when row inserted above' do
+    @sheet1.cells(2,2).detach
+    @cell = @sheet1.cells(2,2)
+    @cell.rowi.should == 2
+    @sheet1.insert_row_above(1)
+    @cell.rowi.should == 3
+  end
+  
 end
 
 

@@ -1,6 +1,13 @@
 module Rspreadsheet
 
-class XMLTiedItem
+class XMLTied
+  def xml
+    xmlnode.to_s
+  end
+end
+  
+# abstrac class. All successort MUST implement: set_index,xml_options,parent,index
+class XMLTiedItem < XMLTied
   def mode
    case
      when xmlnode.nil? then :outbound
@@ -35,6 +42,7 @@ class XMLTiedItem
   end
 end
 
+# abstrac class. All successort MUST implement: prepare_subitem
 module XMLTiedArray
   def find_my_subnode_range_respect_repeated(aindex, options)
     index = 0

@@ -7,7 +7,7 @@ module Rspreadsheet
 
 class Row < XMLTiedItem
   include XMLTiedArray
-  attr_reader :worksheet, :rowi, :cellcache
+  attr_reader :worksheet, :rowi
   def xml_repeated_attribute; 'number-rows-repeated' end
   def xml_items_node_name; 'table-row' end
   def xml_options; {:xml_items_node_name => xml_items_node_name, :xml_repeated_attribute => xml_repeated_attribute} end
@@ -23,12 +23,11 @@ class Row < XMLTiedItem
   # XMLTiedItem things and extensions
   def parent; @worksheet end
   def index; @rowi end
-  def index=(value); @rowi=value end
+  def set_index(value); @rowi=value end
     
   # XMLTiedArray rozšíření 
   def prepare_subitem(coli); Cell.new(@worksheet,@rowi,coli) end
   def cells(coli); subitem(coli) end
-  def cellcache; @itemcache end
     
   # další
   def style_name=(value); 
@@ -48,7 +47,8 @@ class Row < XMLTiedItem
   end
   alias :used_range :range
   def shift_by(diff)
-    @rowi = @rowi + diff
+    super
+    @itemcache.each_value{ |cell| cell.set_rowi(@rowi) }
   end
 end
 
