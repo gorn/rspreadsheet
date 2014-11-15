@@ -64,70 +64,70 @@ module XMLTiedArray
   end
   
   def find_subnode_respect_repeated(axmlnode, aindex, options)
-    ind = 0
+    result1, result2 = find_subnode_with_range_respect_repeated(axmlnode, aindex, options)
+    return result1
+  end  
+    
+  def find_subnode_with_range_respect_repeated(axmlnode, aindex, options)
+    index = 0
     axmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
       repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
-      ind = ind+repeated
-      return node if ind>= aindex
+      oldindex = index
+      index = index+repeated
+      if index>= aindex
+        return node, oldindex..index
+      end
     end
-    return nil
+    return nil, index..Float::INFINITY
+  end
+  
+  def prepare_repeated_subnode(times_repeated,options)
+    result = LibXML::XML::Node.new(options[:xml_items_node_name],nil, Tools.get_namespace('table'))
+    Tools.set_ns_attribute(result,'table',options[:xml_repeated_attribute],times_repeated, 1)
+    result
+  end
+  
+  def clone_before_and_set_repeated_attribute(node,times_repeated,options)
+    newnode = node.copy(true)
+    Tools.set_ns_attribute(newnode,'table',options[:xml_repeated_attribute],times_repeated,1)
+    node.prev = newnode
   end
   
   # detaches subnode with aindex  
   def detach_my_subnode_respect_repeated(aindex, options)
     axmlnode = xmlnode
-    index = 0
-    axmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
-      repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
-      oldindex = index
-      index = index+repeated
-      if index>= aindex  # found the node, now do the detachement
-        ranges = [oldindex+1..aindex-1,aindex..aindex,aindex+1..index].reject {|range| range.size<1}
-        ranges.each do |range|
-          newnode = node.copy(true)
-          Tools.set_ns_attribute(newnode,'table',options[:xml_repeated_attribute],range.size,1)
-          node.prev = newnode
-        end
-        node.remove!
-        return find_subnode_respect_repeated(axmlnode, aindex, options)
+    node,index_range = find_subnode_with_range_respect_repeated(axmlnode, aindex, options)
+
+    if !node.nil? # detach subnode
+      [index_range.begin+1..aindex-1,aindex..aindex,aindex+1..index_range.end].reject {|range| range.size<1}.each do |range| # create new structure by cloning
+        clone_before_and_set_repeated_attribute(node,range.size,options)
+      end
+      node.remove! # remove the original node
+    else # add outbound xmlnode
+      [index_range.begin+1..aindex-1,aindex..aindex].reject {|range| range.size<1}.each do |range|
+        axmlnode << prepare_repeated_subnode(range.size, options)
       end
     end
-    # add outbound xmlnode
-    [index+1..aindex-1,aindex..aindex].reject {|range| range.size<1}.each do |range|
-      node = LibXML::XML::Node.new(options[:xml_items_node_name],nil, Tools.get_namespace('table'))
-      Tools.set_ns_attribute(node,'table',options[:xml_repeated_attribute],range.size, 1)
-      axmlnode << node
-    end  
-    find_subnode_respect_repeated(axmlnode, aindex, options)
+    return find_subnode_respect_repeated(axmlnode, aindex, options)
   end
   
   def insert_my_subnode_before_respect_repeated(aindex, options)
     axmlnode = xmlnode
-    index = 0
-    axmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
-      repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
-      oldindex = index
-      index = index+repeated
-      if index>= aindex  # found the node, now do the insert
-        ranges = [oldindex+1..aindex-1,aindex..index].reject {|range| range.size<1}
-        ranges.each do |range|
-          newnode = node.copy(true)
-          Tools.set_ns_attribute(newnode,'table',options[:xml_repeated_attribute],range.size,1)
-          node.prev = newnode
-        end
-        newnode = LibXML::XML::Node.new(options[:xml_items_node_name],nil, Tools.get_namespace('table'))
-	node.prev.prev = newnode
-        node.remove!
-        return find_subnode_respect_repeated(axmlnode, aindex, options)
+    
+    node,index_range = find_subnode_with_range_respect_repeated(axmlnode, aindex, options)
+    
+    if !node.nil? # found the node, now do the insert
+      [index_range.begin+1..aindex-1,aindex..index_range.end].reject {|range| range.size<1}.each do |range| # split  original node by cloning
+        clone_before_and_set_repeated_attribute(node,range.size,options)
       end
+      clone_before_and_set_repeated_attribute(node.prev,1,options)         # insert new node
+      node.remove!                                                         # remove the original node
+    else # insert outbound xmlnode
+      [index+1..aindex-1,aindex..aindex].reject {|range| range.size<1}.each do |range|
+	axmlnode << XMLTiedArray.prepare_repeated_subnode(range.size, options)
+      end  
     end
-    # insert outbound xmlnode
-    [index+1..aindex-1,aindex..aindex].reject {|range| range.size<1}.each do |range|
-      node = LibXML::XML::Node.new(options[:xml_items_node_name],nil, Tools.get_namespace('table'))
-      Tools.set_ns_attribute(node,'table',options[:xml_repeated_attribute],range.size, 1)
-      axmlnode << node
-    end  
-    find_subnode_respect_repeated(axmlnode, aindex, options)
+    return find_subnode_respect_repeated(axmlnode, aindex, options)
   end
 
   def find_first_unused_index_respect_repeated(options)

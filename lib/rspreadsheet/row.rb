@@ -74,21 +74,7 @@ end
 # #   delegate [:normalize ] => :@row_group
 # 
 #   def normalize; @rowgroup.normalize  end
-#   def range; @rowgroup.range end
-#   def repeated?; self.range.size>1 end
-#   def xmlnode; @rowgroup.xmlnode end
-# 
-#   def initialize(aparent_array,arange,axmlnode=nil)
-#     @rowgroup = RowGroup.new(aparent_array,arange,axmlnode)
-#   end
-#   def self.new_from_xml
-#   end
-#   def to_rowgroup
-#     @rowgroup
-#   end
-#   def range=(arange)
-#     
-#   end
+
 # end
 
 # array which synchronizes with xml structure and reflects. number-xxx-repeated attributes

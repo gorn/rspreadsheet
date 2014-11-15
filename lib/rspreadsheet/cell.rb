@@ -13,6 +13,7 @@ class Cell < XMLTiedItem
   def set_index(value); @coli=value end
     
   def initialize(aworksheet,arowi,acoli)
+    raise "First parameter should be Worksheet object not #{aworksheet.class}" unless aworksheet.kind_of?(Rspreadsheet::Worksheet)
     @worksheet = aworksheet
     @rowi = arowi
     @coli = acoli
@@ -20,6 +21,17 @@ class Cell < XMLTiedItem
   def row; @worksheet.rows(rowi) end
   def coordinates; [rowi,coli] end
   def to_s; value.to_s end
+  def valuexml; self.xmlnode.children.first.andand.inner_xml end
+  # use this to find node in cell xml. ex. xmlfind('.//text:a') finds all link nodes
+  def valuexmlfindall(path)
+    xmlnode.find(path)
+  end
+  def valuexmlfindfirst(path)
+    xmlfindall(path).first
+  end
+  def inspect
+    "#<Rspreadsheet::Cell:Cell\n row:#{row}, col:#{col} address:#{address}\n type: #{guess_cell_type.to_s}, value:#{value}\n mode: #{mode}\n>"
+  end
 
   def value
     gt = guess_cell_type
@@ -142,42 +154,6 @@ class Cell < XMLTiedItem
     result
   end
 end
-  
-# class Cell
-#   def self.empty_cell_node
-#     LibXML::XML::Node.new('table-cell',nil, Tools.get_namespace('table'))
-#   end
-#   def initialize(aparent_row,coli,axmlnode=nil)
-#     raise "First parameter should be Row object not #{aparent_row.class}" unless aparent_row.kind_of?(Rspreadsheet::Row)
-#     @parent_row = aparent_row
-#     if axmlnode.nil?
-#       axmlnode = Cell.empty_cell_node
-#     end
-#     @xmlnode = axmlnode
-#     @col = coli
-#     # set @mode
-#     @mode = case
-#       when !@parent_row.used_col_range.include?(coli) then :outbound
-#       when Tools.get_ns_attribute_value(@xmlnode, 'table', @@xml_repeated_attribute).to_i>1  then :repeated
-#       else:regular
-#     end
-#   end
-#   def xml; self.xmlnode.children.first.andand.inner_xml end
-#   def address; Rspreadsheet::Tools.c2a(row,col) end
-#   def row; @parent_row.row end
-#   def worksheet; @parent_row.worksheet end
-#   # use this to find node in cell xml. ex. xmlfind('.//text:a') finds all link nodes
-#   def xmlfindall(path)
-#     xmlnode.find(path)
-#   end
-#   def xmlfindfirst(path)
-#     xmlfindall(path).first
-#   end
-#   # based on @xmlnode and optionally value which is about to be assigned, guesses which type the result should be
-#   def inspect
-#     "#<Rspreadsheet::Cell:Cell\n row:#{row}, col:#{col} address:#{address}\n type: #{guess_cell_type.to_s}, value:#{value}\n mode: #{mode}\n>"
-#   end
-# end
 
 end
 
