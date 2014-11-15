@@ -19,15 +19,19 @@ book = Rspreadsheet.open('./icecream_list.ods')
 sheet = book.worksheets 'Icecream list'
 total = 0
 
-(3..20).each do |row|
-  puts 'Icecream name: ' + sheet[row,2]
-  puts 'Icecream ingredients: ' + sheet[row,3]
-  puts "I ate this " + sheet[row,4] + ' times'
-  total += sheet[row,4]
+(3..20).each do |r|
+  row = sheet.rows(r)
+  puts 'Icecream name: ' + row.cells(2)
+  puts 'Icecream ingredients: ' + row.cells(3)
+  puts "I ate this " + row.cells(4) + ' times'
+  total += row.cells(4)
 end
 
-sheet[21,3] = 'Total:'
-sheet[21,4] = total
+sheet[21,3].value = 'Total:'
+sheet[21,4].value = total
+
+sheet.A1 = 'List of icecreams (completed by rspreadsheer)'
+sheet.cells(1,1).format.color = #0000FF
 
 sheet.rows[21].format.bold = true
 
