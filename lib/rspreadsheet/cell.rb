@@ -1,5 +1,10 @@
+# @markup markdown
+# @author Jakub Tesinsky
+
 require 'andand'
 require 'rspreadsheet/xml_tied'
+
+
 
 module Rspreadsheet
 
