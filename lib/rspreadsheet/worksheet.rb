@@ -25,25 +25,7 @@ class Worksheet
   def rowxmlnode(rowi)
     find_my_subnode_respect_repeated(rowi, {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
   end
-  
-  def row_nonempty_cells_col_indexes(rowi)
-    arowxmlnode = rowxmlnode(rowi)
-    if arowxmlnode.nil?
-      []
-    else
-      find_nonempty_subnode_indexes(arowxmlnode, {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'})
-    end
-  end
-  
-  def cellxmlnode(rowi,coli)
-    arowxmlnode = rowxmlnode(rowi)
-    if arowxmlnode.nil?
-      nil
-    else
-      rors(rowi).find_my_subnode_respect_repeated(coli, {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'})
-    end
-  end
- 
+    
   def first_unused_row_index
     find_first_unused_index_respect_repeated({:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
   end
