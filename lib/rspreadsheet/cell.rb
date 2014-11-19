@@ -9,7 +9,7 @@ module Rspreadsheet
 #
 #   worksheet.cells(5,2)
 #
-# Note that when using syntax like `worksheet[5,2]` or `worksheet.B5` you won't get this object, but rather the value of the cell.
+# Note that when using syntax like worksheet[5,2] or worksheet.B5 you won't get this object, but rather the value of the cell.
 
 class Cell < XMLTiedItem
   attr_accessor :worksheet, :coli, :rowi
