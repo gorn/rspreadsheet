@@ -21,13 +21,14 @@ class Cell < XMLTiedItem
   def row; @worksheet.rows(rowi) end
   def coordinates; [rowi,coli] end
   def to_s; value.to_s end
-  def valuexml; self.xmlnode.children.first.andand.inner_xml end
+  def valuexml; self.valuexmlnode.andand.inner_xml end
+  def valuexmlnode; self.xmlnode.children.first end
   # use this to find node in cell xml. ex. xmlfind('.//text:a') finds all link nodes
   def valuexmlfindall(path)
-    xmlnode.find(path)
+    valuexmlnode.nil? ? [] : valuexmlnode.find(path)
   end
   def valuexmlfindfirst(path)
-    xmlfindall(path).first
+    valuexmlfindall(path).first
   end
   def inspect
     "#<Rspreadsheet::Cell:Cell\n row:#{rowi}, col:#{coli} address:#{address}\n type: #{guess_cell_type.to_s}, value:#{value}\n mode: #{mode}\n>"

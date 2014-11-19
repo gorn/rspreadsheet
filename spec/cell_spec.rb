@@ -37,6 +37,10 @@ describe Rspreadsheet::Cell do
   end
   it 'can include links' do
     @sheet2.A12.should == '[http://example.org/]'
+    puts @sheet2.cells(12,1).xmlnode
+    @sheet2.cells(12,2).valuexmlfindall('.//text:a').size.should eq 0
+    @sheet2.cells(12,1).valuexmlfindall('.//text:a').size.should eq 1
+    @sheet2.cells(12,1).valuexmlfindfirst('.//text:a').attributes['href'].should eq 'http://example.org/'
   end
   it 'contains good row and col coordinates even after table:number-columns-repeated cells' do
     @cell = @sheet2.cells(13,5)
@@ -228,6 +232,11 @@ describe Rspreadsheet::Cell do
     @sheet1.rows(6).delete
     expect { @cell.rowi }.to raise_error
     @cell.invalid_reference?.should be true
+  end
+  it 'has inspect method returning something good' do
+    @cell = @sheet1.cells(6,2)
+    @cell.value = 'abcde'
+    expect(@cell.inspect).to include('abcde','::Cell','6','2','row')
   end
 end
 
