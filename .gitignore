@@ -23,6 +23,7 @@ build/
 /rdoc/
 .~lock*
 .*kate-swp
+.*kate-swp.bak
 
 ## Environment normalisation:
 /.bundle/
