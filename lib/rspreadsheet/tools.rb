@@ -124,8 +124,8 @@ module Tools
     node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key)
     attr.remove! unless attr.nil? 
   end
-  def self.create_ns_node(nodename,ns_prefix)
-    LibXML::XML::Node.new(nodename,nil, Tools.get_namespace(ns_prefix))
+  def self.create_ns_node(ns_prefix,nodename,value=nil)
+    LibXML::XML::Node.new(nodename,value, Tools.get_namespace(ns_prefix))
   end
 end
  

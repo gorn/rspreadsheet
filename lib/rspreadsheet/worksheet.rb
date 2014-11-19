@@ -16,10 +16,8 @@ class Worksheet
       when LibXML::XML::Node
         @xmlnode = xmlnode_or_sheet_name
       when String
-        @xmlnode = LibXML::XML::Node.new('table')
-        ns = LibXML::XML::Namespace.new(@xmlnode, 'table', 'urn:oasis:names:tc:opendocument:xmlns:table:1.0')
-        @xmlnode .namespaces.namespace = ns
-        @xmlnode['table:name'] = xmlnode_or_sheet_name
+        @xmlnode = Tools.create_ns_node('table','table')
+        Tools.set_ns_attribute(@xmlnode,'table','name', xmlnode_or_sheet_name)
       else raise 'Provide name or xml node to create a Worksheet object'
     end
   end

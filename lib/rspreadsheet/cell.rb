@@ -59,21 +59,21 @@ class Cell < XMLTiedItem
           set_type_attribute('float')
           remove_all_value_attributes_and_content(xmlnode)
           Tools.set_ns_attribute(xmlnode,'office','value', avalue.to_s) 
-          xmlnode << LibXML::XML::Node.new('p', avalue.to_f.to_s, Tools.get_namespace('text'))
+          xmlnode << Tools.create_ns_node('text','p', avalue.to_f.to_s)
         when gt == String then
           set_type_attribute('string')
           remove_all_value_attributes_and_content(xmlnode)
-          xmlnode << LibXML::XML::Node.new('p', avalue.to_s, Tools.get_namespace('text'))
+          xmlnode << Tools.create_ns_node('text','p', avalue.to_s)
         when gt == Date then 
           set_type_attribute('date')
           remove_all_value_attributes_and_content(xmlnode)
           Tools.set_ns_attribute(xmlnode,'office','date-value', avalue.strftime('%Y-%m-%d'))
-          xmlnode << LibXML::XML::Node.new('p', avalue.strftime('%Y-%m-%d'), Tools.get_namespace('text')) 
+          xmlnode << Tools.create_ns_node('text','p', avalue.strftime('%Y-%m-%d')) 
         when gt == 'percentage'
           set_type_attribute('float')
           remove_all_value_attributes_and_content(xmlnode)
           Tools.set_ns_attribute(xmlnode,'office','value', avalue.to_f.to_s) 
-          xmlnode << LibXML::XML::Node.new('p', (avalue.to_f*100).round.to_s+'%', Tools.get_namespace('text'))
+          xmlnode << Tools.create_ns_node('text','p', (avalue.to_f*100).round.to_s+'%')
       end
     else
       raise "Unknown cell mode #{self.mode}"

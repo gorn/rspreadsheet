@@ -1,10 +1,4 @@
 class LibXML::XML::Node
-  def new_with_ns(namespace,name)
-    ns = self.namespaces.find_by_prefix('table') || LibXML::XML::Namespace.new(self, 'table', 'urn:oasis:names:tc:opendocument:xmlns:table:1.0')
-    self.namespaces.namespace = ns
-    self
-    LibXML::XML::Node.new('table-row')
-  end
   def elements
     result = []
     each_element { |e| result << e }
