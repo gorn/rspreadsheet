@@ -37,7 +37,6 @@ describe Rspreadsheet::Cell do
   end
   it 'can include links' do
     @sheet2.A12.should == '[http://example.org/]'
-    puts @sheet2.cells(12,1).xmlnode
     @sheet2.cells(12,2).valuexmlfindall('.//text:a').size.should eq 0
     @sheet2.cells(12,1).valuexmlfindall('.//text:a').size.should eq 1
     @sheet2.cells(12,1).valuexmlfindfirst('.//text:a').attributes['href'].should eq 'http://example.org/'
@@ -81,15 +80,20 @@ describe Rspreadsheet::Cell do
     @sheet2.cells(13,3).should_not == 'cokoli'
     @sheet2.cells(13,4).should_not == 'cokoli'
   end
-  it 'returns type for the cell' do
-    book = Rspreadsheet.new($test_filename)
-    s = book.worksheets[1]
-    s.cells(1,2).type.should === :string
-    s.cells(2,2).type.should === :date
-    s.cells(3,1).type.should === :float
-    s.cells(3,2).type.should === :percentage
-    s.cells(4,2).type.should === :string
-    s.cells(200,200).type.should === :unassigned
+  it 'returns correct type for the cell' do
+    @sheet2.cells(1,2).type.should === :string
+    @sheet2.cells(2,2).type.should === :date
+    @sheet2.cells(3,1).type.should === :float
+    @sheet2.cells(3,2).type.should === :percentage
+    @sheet2.cells(4,2).type.should === :string
+    @sheet2.cells(200,200).type.should === :unassigned
+  end
+  it 'returns value of correct type' do
+    @sheet2[1,2].should be_kind_of(String)
+    @sheet2[2,2].should be_kind_of(Date)
+    @sheet2[3,1].should be_kind_of(Float)
+    @sheet2[3,2].should be_kind_of(Float)
+    @sheet2[4,2].should be_kind_of(String)
   end
   it 'is the same object no matter how you access it' do
     @cell1 = @sheet2.cells(5,5)

@@ -41,7 +41,7 @@ class Cell < XMLTiedItem
         when gt == Float then xmlnode.attributes['value'].to_f
         when gt == String then xmlnode.elements.first.andand.content.to_s
         when gt == Date then Date.strptime(xmlnode.attributes['date-value'].to_s, '%Y-%m-%d')
-        when gt == 'percentage' then xmlnode.attributes['value'].to_f
+        when gt == :percentage then xmlnode.attributes['value'].to_f
       end
     elsif self.mode == :outbound
       nil

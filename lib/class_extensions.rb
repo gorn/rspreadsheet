@@ -34,9 +34,4 @@ class LibXML::XML::Node
   def equals?(node2)  #TODO redefine == with this
     self.simplification_of?(node2) and node2.simplification_of?(self)
   end
-  def add_table_namesepace
-    ns = self.namespaces.find_by_prefix('table') || LibXML::XML::Namespace.new(self, 'table', 'urn:oasis:names:tc:opendocument:xmlns:table:1.0')
-    self.namespaces.namespace = ns
-    self
-  end
 end
