@@ -69,10 +69,10 @@ class Cell < XMLTiedItem
           remove_all_value_attributes_and_content(xmlnode)
           Tools.set_ns_attribute(xmlnode,'office','date-value', avalue.strftime('%Y-%m-%d'))
           xmlnode << Tools.create_ns_node('text','p', avalue.strftime('%Y-%m-%d')) 
-        when gt == 'percentage'
-          set_type_attribute('float')
+        when gt == :percentage
+          set_type_attribute('percentage')
           remove_all_value_attributes_and_content(xmlnode)
-          Tools.set_ns_attribute(xmlnode,'office','value', avalue.to_f.to_s) 
+          Tools.set_ns_attribute(xmlnode,'office','value', '%0.2d%' % avalue.to_f) 
           xmlnode << Tools.create_ns_node('text','p', (avalue.to_f*100).round.to_s+'%')
       end
     else
