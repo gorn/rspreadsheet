@@ -187,6 +187,7 @@ describe Rspreadsheet::Cell do
   end
   it 'can set formats of the cells' do
     skip 'not implemented yet'; pending
+=begin
     @cell = @sheet2.cells(1,1)
     # bold
     @cell.format.bold.should be_falsey
@@ -208,6 +209,7 @@ describe Rspreadsheet::Cell do
     @cell.format.font_size.should be_nil
     @cell.format.font_size = '11pt'
     @cell.format.font_size.should eq '11pt'
+=end
   end
   it 'method cells without arguments returns array of cells' do
     @a = @sheet2.rows(1).cells
