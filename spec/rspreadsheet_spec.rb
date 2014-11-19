@@ -72,6 +72,8 @@ describe Rspreadsheet do
   end
   it 'examples from README file are working' do
     skip 'not implemented yet'; pending
+=begin
+
     book = Rspreadsheet.open($test_filename)
     sheet = book.worksheets[1]
     sheet.B5 = 'cell value'
@@ -98,7 +100,7 @@ describe Rspreadsheet do
       total += row[1]
     end
     total.should eq 99
-
+=end
   end
 end
 
