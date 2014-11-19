@@ -15,7 +15,7 @@ Alhought this gem is still in alpha stage I use in my project it and it works fi
 ```ruby
 require 'rspreadsheet'
 book = Rspreadsheet.open('spreadsheet.ods')
-sheet = book.worksheets.first
+sheet = book.worksheets[1]
 
 
 # get value of a cell B5 (there are more ways to do this)
