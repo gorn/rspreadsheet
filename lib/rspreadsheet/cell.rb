@@ -161,11 +161,6 @@ class Cell < XMLTiedItem
   def address
     Tools.convert_cell_coordinates_to_address(coordinates)
   end
-  def invalidate_references
-    @worksheet = nil
-    @coli = nil
-    @rowi = nil
-  end
 
 end
 
