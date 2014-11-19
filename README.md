@@ -14,28 +14,40 @@ Alhought this gem is still in alpha stage I use in my project it and it works fi
   
 ```ruby
 require 'rspreadsheet'
+book = Rspreadsheet.open('spreadsheet.ods')
+sheet = book.worksheets.first
 
-book = Rspreadsheet.open('./icecream_list.ods')
-sheet = book.worksheets 'Icecream list'
+
+# get value of a cell B5 (there are more ways to do this)
+sheet.B5                       # => 'cell value'
+sheet[5,2]                     # => 'cell value'
+sheet.rows(5).cells(2).value   # => 'cell value'
+
+# set value of a cell B5
+sheet.F5 = 'text'
+sheet[5,2] = 7
+sheet.cells(5,2).value = 1.78
+
+# working with cell format
+sheet.cells(5,2).format.bold = true
+sheet.cells(5,2).format.background = '#FF0000'
+
+# calculating sum of cells in row
+sheet.rows(5).cellvalues.sum
+sheet.rows(5).cells.sum{ |cell| cell.value }
+
+# iterating over list of people and displaying the data
+
 total = 0
-
-(3..20).each do |r|
-  row = sheet.rows(r)
-  puts 'Icecream name: ' + row.cells(2)
-  puts 'Icecream ingredients: ' + row.cells(3)
-  puts "I ate this " + row.cells(4) + ' times'
-  total += row.cells(4)
+sheet.rows.each do |row|
+  puts "Sponsor #{row[1]} with email #{row(2)} has donated #{row(3)} USD."
+  total += row[3]
 end
+puts "Totally fundraised #{total} USD"
 
-sheet[21,3].value = 'Total:'
-sheet[21,4].value = total
-
-sheet.A1 = 'List of icecreams (completed by rspreadsheer)'
-sheet.cells(1,1).format.color = #0000FF
-
-sheet.rows[21].format.bold = true
-
+# saving file
 book.save
+book.save('different_filename.ods')
 
 ```
 
