@@ -4,6 +4,7 @@ describe Rspreadsheet::Cell do
   before do 
     book1 = Rspreadsheet.new
     @sheet1 = book1.create_worksheet
+    @c = @sheet1.cells(1,1)
     book2 = Rspreadsheet.new($test_filename)
     @sheet2 = book2.worksheets[1]
   end
@@ -81,18 +82,23 @@ describe Rspreadsheet::Cell do
     @sheet2.cells(13,4).should_not == 'cokoli'
   end
   it 'returns correct type for the cell' do
-    @sheet2.cells(1,2).type.should === :string
-    @sheet2.cells(2,2).type.should === :date
-    @sheet2.cells(3,1).type.should === :float
-    @sheet2.cells(3,2).type.should === :percentage
-    @sheet2.cells(4,2).type.should === :string
-    @sheet2.cells(200,200).type.should === :unassigned
+    @sheet2.cells(1,2).type.should eq :string
+    @sheet2.cells(2,2).type.should eq :date
+    @sheet2.cells(3,1).type.should eq :float
+    @sheet2.cells(3,2).type.should eq :percentage
+    @sheet2.cells(4,2).type.should eq :string
+    @sheet2.cells(200,200).type.should eq :unassigned
   end
   it 'returns value of correct type' do
     @sheet2[1,2].should be_kind_of(String)
     @sheet2[2,2].should be_kind_of(Date)
     @sheet2[3,1].should be_kind_of(Float)
     @sheet2[3,2].should be_kind_of(Float)
+    @sheet2.cells(3,2).type.should eq :percentage
+    @sheet2.cells(3,2).guess_cell_type.should eq :percentage
+    @sheet2.cells(3,2).guess_cell_type(1).should eq :percentage
+    @sheet2[3,2]=0.1
+    @sheet2.cells(3,2).type.should eq :percentage
     @sheet2[4,2].should be_kind_of(String)
   end
   it 'is the same object no matter how you access it' do
@@ -241,6 +247,12 @@ describe Rspreadsheet::Cell do
     @cell = @sheet1.cells(6,2)
     @cell.value = 'abcde'
     expect(@cell.inspect).to include('abcde','::Cell','6','2','row')
+  end
+  it 'stores date correctly' do
+    @c.value= Date.parse('2014-01-02')
+    @c.value.year.should eq 2014
+    @c.value.month.should eq 1
+    @c.value.day.should eq 2
   end
 end
 

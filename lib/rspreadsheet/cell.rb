@@ -150,6 +150,8 @@ class Cell < XMLTiedItem
           nil
         end
       end
+    elsif valueguess == Float and xmlnode.andand.attributes['value-type'] == 'percentage'
+      result = :percentage
     end
     result
   end
