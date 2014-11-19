@@ -100,6 +100,6 @@ One of the main ideas is that the manipulation with OpenDOcument files should be
 ## Further reading
 
 * [Advanced Guide](GUIDE.md) how to use the gem
-* [Code documentation](http://www.rubydoc.info/github/gorn/rspreadsheet) is hosted on (rubydoc.info)[http://www.rubydoc.info/]
+* [Code documentation](http://www.rubydoc.info/github/gorn/rspreadsheet) is hosted on [rubydoc.info](http://www.rubydoc.info/)
 * [Changelog](CHANGELOG.md)
 * [Documentation for developers](DEVEL_BLOG.md) containing ideas for future development and documentation on testing tools
