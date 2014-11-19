@@ -8,9 +8,7 @@ module Rspreadsheet
 class Row < XMLTiedItem
   include XMLTiedArray
   attr_reader :worksheet, :rowi
-  def xml_repeated_attribute; 'number-rows-repeated' end
-  def xml_items_node_name; 'table-row' end
-  def xml_options; {:xml_items_node_name => xml_items_node_name, :xml_repeated_attribute => xml_repeated_attribute} end
+  def xml_options; {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'} end
   def subitem_xml_options; {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'} end
     
   def initialize(aworksheet,arowi)

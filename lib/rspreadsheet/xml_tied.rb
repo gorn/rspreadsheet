@@ -15,7 +15,7 @@ class XMLTiedItem < XMLTied
      else :regular
    end
   end
-  def repeated; (Tools.get_ns_attribute_value(xmlnode, 'table', xml_repeated_attribute) || 1 ).to_i end
+  def repeated; (Tools.get_ns_attribute_value(xmlnode, 'table', xml_options[:xml_repeated_attribute]) || 1 ).to_i end
   def repeated?; mode==:repeated || mode==:outbound end
   alias :is_repeated? :repeated?
   def xmlnode
@@ -59,6 +59,7 @@ class XMLTiedItem < XMLTied
     parent.delete_subitem(index)
     invalidate_myself
   end
+
 end
 
 # abstrac class. All successort MUST implement: prepare_subitem

@@ -9,13 +9,16 @@ module Rspreadsheet
 #
 #   worksheet.cells(5,2)
 #
-# Note that when using syntax like worksheet[5,2] or worksheet.B5 you won't get this object, but rather the value of the cell.
+# Note that when using syntax like worksheet\[5,2\] or worksheet.B5 you won't get this object, but rather the value of the cell.
 
 class Cell < XMLTiedItem
   attr_accessor :worksheet, :coli, :rowi
-  def xml_repeated_attribute;  'number-columns-repeated' end
-  def xml_items_node_name; 'table-cell' end
-  def xml_options; {:xml_items_node_name => xml_items_node_name, :xml_repeated_attribute => xml_repeated_attribute} end
+  # xml_options[:xml_items_node_name] gives the name of the tag representing cell
+  # xml_options[:number-columns-repeated] gives the name of the previous tag which sais how many times the item is repeated
+  def xml_options; {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'} end
+  
+  ## defining abstract methods from XMLTiedItem
+  # returns parent XMLTiedArray object of myself (XMLTiedItem)
   def parent; row end
   def index; @coli end
   def set_index(value); @coli=value end
