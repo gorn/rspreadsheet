@@ -1,0 +1,9 @@
+=0.2.x
+
+  * complete rexrite without xmlnodes caching
+  * adding formats to cells
+  * refactoring common parts of code from row and cell to XMLTiedItem and XMLTiedArray objects
+  * increasing travis coverage
+  
+=0.1.x 
+  * initial take on syntax and all fuctions, it is usable now
