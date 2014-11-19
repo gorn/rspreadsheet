@@ -2,28 +2,31 @@ See [GUIDE.md](GUIDE.md#conventions) for syntax conventions.
 
 ## Ideas/wishlist
 
-  * What should be returned when asking for row/cell outside used range? Currently it creates new row/cell on fly, but maybe it should only return nil, so the user needs to insert apropriate rows/cells himself before using them. However it spoils little bit syntax like spreadsheet.rows(5).cells(3) because if rows returns nil, that would fail and ugly constructs like spreadsheet.andand.rows(5).andand.cells(3) would be needed. The only way this could be acoided is by using something like "UncreatedRow" object. This concern falls to category "clash of worlds" like the indexing issue (0 vs 1 based) and many others.
+  * What should be returned when asking for row/cell outside used range? Currently it creates new row/cell on fly, but maybe it should only return nil, so the user needs to insert apropriate rows/cells himself before using them. However it spoils little bit syntax like spreadsheet.rows(5).cells(3) because if rows returns nil, that would fail and ugly constructs like spreadsheet.andand.rows(5).andand.cells(3) would be needed. The only way this could be acoided is by using something like "UncreatedRow" object. This concern falls to category "clash of worlds" like the indexing issue (0 vs 1 based) and many others. - now it returns "UncreatedRow/Cell" which is detached upon value assignement.
   * In future inntroduce syntax like ``sheet.range('C3:E4')`` for mass operations. Also maybe ``sheet.cells('C3')`` or ``sheet.cells(3, 'C')`` etc.
   * Trying to make row Enumerable - perhaps skipping empty or undefined cells.
   * Accessors for nonempty/defined cells.
   * Maybe insted two syntaxes for accessing cell, we make both of them do the same and return Proxy object which would act either as value or cell.
   * Allow any of these:
     * ``book['Spring 2014']`` as alternative to ``book.worksheets('Spring 2014')`` ?
-    * ``sheet.cells.F13`` as alternative to ``sheet.cells[14,5]`` ?
-  * We may have problem with the @parent_row concept in cells. If cell has repeated row as parent and it is detached in some other code, the cell never finds out that its parent_row was changed. A cure to this might be, when there are no "unatacched" cells, and when all cells belong to some row. This way if row detaches it can let know to all its cells.
+    * ``sheet.cells('F13')`` as alternative to ``sheet.cells(14,5)`` ?
   * Document that there is a little distinction betwean RSpreadsheet and RSpreadsheet::Workbook. The former delegates everythink to the other.
-  * allow book.worskeets.first syntax
+  * allow `book.worskheets.first` syntax
+  * allow `sheet.cells.sum { |cell| cell.value }
+  * allow `sheet.rows(1).cells.each {}  iterate through nonempty cells ??? or all of them until last used
+  * `sheet.rows(1).cells` returns list of cells objects and `sheet.rows(1).cellvalues` return array of values with nils when empty
 
 Guiding ideas
   * xml document is always synchronized with the data. So the save is trivial.
   * no duplication of data. Objects like RowArray should containg minimum information. This one exists solely to speed up cell search. Taken to extream it is questionable, whether we need such objects at all, it might be possible to always work with xml directly.
-
+  * all cells and rows only server as proxy. they hold index and worksheet pointer and everytime read or write is done, the xml is newly searched. until there is a xmlnode caching we have no problem
+  * all cells returned for particular coordinates are **always the same object**. This way we have no problem to synchronize changes.
     
 ## Developing this gem
 
 ### Automated testing
 
-  * ``budele exec guard`` will get tested any changes as soon as they are summitted
+  * ``bundle exec guard`` will get tested any changes as soon as they are summitted
   * ``rake spec`` runs all test manually
 
 ### Automated utilities
