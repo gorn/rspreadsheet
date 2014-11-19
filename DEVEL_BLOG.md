@@ -15,6 +15,8 @@ See [GUIDE.md](GUIDE.md#conventions) for syntax conventions.
   * allow `sheet.cells.sum { |cell| cell.value }
   * allow `sheet.rows(1).cells.each {}  iterate through nonempty cells ??? or all of them until last used
   * `sheet.rows(1).cells` returns list of cells objects and `sheet.rows(1).cellvalues` return array of values with nils when empty
+  * implement to_csv
+  * longterm plan - go through other used libraries and try to find out whose syntax could be adopted, so this library is drop in replacement (possibly with some config options) for them
 
 Guiding ideas
   * xml document is always synchronized with the data. So the save is trivial.
