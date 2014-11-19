@@ -70,6 +70,25 @@ describe Rspreadsheet do
     book = Rspreadsheet.new
     book.create_worksheet
   end
+  it 'examples from README file are working' do
+    book = Rspreadsheet.open($test_filename)
+    sheet = book.worksheets[1]
+    sheet.B5 = 'cell value'
+    
+    sheet.B5.should eq 'cell value'
+    sheet[5,2].should eq 'cell value'
+    sheet.rows(5).cells(2).value.should eq 'cell value'
+    
+    expect {
+      sheet.F5 = 'text'
+      sheet[5,2] = 7
+      sheet.cells(5,2).value = 1.78
+      
+      sheet.cells(5,2).format.bold = true
+      sheet.cells(5,2).format.background_color = '#FF0000'
+    }.not_to raise_error
+    
+  end
 end
 
 

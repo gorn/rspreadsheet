@@ -14,9 +14,18 @@ module Tools
     else
       raise 'Wrong number of arguments'
     end
-      
-    colname=colname.rjust(3,'@')
-    col = (colname[-1].ord-64)+(colname[-2].ord-64)*26+(colname[-3].ord-64)*26*26
+     
+    ## first possibility how to implement it
+#     colname=colname.rjust(3,'@')
+#     col = (colname[-1].ord-64)+(colname[-2].ord-64)*26+(colname[-3].ord-64)*26*26
+
+    ## second possibility how to implement it
+    # col=(colname.to_i(36)-('A'*colname.size).to_i(36)).to_s(36).to_i(26)+('1'*colname.size).to_i(26)
+    
+    ## third possibility how to implement it (second one little shortened)
+    s=colname.size
+    col=(colname.to_i(36)-(36**s-1).div(3.5)).to_s(36).to_i(26)+(26**s-1)/25
+    
     row = rowname.to_i
     return [row,col]
   end

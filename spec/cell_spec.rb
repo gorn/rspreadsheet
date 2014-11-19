@@ -12,7 +12,6 @@ describe Rspreadsheet::Cell do
     @cell.rowi.should == 1
     @cell.coli.should == 3
     @cell.coordinates.should == [1,3]
-    
     @cell = @sheet2.cells(7,2)
     @cell.rowi.should == 7
     @cell.coli.should == 2
@@ -31,6 +30,10 @@ describe Rspreadsheet::Cell do
     @cell.value.should == 'zadruhe'
     @sheet1.B2 = 'zatreti'
     @cell.value.should == 'zatreti'
+    @sheet1.rows(2).cells(2).value = 'zactvrte'
+    @cell.value.should == 'zactvrte'
+    @sheet1.rows(2)[2] = 'zapate'
+    @cell.value.should == 'zapate'
   end
   it 'can include links' do
     @sheet2.A12.should == '[http://example.org/]'
@@ -150,7 +153,7 @@ describe Rspreadsheet::Cell do
     @sheet2.insert_cell_before(1,1)
     @sheet2.rows(1).cells(1).should be_kind_of(Rspreadsheet::Cell)
   end
-  it 'can be bold' do
+  it 'can have different formats' do
     @cell = @sheet2.cells(6,3)
     @cell.format.bold.should == true
     @cell = @sheet2.cells(6,4)
@@ -168,6 +171,25 @@ describe Rspreadsheet::Cell do
     # after fresh create
     @cell.xmlnode.attributes['style-name'].should_not be_nil
   end
+  it 'can set formats of the cells' do
+    @cell = @sheet2.cells(1,1)
+    # bold
+    @cell.format.bold.should be_falsey
+    @cell.format.bold = true
+    @cell.format.bold.should be_truthy
+    # italic
+    @cell.format.italic.should be_falsey
+    @cell.format.italic = true
+    @cell.format.italic.should be_truthy
+  
+  
+  end
+  it 'method cells without arguments returns array of cells' do
+    @a = @sheet2.rows(1).cells
+    @a.should be_kind_of(Array)
+    @a.each { |item| item.should be_kind_of(Rspreadsheet::Cell)}
+  
+  end
   it 'changes coordinates when row inserted above' do
     @sheet1.cells(2,2).detach
     @cell = @sheet1.cells(2,2)
@@ -175,8 +197,29 @@ describe Rspreadsheet::Cell do
     @sheet1.insert_row_above(1)
     @cell.rowi.should == 3
   end
-  
+  it 'switches to invalid_reference cell when deleted' do
+    @sheet1[2,5] = 'nejaka data'
+    @cell = @sheet1.cells(2,2)
+    @cell.value = 'data'
+    @cell.invalid_reference?.should be false
+    @cell.delete
+    @cell.invalid_reference?.should be true
+    expect { @cell.rowi }.to raise_error
+    expect { @cell.address }.to raise_error
+    
+    @sheet1.cells(2,2).type.should == :string
+    @sheet1.cells(3,2).type.should == :unassigned
+  end
+  it 'switches to invalid_reference cell when its row is deleted' do
+    @cell = @sheet1.cells(6,2)
+    @cell.value = 'data'
+    @cell.rowi.should == 6
+    @sheet1.rows(6).delete
+    expect { @cell.rowi }.to raise_error
+    @cell.invalid_reference?.should be true
+  end
 end
+
 
 
 

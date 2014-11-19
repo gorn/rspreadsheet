@@ -40,10 +40,35 @@ class XMLTiedItem < XMLTied
   def range
     parent.find_my_subnode_range_respect_repeated(index,xml_options)
   end
+  def invalid_reference?; false end
+  # destroys the object so it can not be used, this is necessarry to prevent
+  # accessing cells and rows which has been long time ago deleted and do not represent
+  # any physical object anymore
+  def invalidate_myself
+    raise_destroyed_cell_error = Proc.new {|*params| raise "Calling method of already destroyed Cell."}
+    (self.methods - Object.methods + [:nil?]).each do |method| # "undefine" all methods
+      self.singleton_class.send(:define_method, method, raise_destroyed_cell_error)
+    end
+    self.singleton_class.send(:define_method, :inspect, -> { "#<%s:0x%x destroyed cell>" % [self.class,object_id] })  # define descriptive inspect
+    self.singleton_class.send(:define_method, :invalid_reference?, -> { true }) # define invalid_reference? method
+#     self.instance_variables.each do |variable|
+#       instance_variable_set(variable,nil)
+#     end
+  end
+  def delete
+    parent.delete_subitem(index)
+    invalidate_myself
+  end
 end
 
 # abstrac class. All successort MUST implement: prepare_subitem
+# terminology
+#  item, subitem is object from @itemcache (quite often subclass of XMLTiedItem)
+#  node, subnode is LibXML::XML::Node object
+
 module XMLTiedArray
+  attr_reader :itemcache
+
   def find_my_subnode_range_respect_repeated(aindex, options)
     index = 0
     xmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
@@ -65,9 +90,15 @@ module XMLTiedArray
   def subitem(aindex)
     aindex = aindex.to_i
     if aindex.to_i<=0
-      nil 
+      nil
     else 
       @itemcache[aindex] ||= prepare_subitem(aindex)
+    end
+  end
+  
+  def subitems_array
+    (1..(find_first_unused_index_respect_repeated(subitem_xml_options)-1)).collect do |i|
+      subitem(i)
     end
   end
   
@@ -105,15 +136,16 @@ module XMLTiedArray
   def detach_my_subnode_respect_repeated(aindex, options)
     axmlnode = xmlnode
     node,index_range = find_subnode_with_range_respect_repeated(axmlnode, aindex, options)
-
-    if !node.nil? # detach subnode
-      [index_range.begin+1..aindex-1,aindex..aindex,aindex+1..index_range.end].reject {|range| range.size<1}.each do |range| # create new structure by cloning
-        clone_before_and_set_repeated_attribute(node,range.size,options)
-      end
-      node.remove! # remove the original node
-    else # add outbound xmlnode
-      [index_range.begin+1..aindex-1,aindex..aindex].reject {|range| range.size<1}.each do |range|
-        axmlnode << prepare_repeated_subnode(range.size, options)
+    if index_range.size > 1 # pokud potřebuje vůbec detachovat
+      if !node.nil? # detach subnode
+        [index_range.begin+1..aindex-1,aindex..aindex,aindex+1..index_range.end].reject {|range| range.size<1}.each do |range| # create new structure by cloning
+          clone_before_and_set_repeated_attribute(node,range.size,options)
+        end
+        node.remove! # remove the original node
+      else # add outbound xmlnode
+        [index_range.begin+1..aindex-1,aindex..aindex].reject {|range| range.size<1}.each do |range|
+          axmlnode << prepare_repeated_subnode(range.size, options)
+        end
       end
     end
     return find_subnode_respect_repeated(axmlnode, aindex, options)
@@ -138,6 +170,11 @@ module XMLTiedArray
     return find_subnode_respect_repeated(axmlnode, aindex, options)
   end
 
+  def delete_my_subnode_respect_repeated(aindex,options)
+    detach_my_subnode_respect_repeated(aindex,options) #TODO: tohle neni uplne spravne, protoze to zanecha skupinu rozdelenou na dve casti
+    subitem(aindex).xmlnode.remove!
+  end
+  
   def find_first_unused_index_respect_repeated(options)
     index = 0
     xmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
@@ -155,9 +192,30 @@ module XMLTiedArray
       @itemcache[i+1]=@itemcache.delete(i)
       @itemcache[i+1].shift_by(1)
     end
-    insert_my_subnode_before_respect_repeated(aindex,options)
+    insert_my_subnode_before_respect_repeated(aindex,options)  # nyní vlož node do xml
     @itemcache[aindex] =  subitem(aindex)
   end
+  
+  # clean up item from xml (handle possible detachments) and itemcache. leave the object invalidation on the object
+  # this should not be called from nowhere but XMLTiedItem.delete
+  def delete_subitem(aindex)
+    options = subitem_xml_options
+    delete_my_subnode_respect_repeated(aindex,options)  # vymaž node z xml
+    @itemcache.delete(aindex)
+    @itemcache.keys.sort.select{|i| i>=aindex+1 }.each do |i| 
+      @itemcache[i-1]=@itemcache.delete(i)
+      @itemcache[i-1].shift_by(-1)
+    end
+  end
+  
+  def delete
+    @itemcache.each do |key,item| 
+      item.delete   # delete item - this destroys its subitems, xmlnode and invalidates it
+      @itemcache.delete(key)  # delete the entry from the hash, normally this would mean this ceases to exist, if user does not have reference stored somewhere. Of he does, the object is invalidated anyways
+    end
+    super # this for example for Row objects calls XMLTiedItem.delete
+  end
+
   def find_nonempty_subnode_indexes(axmlnode, options)
     index = 0
     result = []

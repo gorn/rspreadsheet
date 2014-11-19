@@ -11,7 +11,7 @@ class Cell < XMLTiedItem
   def parent; row end
   def index; @coli end
   def set_index(value); @coli=value end
-  def set_rowi(arowi); @rowi = arowi end # this shoul ONLY be used by parent row
+  def set_rowi(arowi); @rowi = arowi end # this should ONLY be used by parent row
   def initialize(aworksheet,arowi,acoli)
     raise "First parameter should be Worksheet object not #{aworksheet.class}" unless aworksheet.kind_of?(Rspreadsheet::Worksheet)
     @worksheet = aworksheet
@@ -158,6 +158,12 @@ class Cell < XMLTiedItem
   def address
     Tools.convert_cell_coordinates_to_address(coordinates)
   end
+  def invalidate_references
+    @worksheet = nil
+    @coli = nil
+    @rowi = nil
+  end
+
 end
 
 # proxy object to allow cell.format syntax. Also handles all logic for formats.
@@ -176,8 +182,7 @@ class CellFormat
   def color; Tools.get_ns_attribute_value(text_style_node,'fo','color') end
   def font_size; Tools.get_ns_attribute_value(text_style_node,'fo','font-size') end
   def background_color; Tools.get_ns_attribute_value(cell_style_node,'fo','background-color') end
-  
-  
+ 
   def unused_cell_style_name
     last = cellnode.doc.root.find('./office:automatic-styles/style:style').
       collect {|node| node['name']}.

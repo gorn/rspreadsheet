@@ -16,7 +16,7 @@ class Row < XMLTiedItem
   def initialize(aworksheet,arowi)
     @worksheet = aworksheet
     @rowi = arowi
-    @itemcache = Hash.new
+    @itemcache = Hash.new  #TODO: move to module XMLTiedArray
   end
   def xmlnode; parent.find_my_subnode_respect_repeated(index, xml_options)  end
     
@@ -27,7 +27,17 @@ class Row < XMLTiedItem
     
   # XMLTiedArray rozšíření 
   def prepare_subitem(coli); Cell.new(@worksheet,@rowi,coli) end
-  def cells(coli); subitem(coli) end
+  def cells(*params)
+    raise 'Invalid row reference' if invalid_reference?
+    case params.length 
+      when 0 then subitems_array
+      when 1 then subitem(params[0]) 
+      else raise Exception.new('Wrong number of arguments.')
+    end
+  end
+  # syntactis sugar to cells and its values
+  def [](coli); cells(coli).value end
+  def []=(coli,avalue); cells(coli).value=avalue end
     
   # další
   def style_name=(value); 

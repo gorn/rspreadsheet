@@ -178,6 +178,29 @@ describe Rspreadsheet::Row do
     @sheet2.insert_row_above(1)
     @sheet2.rows(1).should be_kind_of(Rspreadsheet::Row)
   end
+  it 'can be deleted' do
+    @sheet1[15,4]='data'
+    @row = @sheet1.rows(15)
+    @row.invalid_reference?.should be false
+    @row.delete
+    @row.invalid_reference?.should be true
+    expect { @row.cells(4) }.to raise_error
+    @sheet1.rows(15).invalid_reference?.should be false # this is former line 16
+  end
+  it 'shifts rows if row is deleted' do
+    @row = @sheet1.rows(15)
+    @row[1] = 'data1'
+    @row[1].should eq 'data1'
+    @row.rowi.should == 15
+    
+    @sheet1.rows(7).delete
+    
+    @row[1].should eq 'data1'
+    @row.rowi.should == 14
+
+    @sheet1.rows(14).should be @row
+    @sheet1.rows(14).cells(1).value.should eq 'data1'
+  end
 end
 
  
