@@ -172,6 +172,7 @@ describe Rspreadsheet::Cell do
     @cell.xmlnode.attributes['style-name'].should_not be_nil
   end
   it 'can set formats of the cells' do
+    skip 'not implemented yet'; pending
     @cell = @sheet2.cells(1,1)
     # bold
     @cell.format.bold.should be_falsey
@@ -181,8 +182,18 @@ describe Rspreadsheet::Cell do
     @cell.format.italic.should be_falsey
     @cell.format.italic = true
     @cell.format.italic.should be_truthy
-  
-  
+    # color
+    @cell.format.color.should be_nil
+    @cell.format.color = '#AABBCC'
+    @cell.format.color.should eq '#AABBCC'
+    # background_color
+    @cell.format.background_color.should be_nil
+    @cell.format.background_color = '#AABBCC'
+    @cell.format.background_color.should eq '#AABBCC'
+    # font_size
+    @cell.format.font_size.should be_nil
+    @cell.format.font_size = '11pt'
+    @cell.format.font_size.should eq '11pt'
   end
   it 'method cells without arguments returns array of cells' do
     @a = @sheet2.rows(1).cells

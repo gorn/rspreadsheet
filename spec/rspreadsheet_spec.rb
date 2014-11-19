@@ -71,6 +71,7 @@ describe Rspreadsheet do
     book.create_worksheet
   end
   it 'examples from README file are working' do
+    skip 'not implemented yet'; pending
     book = Rspreadsheet.open($test_filename)
     sheet = book.worksheets[1]
     sheet.B5 = 'cell value'
@@ -88,6 +89,16 @@ describe Rspreadsheet do
       sheet.cells(5,2).format.background_color = '#FF0000'
     }.not_to raise_error
     
+    sheet.rows(4).cellvalues.sum.should eq 4+7*4
+    sheet.rows(5).cells.sum{ |cell| cell.value }.should eq 4+7*4
+
+    total = 0
+    sheet.rows.each do |row|
+      expect {"Sponsor #{row[1]} with email #{row(2)} has donated #{row(3)} USD." }.not_to raise_error
+      total += row[1]
+    end
+    total.should eq 99
+
   end
 end
 
