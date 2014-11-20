@@ -47,9 +47,9 @@ class Row < XMLTiedItem
       else raise Exception.new('Wrong number of arguments.')
     end
   end
-  ## @return [String or Float or Date] value of the cell
-  # @param coli [Integer] colum index of the cell 
-  # returns value of the cell at column `coli`
+  # returns value of the cell at column `coli`.
+  # @return [String or Float or Date] value of the cell
+  # @param coli [Integer] colum index of the cell
   def [](coli); cells(coli).value end
   # sets value of the cell at column `coli`
   # @param [Integer] colum index of the cell 
