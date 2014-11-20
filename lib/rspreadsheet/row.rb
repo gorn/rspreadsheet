@@ -54,8 +54,8 @@ class Row < XMLTiedItem
   # @return [String or Float or Date] value of the cell
   # returns value of the cell at column `coli`
   def [](coli); cells(coli).value end
-  ## @param coli [Integer] colum index of the cell @param avalue [String or Float or Date] colum index of the cell  
-  # sets value of the cell at column `coli`
+  ## sets value of the cell at column `coli`
+  # @param coli [Integer] colum index of the cell @param avalue [String or Float or Date] colum index of the cell  
   def []=(coli,avalue); cells(coli).value=avalue end
     
   # další
