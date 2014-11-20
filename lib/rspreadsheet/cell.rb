@@ -11,7 +11,7 @@ module Rspreadsheet
 
 ###
 # Represents a cell in spreadsheet which has coordinates, contains value, formula and can be formated.
-# You can get this object like this (where @worksheet is {Rspreadsheet::Worksheet} object)
+# You can get this object like this (suppose that @worksheet contains {Rspreadsheet::Worksheet} object)
 #
 #     @worksheet.cells(5,2)
 #

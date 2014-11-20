@@ -5,7 +5,7 @@ require 'rspreadsheet/xml_tied'
 module Rspreadsheet
 
 # Represents a row in a spreadsheet which has coordinates, contains value, formula and can be formated.
-# You can get this object like this
+# You can get this object like this (suppose that @worksheet contains {Rspreadsheet::Worksheet} object)
 #
 #     @row = @worksheet.rows(5)
 #
