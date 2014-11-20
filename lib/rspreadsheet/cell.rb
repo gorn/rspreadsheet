@@ -1,5 +1,6 @@
 # @markup markdown
 # @author Jakub Tesinsky
+# @titel rspreadsheet Cell
 
 require 'andand'
 require 'rspreadsheet/xml_tied'
