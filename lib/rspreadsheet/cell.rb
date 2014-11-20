@@ -11,11 +11,11 @@ module Rspreadsheet
 
 ###
 # Represents a cell in spreadsheet which has coordinates, contains value, formula and can be formated.
-# You can get this object like this
+# You can get this object like this (where @worksheet is {Rspreadsheet::Worksheet} object)
 #
-#     worksheet.cells(5,2)
+#     @worksheet.cells(5,2)
 #
-# Note that when using syntax like `worksheet[5,2]` or `worksheet.B5` you won't get this object, but rather the value of the cell.
+# Note that when using syntax like `@worksheet[5,2]` or `@worksheet.B5` you won't get this object, but rather the value of the cell.
 
 class Cell < XMLTiedItem
   attr_accessor :worksheet, :coli, :rowi

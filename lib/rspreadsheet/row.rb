@@ -7,13 +7,13 @@ module Rspreadsheet
 # Represents a row in a spreadsheet which has coordinates, contains value, formula and can be formated.
 # You can get this object like this
 #
-#   @row = @worksheet.rows(5)
+#     @row = @worksheet.rows(5)
 #
 # Mostly this is only syntactic sugar / different way to acess cells and contains not that much functionality itself.
 # You can use this object to access row cells
 #
-#   @row.cells(2)     # identical to @worksheet.rows(5).cells(2)
-#   @row[2]           # identical to @worksheet[5,2] or @row.cells(2)
+#     @row.cells(2)     # identical to @worksheet.rows(5).cells(2)
+#     @row[2]           # identical to @worksheet[5,2] or @row.cells(2)
 
 class Row < XMLTiedItem
   include XMLTiedArray
