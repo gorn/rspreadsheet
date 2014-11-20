@@ -26,8 +26,8 @@ class Row < XMLTiedItem
   # @!attribute [r] worksheet
   # @return [Worksheet] worksheet which contains the row
   attr_reader :worksheet
+  ## @return [Integer] row index of the row
   # @!attribute [r] rowi
-  # @return [Integer] row index of the row
   attr_reader :rowi 
   def xml_options; {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'} end
   def subitem_xml_options; {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'} end
@@ -54,11 +54,11 @@ class Row < XMLTiedItem
       else raise Exception.new('Wrong number of arguments.')
     end
   end
-  ## returns value of the cell at column `coli`
-  # @param coli [Integer] colum index of the cell @return [String or Float or Date] value of the cell
+  ## @param coli [Integer] colum index of the cell @return [String or Float or Date] value of the cell
+  # returns value of the cell at column `coli`
   def [](coli); cells(coli).value end
-  ## sets value of the cell at column `coli`
-  # @param coli [Integer] colum index of the cell @param avalue [String or Float or Date] colum index of the cell  
+  ## @param coli [Integer] colum index of the cell @param avalue [String or Float or Date] colum index of the cell  
+  # sets value of the cell at column `coli`
   def []=(coli,avalue); cells(coli).value=avalue end
     
   # další
