@@ -23,6 +23,7 @@ module Rspreadsheet
 
 class Row < XMLTiedItem
   include XMLTiedArray
+  # @!attribute [r] worksheet
   # @return [Worksheet] which containt the row
   attr_reader :worksheet
   # @return [Integer] which containt the row
