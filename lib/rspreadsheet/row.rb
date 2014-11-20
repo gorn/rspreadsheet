@@ -1,7 +1,9 @@
 require 'rspreadsheet/cell'
 require 'rspreadsheet/xml_tied'
 
-###
+
+module Rspreadsheet
+
 # Represents a row in a spreadsheet which has coordinates, contains value, formula and can be formated.
 # You can get this object like this
 #
@@ -12,8 +14,6 @@ require 'rspreadsheet/xml_tied'
 #
 #   @row.cells(2)     # identical to @worksheet.rows(5).cells(2)
 #   @row[2]           # identical to @worksheet[5,2] or @row.cells(2)
-
-module Rspreadsheet
 
 class Row < XMLTiedItem
   include XMLTiedArray
