@@ -1,3 +1,4 @@
 --exclude lib/class_extensions.rb --exclude class_extensions.rb
-lib/class_extensions.rb
+lib/*.rb
+
 --no-private
