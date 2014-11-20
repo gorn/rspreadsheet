@@ -182,6 +182,7 @@ class Cell < XMLTiedItem
 end
 
 # proxy object to allow cell.format syntax. Also handles all logic for formats.
+# @private
 class CellFormat
   attr_reader :bold
   def initialize(cell)
