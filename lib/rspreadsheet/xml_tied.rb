@@ -100,6 +100,14 @@ module XMLTiedArray
     end
   end
   
+  def subitems(*params)
+    case params.length 
+      when 0 then subitems_array
+      when 1 then subitem(params[0]) 
+      else raise Exception.new('Wrong number of arguments.')
+    end
+  end
+  
   def subitems_array
     (1..(find_first_unused_index_respect_repeated(subitem_xml_options)-1)).collect do |i|
       subitem(i)

@@ -117,8 +117,12 @@ module Tools
       nil
     end
   end
-  def self.get_ns_attribute(node,ns_prefix,key)
-    node.nil? ? nil : node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key)
+  def self.get_ns_attribute(node,ns_prefix,key,default=:undefined_default)
+    if default==:undefined_default
+      node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key)
+    else
+      node.nil? ? default : node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key) || default
+    end
   end
   def self.get_ns_attribute_value(node,ns_prefix,key)
     Tools.get_ns_attribute(node,ns_prefix,key).andand.value
@@ -127,7 +131,7 @@ module Tools
     node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key)
     attr.remove! unless attr.nil? 
   end
-  def self.create_ns_node(ns_prefix,nodename,value=nil)
+  def self.prepare_ns_node(ns_prefix,nodename,value=nil)
     LibXML::XML::Node.new(nodename,value, Tools.get_namespace(ns_prefix))
   end
 end

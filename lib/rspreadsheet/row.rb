@@ -39,14 +39,8 @@ class Row < XMLTiedItem
   def xmlnode; parent.find_my_subnode_respect_repeated(index, xml_options)  end
     
  # @!group Syntactic sugar
-  def cells(*params)
-    raise 'Invalid row reference' if invalid_reference?
-    case params.length 
-      when 0 then subitems_array
-      when 1 then subitem(params[0]) 
-      else raise Exception.new('Wrong number of arguments.')
-    end
-  end
+  def cells(*params); subitems(*params) end
+  
   ## @return [String or Float or Date] value of the cell
   # @param coli [Integer] colum index of the cell 
   # returns value of the cell at column `coli`
@@ -77,6 +71,9 @@ class Row < XMLTiedItem
   # Inserts row above itself (and shifts itself and all following rows down)
   def add_row_above
     parent.add_row_above(rowi)
+  end
+  def cellvalues
+    cells.collect{|c| c.value}
   end
   
  # @!group Private methods, which should not be called directly

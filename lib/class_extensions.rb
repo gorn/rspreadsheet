@@ -37,3 +37,13 @@ class LibXML::XML::Node
     self.simplification_of?(node2) and node2.simplification_of?(self)
   end
 end
+
+class Array
+  def sum(identity = 0, &block)
+    if block_given?
+      map(&block).sum(identity)
+    else
+      inject { |sum, element| sum + element } || identity
+    end
+  end
+end
