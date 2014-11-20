@@ -69,6 +69,7 @@ end
 # terminology
 #  item, subitem is object from @itemcache (quite often subclass of XMLTiedItem)
 #  node, subnode is LibXML::XML::Node object
+# @private
 
 module XMLTiedArray
   attr_reader :itemcache
