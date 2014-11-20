@@ -14,9 +14,12 @@ module Rspreadsheet
 #     @row.cells(2)     # identical to @worksheet.rows(5).cells(2)
 #     @row[2]           # identical to @worksheet[5,2] or @row.cells(2)
 #
-# or add new rows
+# or manipulate rows
 #
-#     @row.add_row_above
+#     @row.add_row_above   # adds empty row above
+#     @row.delete          # deletes row
+#
+# and shifts all other rows down/up appropriatelly.
 
 class Row < XMLTiedItem
   include XMLTiedArray
