@@ -9,7 +9,9 @@ class XMLTied
 end
   
 # abstrac class. All successort MUST implement: set_index,xml_options,parent,index
+# @private
 class XMLTiedItem < XMLTied
+# @private
   def mode
    case
      when xmlnode.nil? then :outbound

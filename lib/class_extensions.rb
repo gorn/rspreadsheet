@@ -1,5 +1,3 @@
-# @private
-
 class LibXML::XML::Node
 # @private
   def elements
