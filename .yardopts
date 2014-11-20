@@ -1,5 +1,4 @@
---exclude lib/class_extensions.rb --exclude class_extensions.rb
+--no-private
 lib/rspreadsheet/*.rb
 lib/**.rb
 
---no-private
