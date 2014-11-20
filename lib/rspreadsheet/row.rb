@@ -23,8 +23,8 @@ module Rspreadsheet
 
 class Row < XMLTiedItem
   include XMLTiedArray
+  ## @return [Worksheet] worksheet which contains the row
   # @!attribute [r] worksheet
-  # @return [Worksheet] worksheet which contains the row
   attr_reader :worksheet
   ## @return [Integer] row index of the row
   # @!attribute [r] rowi
@@ -37,6 +37,7 @@ class Row < XMLTiedItem
     @rowi = arowi
     @itemcache = Hash.new  #TODO: move to module XMLTiedArray
   end
+  
   def xmlnode; parent.find_my_subnode_respect_repeated(index, xml_options)  end
     
   # XMLTiedItem things and extensions
@@ -46,6 +47,8 @@ class Row < XMLTiedItem
     
   # XMLTiedArray rozšíření 
   def prepare_subitem(coli); Cell.new(@worksheet,@rowi,coli) end
+  
+  # @!group Syntactic sugar
   def cells(*params)
     raise 'Invalid row reference' if invalid_reference?
     case params.length 
@@ -54,14 +57,17 @@ class Row < XMLTiedItem
       else raise Exception.new('Wrong number of arguments.')
     end
   end
-  ## @param coli [Integer] colum index of the cell @return [String or Float or Date] value of the cell
+  ## @return [String or Float or Date] value of the cell
+  # @param coli [Integer] colum index of the cell 
   # returns value of the cell at column `coli`
   def [](coli); cells(coli).value end
-  ## @param coli [Integer] colum index of the cell @param avalue [String or Float or Date] colum index of the cell  
+  ## @param coli [Integer] colum index of the cell 
+  # @param avalue [String or Float or Date] colum index of the cell  
   # sets value of the cell at column `coli`
   def []=(coli,avalue); cells(coli).value=avalue end
-    
-  # další
+  # @!endgroup
+  
+  # @!group Other methods
   def style_name=(value); 
     detach_if_needed
     Tools.set_ns_attribute(xmlnode,'table','style-name',value)
@@ -83,6 +89,7 @@ class Row < XMLTiedItem
     parent.add_row_above(rowi)
   end
   
+  # @!group Private methods, which should not be called directly
   # @private
   # shifts internal represetation of row by diff. This should not be called directly
   # by user, it is only used by XMLTiedArray as hook when shifting around rows
