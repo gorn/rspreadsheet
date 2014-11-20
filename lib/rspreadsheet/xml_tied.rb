@@ -1,7 +1,6 @@
-# @private
-
 module Rspreadsheet
 
+# @private
 class XMLTied
   def xml
     xmlnode.to_s
