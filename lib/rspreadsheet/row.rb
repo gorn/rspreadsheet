@@ -75,8 +75,9 @@ class Row < XMLTiedItem
     parent.add_row_above(rowi)
   end
   
-  # @protected shifts internal represetation of row by diff. This should not be called directly
-  #   by user, it is only used by XMLTiedArray as hook when shifting around rows
+  # @protected
+  # shifts internal represetation of row by diff. This should not be called directly
+  # by user, it is only used by XMLTiedArray as hook when shifting around rows
   def _shift_by(diff)
     super
     @itemcache.each_value{ |cell| cell.set_rowi(@rowi) }
