@@ -49,7 +49,9 @@ class Row < XMLTiedItem
       else raise Exception.new('Wrong number of arguments.')
     end
   end
-  # syntactis sugar to cells and its values
+  # Syntactic sugar to cells and its values
+  # @parameter coli [Integer]
+  # @return [value] value of the cell in `coli` column.
   def [](coli); cells(coli).value end
   def []=(coli,avalue); cells(coli).value=avalue end
     
