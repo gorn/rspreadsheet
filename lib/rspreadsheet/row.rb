@@ -24,9 +24,10 @@ module Rspreadsheet
 class Row < XMLTiedItem
   include XMLTiedArray
   # @!attribute [r] worksheet
-  # @return [Worksheet] which containt the row
+  # @return [Worksheet] worksheet which contains the row
   attr_reader :worksheet
-  # @return [Integer] which containt the row
+  # @!attribute [r] rowi
+  # @return [Integer] row index of the row
   attr_reader :rowi 
   def xml_options; {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'} end
   def subitem_xml_options; {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'} end
