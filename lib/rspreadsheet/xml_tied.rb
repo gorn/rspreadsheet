@@ -1,3 +1,5 @@
+# @private
+
 module Rspreadsheet
 
 class XMLTied
