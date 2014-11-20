@@ -1,6 +1,7 @@
 # @private
 
 class LibXML::XML::Node
+# @private
   def elements
     result = []
     each_element { |e| result << e }
