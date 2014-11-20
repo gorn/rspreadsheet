@@ -29,8 +29,6 @@ class Row < XMLTiedItem
   ## @return [Integer] row index of the row
   # @!attribute [r] rowi
   attr_reader :rowi 
-  def xml_options; {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'} end
-  def subitem_xml_options; {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'} end
     
   def initialize(aworksheet,arowi)
     @worksheet = aworksheet
@@ -92,8 +90,10 @@ class Row < XMLTiedItem
   
  private
   # @!group XMLTiedArray related methods
+  def subitem_xml_options; {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'} end
   def prepare_subitem(coli); Cell.new(@worksheet,@rowi,coli) end
   # @!group XMLTiedItem related methods and extensions
+  def xml_options; {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'} end
   def parent; @worksheet end                
   def index; @rowi end                       
   def set_index(value); @rowi=value end      
