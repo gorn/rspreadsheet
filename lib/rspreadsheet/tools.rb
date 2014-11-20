@@ -50,8 +50,8 @@ module Tools
   end
   def self.c2a(*x); convert_cell_coordinates_to_address(*x) end
   def self.a2c(*x); convert_cell_address_to_coordinates(*x) end
-  ## @return [LibXML::XML::Namespace]
-  # @param prerix [String]
+  # @return [LibXML::XML::Namespace] namespace object
+  # @param prefix [String] namespace prefix
   # Finds {LibXML::XML::Namespace} object by its prefix. It knows all OpenDocument commonly used namespaces.
   def self.get_namespace(prefix)
     ns_array = {
