@@ -30,13 +30,13 @@ class Worksheet
     find_first_unused_index_respect_repeated({:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
   end
   
-  def insert_row_above(arowi)
-    insert_subitem_before(arowi)
+  def add_row_above(arowi)
+    add_empty_subitem_before(arowi)
   end
   
   def insert_cell_before(arowi,acoli)
     detach_row_in_xml(arowi)
-    rows(arowi).insert_subitem_before(acoli)
+    rows(arowi).add_empty_subitem_before(acoli)
   end
   
   def detach_row_in_xml(rowi)

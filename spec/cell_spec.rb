@@ -221,7 +221,7 @@ describe Rspreadsheet::Cell do
     @sheet1.cells(2,2).detach
     @cell = @sheet1.cells(2,2)
     @cell.rowi.should == 2
-    @sheet1.insert_row_above(1)
+    @sheet1.add_row_above(1)
     @cell.rowi.should == 3
   end
   it 'switches to invalid_reference cell when deleted' do

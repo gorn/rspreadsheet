@@ -168,17 +168,17 @@ describe Rspreadsheet::Row do
     @row.range.should == (16..19)
     @row.rowi.should == 16
     
-    @sheet1.insert_row_above(7)
+    @sheet1.add_row_above(7)
     @sheet1.rows(17).range.should == (17..20)
     @row.range.should == (17..20)
     @row.rowi.should == 17
     @sheet1.rows(17).should equal(@row)
     
-    @row.insert_row_above
+    @row.add_row_above
     @row.rowi.should == 18
   end
   it 'inserted has correct class' do # based on real error
-    @sheet2.insert_row_above(1)
+    @sheet2.add_row_above(1)
     @sheet2.rows(1).should be_kind_of(Rspreadsheet::Row)
   end
   it 'can be deleted' do

@@ -36,7 +36,7 @@ class XMLTiedItem < XMLTied
     parent.detach_my_subnode_respect_repeated(index, xml_options)
     self
   end
-  def shift_by(diff)
+  def _shift_by(diff)
     set_index(index + diff)
   end
   def range
@@ -188,15 +188,12 @@ module XMLTiedArray
     return index+1
   end
 
-  def insert_subitem_before(aindex)
-    insert_subitem_before_with_options(aindex,subitem_xml_options)
-  end
-  def insert_subitem_before_with_options(aindex,options)
+  def add_empty_subitem_before(aindex)
     @itemcache.keys.sort.reverse.select{|i| i>=aindex }.each do |i| 
       @itemcache[i+1]=@itemcache.delete(i)
-      @itemcache[i+1].shift_by(1)
+      @itemcache[i+1]._shift_by(1)
     end
-    insert_my_subnode_before_respect_repeated(aindex,options)  # nyní vlož node do xml
+    insert_my_subnode_before_respect_repeated(aindex,subitem_xml_options)  # nyní vlož node do xml
     @itemcache[aindex] =  subitem(aindex)
   end
   
@@ -208,7 +205,7 @@ module XMLTiedArray
     @itemcache.delete(aindex)
     @itemcache.keys.sort.select{|i| i>=aindex+1 }.each do |i| 
       @itemcache[i-1]=@itemcache.delete(i)
-      @itemcache[i-1].shift_by(-1)
+      @itemcache[i-1]._shift_by(-1)
     end
   end
   

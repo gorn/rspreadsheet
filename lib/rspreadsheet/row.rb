@@ -16,7 +16,7 @@ module Rspreadsheet
 #
 # or add new rows
 #
-#     @row.add
+#     @row.add_row_above
 
 class Row < XMLTiedItem
   include XMLTiedArray
@@ -68,13 +68,13 @@ class Row < XMLTiedItem
   end
   alias :used_range :range
   # Inserts row above itself (and shifts itself and all following rows down)
-  def insert_row_above
-    parent.insert_row_above(rowi)
+  def add_row_above
+    parent.add_row_above(rowi)
   end
   
   # @protected shifts internal represetation of row by diff. This should not be called directly
   #   by user, it is only used by XMLTiedArray as hook when shifting around rows
-  def sshift_by(diff)
+  def _shift_by(diff)
     super
     @itemcache.each_value{ |cell| cell.set_rowi(@rowi) }
   end
