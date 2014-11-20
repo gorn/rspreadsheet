@@ -1,3 +1,5 @@
+# @private
+
 class LibXML::XML::Node
   def elements
     result = []
