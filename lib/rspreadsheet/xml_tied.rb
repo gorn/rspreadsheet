@@ -8,6 +8,7 @@ class XMLTied
   end
 end
   
+# @private
 # abstrac class. All successort MUST implement: set_index,xml_options,parent,index
 class XMLTiedItem < XMLTied
   def mode
