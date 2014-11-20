@@ -1,4 +1,5 @@
 --no-private
+--markup markdown
 lib/rspreadsheet/*.rb
 lib/**.rb
 
