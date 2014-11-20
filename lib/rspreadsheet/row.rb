@@ -41,10 +41,9 @@ class Row < XMLTiedItem
   def xmlnode; parent.find_my_subnode_respect_repeated(index, xml_options)  end
     
  # @!group XMLTiedItem related methods and extensions
- # @private
-  def parent; @worksheet end
-  def index; @rowi end
-  def set_index(value); @rowi=value end
+  def parent; @worksheet end                 # @private
+  def index; @rowi end                       # @private
+  def set_index(value); @rowi=value end      # @private
     
  # @!group XMLTiedArray related methods
  # @private
