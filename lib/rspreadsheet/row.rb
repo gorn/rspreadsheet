@@ -38,7 +38,6 @@ class Row < XMLTiedItem
   
   def xmlnode; parent.find_my_subnode_respect_repeated(index, xml_options)  end
     
- # @!group Syntactic sugar
   def cells(*params)
     raise 'Invalid row reference' if invalid_reference?
     case params.length 
@@ -55,7 +54,6 @@ class Row < XMLTiedItem
   # @param [Integer] colum index of the cell 
   # @param [String or Float or Date] colum index of the cell  
   def []=(coli,avalue); cells(coli).value=avalue end
- # @!endgroup
   
  # @!group Other methods
   def style_name=(value); 
