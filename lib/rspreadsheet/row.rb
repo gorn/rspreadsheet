@@ -51,7 +51,7 @@ class Row < XMLTiedItem
   end
   # @param coli [Integer] colum index of the cell
   # @return [String or Float or Date] value of the cell
-  # returns value of the cell at column `coli`. The same as `cells(coli).value`.
+  # returns value of the cell at column `coli`
 
   def [](coli); cells(coli).value end
   def []=(coli,avalue); cells(coli).value=avalue end
@@ -78,7 +78,7 @@ class Row < XMLTiedItem
     parent.add_row_above(rowi)
   end
   
-  # @protected
+  # @private
   # shifts internal represetation of row by diff. This should not be called directly
   # by user, it is only used by XMLTiedArray as hook when shifting around rows
   def _shift_by(diff)
