@@ -131,8 +131,8 @@ end
  
 end
 
-class Range
 # @private
+class Range
   def size
     res = self.end-self.begin+1
     res>0 ? res : 0
