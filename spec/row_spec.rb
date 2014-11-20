@@ -172,7 +172,10 @@ describe Rspreadsheet::Row do
     @sheet1.rows(17).range.should == (17..20)
     @row.range.should == (17..20)
     @row.rowi.should == 17
-    @sheet1.rows(17).should equal(@row)    
+    @sheet1.rows(17).should equal(@row)
+    
+    @row.insert_row_above
+    @row.rowi.should == 18
   end
   it 'inserted has correct class' do # based on real error
     @sheet2.insert_row_above(1)

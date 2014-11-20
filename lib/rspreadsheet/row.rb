@@ -9,11 +9,14 @@ module Rspreadsheet
 #
 #     @row = @worksheet.rows(5)
 #
-# Mostly this is only syntactic sugar / different way to acess cells and contains not that much functionality itself.
-# You can use this object to access row cells
+# Mostly you will this object to access row cells
 #
 #     @row.cells(2)     # identical to @worksheet.rows(5).cells(2)
 #     @row[2]           # identical to @worksheet[5,2] or @row.cells(2)
+#
+# or add new rows
+#
+#     @row.add
 
 class Row < XMLTiedItem
   include XMLTiedArray
@@ -64,7 +67,14 @@ class Row < XMLTiedItem
     end
   end
   alias :used_range :range
-  def shift_by(diff)
+  # Inserts row above itself (and shifts itself and all following rows down)
+  def insert_row_above
+    parent.insert_row_above(rowi)
+  end
+  
+  # @protected shifts internal represetation of row by diff. This should not be called directly
+  #   by user, it is only used by XMLTiedArray as hook when shifting around rows
+  def sshift_by(diff)
     super
     @itemcache.each_value{ |cell| cell.set_rowi(@rowi) }
   end
