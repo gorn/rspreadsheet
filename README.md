@@ -40,7 +40,7 @@ sheet.rows(5).cells.sum{ |cell| cell.value }
 
 total = 0
 sheet.rows.each do |row|
-  puts "Sponsor #{row[1]} with email #{row(2)} has donated #{row(3)} USD."
+  puts "Sponsor #{row[1]} with email #{row[2]} has donated #{row[3]} USD."
   total += row[3]
 end
 puts "Totally fundraised #{total} USD"
