@@ -254,6 +254,19 @@ describe Rspreadsheet::Cell do
     @c.value.month.should eq 1
     @c.value.day.should eq 2
   end
+  it 'can be addressed by even more ways and all are identical' do
+    @cell = @sheet1.cells(2,2)
+    @sheet1.cells('B2').value = 'zaseste'
+    @cell.value.should == 'zaseste'
+    @sheet1.cells(2,'B').value = 'zasedme'
+    @cell.value.should == 'zasedme'
+    @sheet1['B2'] = 'zaosme'
+    @cell.value.should == 'zaosme'
+    
+    @sheet2.cells('F2').should be @sheet2.cells(2,6)
+    @sheet2.cells('BA177').should be @sheet2.cells(177,53)
+    @sheet2.cells('ADA2').should be @sheet2.cells(2,781)
+  end
 end
 
 

@@ -47,20 +47,26 @@ class Worksheet
     used_rows_range.collect{ |rowi| rows(rowi).nonemptycells }.flatten
   end
   
-  # rozšíření XMLTiedArray
+  #@!group XMLTiedArray connected methods
   def rows(*params); subitems(*params) end
   def prepare_subitem(rowi); Row.new(self,rowi) end
   def rowcache; @itemcache end
   
-  ## syntactic sugar follows
+  #@!group How to get to cells? (syntactic sugar)
+  # Returns value of the cell in row r and column c. If you want to get the cell object #see cells
   def [](r,c)
     cells(r,c).andand.value
   end
+  # sets value of the cell in row r and column c to avalue. It also sets the type of the cell according to type of the value. For details #see Cell.value=
   def []=(r,c,avalue)
     cells(r,c).andand.value=avalue
   end
+  # Returns a Cell object placed in row r and column c.
   def cells(r,c)
     rows(r).andand.cells(c)
+  end
+  def cells(address)
+  
   end
   # allows syntax like sheet.F15
   def method_missing method_name, *args, &block
