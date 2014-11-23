@@ -20,7 +20,7 @@ class Workbook
     if @filename.nil? and new_filename.nil? then raise 'New file should be named on first save.' end
     # if the filename has changed than first copy the original file to new location (or template if it is a new file)
     if new_filename
-      FileUtils.cp(@filename || './lib/rspreadsheet/empty_file_template.ods', new_filename)
+      FileUtils.cp(@filename || File.dirname(__FILE__)+'/empty_file_template.ods', new_filename)
       @filename = new_filename
     end
     Zip::File.open(@filename) do |zip|

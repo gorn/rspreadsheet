@@ -10,6 +10,7 @@
 /test/version_tmp/
 /tmp/
 lib/bundler/man
+.kateproject.d
 
 ## Specific to RubyMotion:
 .dat*
