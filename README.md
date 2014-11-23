@@ -51,7 +51,11 @@ book.save('different_filename.ods')
 
 ```
 
-This is the basic functionality. However rspreadsheet should allows lots of alternative syntax, like described in [GUIDE.md](GUIDE.md)
+This is also pubished as Gist **where you can leave you comments and suggestions**:
+
+  * [basic functionality](https://gist.github.com/gorn/42e33d086d9b4fda10ec) 
+  * [extended examples](https://gist.github.com/gorn/b432e6a69e82628349e6) of lots of alternative syntax
+  * [GUIDE.md](GUIDE.md) some other notes
 
 ## Installation
 
