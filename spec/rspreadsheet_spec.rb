@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Rspreadsheet do
   it 'can open ods testfile and reads its content correctly' do
     book = Rspreadsheet.new($test_filename)
-    s = book.worksheets[1]
+    s = book.worksheets(1)
     (1..10).each do |i|
       s[i,1].should === i
     end
@@ -18,8 +18,8 @@ describe Rspreadsheet do
     
     book1 = Rspreadsheet.new($test_filename)   # now open both again
     book2 = Rspreadsheet.new(tmp_filename)
-    @sheet1 = book1.worksheets[1]
-    @sheet2 = book2.worksheets[1]
+    @sheet1 = book1.worksheets(1)
+    @sheet2 = book2.worksheets(1)
     
     @sheet1.nonemptycells.each do |cell|       # and test identity
       @sheet2[cell.rowi,cell.coli].should == cell.value
@@ -48,9 +48,9 @@ describe Rspreadsheet do
     tmp_filename = '/tmp/testfile1.ods'        # first delete temp file
     File.delete(tmp_filename) if File.exists?(tmp_filename)
     book = Rspreadsheet.new($test_filename)    # than open test file
-    book.worksheets[1].rows(1).cells(1).value.should_not == 'xyzxyz'
-    book.worksheets[1].rows(1).cells(1).value ='xyzxyz'
-    book.worksheets[1].rows(1).cells(1).value.should == 'xyzxyz'
+    book.worksheets(1).rows(1).cells(1).value.should_not == 'xyzxyz'
+    book.worksheets(1).rows(1).cells(1).value ='xyzxyz'
+    book.worksheets(1).rows(1).cells(1).value.should == 'xyzxyz'
     
     book.save(tmp_filename)                    # and save it as temp file
     
@@ -72,7 +72,7 @@ describe Rspreadsheet do
   end
   it 'examples from README file are working' do
     book = Rspreadsheet.open($test_filename)
-    sheet = book.worksheets[1]
+    sheet = book.worksheets(1)
     sheet.B5 = 'cell value'
     
     sheet.B5.should eq 'cell value'

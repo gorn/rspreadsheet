@@ -4,9 +4,8 @@ describe Rspreadsheet::Cell do
   before do 
     book1 = Rspreadsheet.new
     @sheet1 = book1.create_worksheet
-    @c = @sheet1.cells(1,1)
     book2 = Rspreadsheet.new($test_filename)
-    @sheet2 = book2.worksheets[1]
+    @sheet2 = book2.worksheets(1)
   end
   it 'contains good row and col coordinates' do
     @cell = @sheet1.cells(1,3)
@@ -249,17 +248,21 @@ describe Rspreadsheet::Cell do
     expect(@cell.inspect).to include('abcde','::Cell','6','2','row')
   end
   it 'stores date correctly' do
-    @c.value= Date.parse('2014-01-02')
-    @c.value.year.should eq 2014
-    @c.value.month.should eq 1
-    @c.value.day.should eq 2
+    @cell = @sheet1.cells(1,1)
+    @cell.value= Date.parse('2014-01-02')
+    @cell.value.year.should eq 2014
+    @cell.value.month.should eq 1
+    @cell.value.day.should eq 2
   end
   it 'can be addressed by even more ways and all are identical' do
     @cell = @sheet1.cells(2,2)
     @sheet1.cells('B2').value = 'zaseste'
+    @sheet1.cells('B2').value.should == 'zaseste'
     @cell.value.should == 'zaseste'
+    @sheet1.cells(2,'B').value.should == 'zaseste'
     @sheet1.cells(2,'B').value = 'zasedme'
     @cell.value.should == 'zasedme'
+    @sheet1['B2'].should == 'zasedme'
     @sheet1['B2'] = 'zaosme'
     @cell.value.should == 'zaosme'
     

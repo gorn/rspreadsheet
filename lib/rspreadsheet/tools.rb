@@ -2,31 +2,59 @@ module Rspreadsheet
 
 # this module contains methods used bz several objects
 module Tools
+  def self.only_letters?(x); x.kind_of?(String) and x.match(/^[A-Za-z]*$/) != nil end
+  def self.kind_of_integer?(x)
+    (x.kind_of?(Numeric) and x.to_i==x) or 
+    (x.kind_of?(String) and x.match(/^\d*(\.0*)?$/) != nil)
+  end
+
   # converts cell adress like 'F12' to pair od integers [row,col]
   def self.convert_cell_address_to_coordinates(*addr)
     if addr.length == 1
-      addr[0].match(/^([A-Z]{1,3})(\d{1,8})$/)
+      addr[0].match(/^([A-Za-z]{1,3})(\d{1,8})$/)
       colname = $~[1]
-      rowname = $~[2]
+      rowname = $~[2].to_i
     elsif addr.length == 2
-      colname = addr[0]
-      rowname = addr[1]
+      a = addr[0]; b = addr[1]
+      if a.kind_of?(Integer) and b.kind_of?(Integer) # most common case first
+        colname,rowname = b,a 
+      elsif only_letters?(a)
+        if kind_of_integer?(b)
+          colname,rowname = a,b.to_i
+        else
+          raise 'Wrong parameters - first is letters, but the seconds is not digits only'
+        end
+      elsif kind_of_integer?(a)
+        if only_letters?(b)
+          colname,rowname = b,a.to_i
+        elsif kind_of_integer?(b)
+          colname,rowname = b.to_i,a.to_i
+        else
+          raise 'Wrong second out of two paremeters - mix of digits and numbers'
+        end
+      else 
+        raise 'Wrong first out of two paremeters - mix of digits and numbers'
+      end
     else
       raise 'Wrong number of arguments'
     end
      
     ## first possibility how to implement it
-#     colname=colname.rjust(3,'@')
-#     col = (colname[-1].ord-64)+(colname[-2].ord-64)*26+(colname[-3].ord-64)*26*26
+    # colname=colname.rjust(3,'@')
+    # col = (colname[-1].ord-64)+(colname[-2].ord-64)*26+(colname[-3].ord-64)*26*26
 
     ## second possibility how to implement it
     # col=(colname.to_i(36)-('A'*colname.size).to_i(36)).to_s(36).to_i(26)+('1'*colname.size).to_i(26)
     
+    if colname.kind_of?(Integer)
+      col=colname
+    else
     ## third possibility how to implement it (second one little shortened)
-    s=colname.size
-    col=(colname.to_i(36)-(36**s-1).div(3.5)).to_s(36).to_i(26)+(26**s-1)/25
+      s=colname.size
+      col=(colname.upcase.to_i(36)-(36**s-1).div(3.5)).to_s(36).to_i(26)+(26**s-1)/25
+    end
     
-    row = rowname.to_i
+    row = rowname
     return [row,col]
   end
   def self.convert_cell_coordinates_to_address(*coords)

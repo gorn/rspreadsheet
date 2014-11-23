@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Rspreadsheet::Row do
   before do 
     @sheet1 = Rspreadsheet.new.create_worksheet
-    @sheet2 = Rspreadsheet.new($test_filename).worksheets[1]
+    @sheet2 = Rspreadsheet.new($test_filename).worksheets(1)
   end
   it 'allows access to cells in a row' do
     @row = @sheet2.rows(1)
@@ -106,7 +106,7 @@ describe Rspreadsheet::Row do
   end
   it 'can open ods testfile and read its content' do
     book = Rspreadsheet.new($test_filename)
-    s = book.worksheets[1]
+    s = book.worksheets(1)
     (1..10).each do |i|
       s.rows(i).should be_kind_of(Rspreadsheet::Row)
       s.rows(i).repeated.should == 1
