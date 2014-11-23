@@ -1,6 +1,7 @@
 # Changelog
 ## 0.2.4 version
   * new accessors like sheet.cells('A3') or sheet['A3']='hi' ro even sheet['A','3'] etc.
+
 ## 0.2.x versions (x<4)
 
   * complete rewrite without xmlnodes caching
