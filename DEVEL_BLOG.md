@@ -43,12 +43,11 @@ Guiding ideas
 5. When happy, increment the version number and `git add .; git commit -am'commit message'; git push`
 6. ``rake release`` - creates a version tag in git and pushes the code to github + Rubygems. After this is succesfull the new version appears as release in Github and RubyGems.
 
+gem alternativa to points 3-6
 
     gem build rspreadsheet.gemspec              -\   These two lines together are in install.sh
     sudo gem install rspreadsheet-x.y.z.gem     -/   which should be invoked from parent directory
     gem push rspreadsheet-x.y.z.gem             releases the gem, do not forgot to update version in rspreadsheet.gemspec before doing this
-
-alternative way using ``rake`` command - release is more automatic
 
 [^1]:  if this fails with "mkmf.rb can't find header files for ruby at /usr/lib/ruby/include/ruby.h" you may want to ``sudo aptitude install ruby-dev``
 
