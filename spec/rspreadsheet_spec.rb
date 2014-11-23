@@ -98,6 +98,51 @@ describe Rspreadsheet do
     end
     total.should eq 55
   end
+  it 'examples from advanced syntax GUIDE are working' do
+    def p(*par); end # supress p in the example
+    expect do 
+      book = Rspreadsheet::Workbook.new
+      sheet = book.create_worksheet 'Top icecreams'
+      
+      sheet[1,1] = 'My top 5'
+      p sheet[1,1].class # => String
+      p sheet[1,1] # => "My top 5"
+      
+      # These are all the same values - alternative syntax
+      p sheet.rows(1).cells(1).value
+      p sheet.cells(1,1).value
+      p sheet.A1
+      p sheet[1,1]
+      p sheet['A1']
+      p sheet.cells('A1').value
+      
+      # How to inspect/manipulate the Cell object
+      sheet.cells(1,1) # => Rspreadsheet::Cell
+      sheet.cells(1,1).format
+      sheet.cells(1,1).format.font_size = '15pt'
+      sheet.cells(1,1).format.bold = true
+      p sheet.cells(1,1).format.bold? # => true
+      
+      # There are the same assigmenents
+      value = 1.234
+      sheet.A1 = value
+      sheet[1,1]= value
+      sheet.cells(1,1).value = value
+      
+      p sheet.A1.class # => Rspreadsheet::Cell
+      
+      # relative cells
+      sheet.cells(4,7).relative(-1,0) # => cell 3,7
+      
+      # build the top five list (these features are not implemented yet)
+      (1..5).each { |i| sheet[i,1] = i }
+      sheet.columns(1).format.bold = true
+      sheet.cells[2,1..5] = ['Vanilla', 'Pistacia', 'Chocolate', 'Annanas', 'Strawbery']
+      sheet.columns(1).cells(1).format.color = :red
+      
+      book.save('testfile.ods')
+    end.not_to raise_error
+  end
 end
 
 

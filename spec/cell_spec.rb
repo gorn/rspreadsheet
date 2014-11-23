@@ -184,8 +184,9 @@ describe Rspreadsheet::Cell do
     # after fresh create
     @cell.xmlnode.attributes['style-name'].should_not be_nil
   end
-  it 'can set formats of the cells' do
-    @cell = @sheet2.cells(1,1)
+  it 'can set formats of the cells in new file' do
+    @cell = @sheet1.cells(1,1)
+    @cell.value = '1'
     # bold
     @cell.format.bold.should be_falsey
     @cell.format.bold = true

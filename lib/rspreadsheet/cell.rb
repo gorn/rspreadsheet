@@ -191,6 +191,7 @@ class CellFormat
   
   # text style attribute readers
   def bold;      get_text_style_node_attribute('font-weight') == 'bold' end
+  alias :bold? :bold 
   def italic;    get_text_style_node_attribute('font-style') == 'italic' end
   def color;     get_text_style_node_attribute('color') end
   def font_size; get_text_style_node_attribute('font-size') end
@@ -252,7 +253,7 @@ class CellFormat
     last = cellnode.doc.root.find('./office:automatic-styles/style:style').
       collect {|node| node['name']}.
       collect{ |name| /^ce(\d*)$/.match(name); $1.andand.to_i}.
-      compact.max
+      compact.max || 0
     "ce#{last+1}"
   end
   def automatic_styles_node; cellnode.doc.root.find("./office:automatic-styles").first end

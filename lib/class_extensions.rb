@@ -43,7 +43,7 @@ class Array
     if block_given?
       map(&block).sum(identity)
     else
-      inject { |sum, element| sum + element } || identity
+      inject(0){ |sum, element| sum.to_f + element.to_f } || identity
     end
   end
 end

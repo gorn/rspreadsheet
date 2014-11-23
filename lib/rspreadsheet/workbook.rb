@@ -8,7 +8,7 @@ class Workbook
   def initialize(afilename=nil)
     @worksheets=[]
     @filename = afilename
-    @content_xml = Zip::File.open(@filename || './lib/rspreadsheet/empty_file_template.ods') do |zip|
+    @content_xml = Zip::File.open(@filename || File.dirname(__FILE__)+'/empty_file_template.ods') do |zip|
       LibXML::XML::Document.io zip.get_input_stream('content.xml')
     end
     @xmlnode = @content_xml.find_first('//office:spreadsheet')
