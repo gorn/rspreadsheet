@@ -1,7 +1,7 @@
 # rspreadsheet
 
 [![Build Status](https://api.travis-ci.org/gorn/rspreadsheet.svg?branch=master)](https://travis-ci.org/gorn/rspreadsheet) [![Coverage Status](https://coveralls.io/repos/gorn/rspreadsheet/badge.png)](https://coveralls.io/r/gorn/rspreadsheet)
-
+ 
 Manipulating spreadsheets with Ruby. Read, modify, write or create new OpenDocument Spreadsheet files from ruby code.
 
 ## Contibutions, ideas and wishes welcomed
@@ -14,8 +14,8 @@ Alhought this gem is still in alpha stage I use in my project it and it works fi
   
 ```ruby
 require 'rspreadsheet'
-book = Rspreadsheet.open('spreadsheet.ods')
-sheet = book.worksheets[1]
+book = Rspreadsheet.open('./test.ods')
+sheet = book.worksheets(1)
 
 
 # get value of a cell B5 (there are more ways to do this)
@@ -30,28 +30,31 @@ sheet.cells(5,2).value = 1.78
 
 # working with cell format
 sheet.cells(5,2).format.bold = true
-sheet.cells(5,2).format.background = '#FF0000'
+sheet.cells(5,2).format.background_color = '#FF0000'
 
 # calculating sum of cells in row
 sheet.rows(5).cellvalues.sum
-sheet.rows(5).cells.sum{ |cell| cell.value }
+sheet.rows(5).cells.sum{ |cell| cell.value.to_f }
 
 # iterating over list of people and displaying the data
 
 total = 0
 sheet.rows.each do |row|
   puts "Sponsor #{row[1]} with email #{row[2]} has donated #{row[3]} USD."
-  total += row[3]
+  total += row[3].to_f
 end
 puts "Totally fundraised #{total} USD"
 
 # saving file
 book.save
 book.save('different_filename.ods')
-
 ```
 
-This is the basic functionality. However rspreadsheet should allows lots of alternative syntax, like described in [GUIDE.md](GUIDE.md)
+This is also pubished as Gist **where you can leave you comments and suggestions**:
+
+  * [basic functionality](https://gist.github.com/gorn/42e33d086d9b4fda10ec) 
+  * [extended examples](https://gist.github.com/gorn/b432e6a69e82628349e6) of lots of alternative syntax
+  * [GUIDE.md](GUIDE.md) some other notes
 
 ## Installation
 

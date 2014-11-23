@@ -37,7 +37,7 @@ Guiding ideas
 1. make changes
 2. test if all tests pass (run `bundle exex guard` to test automatically). If not go to 1
 3. build and install locally
-    * ``rake build`` - builds the gem to pkg directory. 
+    * ``rake build`` - builds the gem to pkg directory (if something gets wrong, sometimes comit go git gelps)
     * ``sudo rake install`` - installs gem to local system [^1]
 4. Now can locally and manually use/test the gem. This should not be replacement for automated testing. If you make some changes, go to 1.
 5. When happy, increment the version number and `git add .; git commit -am'commit message'; git push`
