@@ -152,8 +152,12 @@ module Tools
       node.nil? ? default : node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key) || default
     end
   end
-  def self.get_ns_attribute_value(node,ns_prefix,key)
-    Tools.get_ns_attribute(node,ns_prefix,key).andand.value
+  def self.get_ns_attribute_value(node,ns_prefix,key,default=:undefined_default)
+    if default==:undefined_default
+      Tools.get_ns_attribute(node,ns_prefix,key).andand.value
+    else
+      node.nil? ? default : Tools.get_ns_attribute(node,ns_prefix,key,nil).andand.value || default
+    end
   end
   def self.remove_ns_attribute(node,ns_prefix,key)
     node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key)

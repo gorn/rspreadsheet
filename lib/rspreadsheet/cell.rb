@@ -209,6 +209,7 @@ class CellFormat
   def color=(value);    set_text_style_node_attribute('color',  value) end
   def font_size=(value);set_text_style_node_attribute('font-size',  value) end
   def set_text_style_node_attribute(attribute_name,value)
+    @cell.detach if @cell.mode != :regular
     if text_style_node.nil?
       self.create_text_style_node
       raise 'Style node was not correctly initialized' if text_style_node.nil?
@@ -250,17 +251,21 @@ class CellFormat
   end
   
   def unused_cell_style_name
-    last = cellnode.doc.root.find('./office:automatic-styles/style:style').
+    last = (cellnode.nil? ? [] : cellnode.doc.root.find('./office:automatic-styles/style:style')).
       collect {|node| node['name']}.
       collect{ |name| /^ce(\d*)$/.match(name); $1.andand.to_i}.
       compact.max || 0
     "ce#{last+1}"
   end
-  def automatic_styles_node; cellnode.doc.root.find("./office:automatic-styles").first end
-  def style_name; Tools.get_ns_attribute_value(cellnode,'table','style-name') end
-  def style_node; cellnode.doc.root.find("./office:automatic-styles/style:style[@style:name=\"#{style_name}\"]").first end
-  def text_style_node; cellnode.doc.root.find("./office:automatic-styles/style:style[@style:name=\"#{style_name}\"]/style:text-properties").first end
-  def cell_style_node; cellnode.doc.root.find("./office:automatic-styles/style:style[@style:name=\"#{style_name}\"]/style:table-cell-properties").first end
+  def automatic_styles_node; style_node_with_partial_xpath('') end
+  def style_name; Tools.get_ns_attribute_value(cellnode,'table','style-name',nil) end
+  def style_node; style_node_with_partial_xpath("/style:style[@style:name=\"#{style_name}\"]") end
+  def text_style_node; style_node_with_partial_xpath("/style:style[@style:name=\"#{style_name}\"]/style:text-properties") end
+  def cell_style_node; style_node_with_partial_xpath("/style:style[@style:name=\"#{style_name}\"]/style:table-cell-properties") end
+  def style_node_with_partial_xpath(xpath)
+    return nil if cellnode.nil?
+    cellnode.doc.root.find("./office:automatic-styles#{xpath}").first 
+  end
 end
 
 end
