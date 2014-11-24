@@ -83,7 +83,7 @@ then you might not have installed libxml for ruby. I.e. in debian something like
 This project arised from the necessity. Alhought it is not true that there are no ruby gems allowing to acess OpenDOcument spreadsheet, I did not find another decent one which would suit my needs. Most of them also look abandoned and inactive. I have investigated these options:
 
   * [ruby-ods](https://github.com/yalab/ruby-ods) - this one seems as if it never really started
-  * [rodf](https://github.com/thiagoarrais/rodf)- this only server as builder, it can not read existing files
+  * [rodf](https://github.com/thiagoarrais/rodf)- this only serves as builder, it can not read existing files or modify them
   * [rods](http://www.drbreinlinger.de/ruby/rods/) - this is pretty ok, but it has terrible syntax. I first thought of writing wrapper around it, but it turned to be not so easy. Also last commit is 2 years old.
   * [rubiod](https://github.com/netoctone/rubiod) - this one is quite ok, the syntax is definitely better that in rods, but it seems also very abandoned. It does not support formats. This is a closest match.
   * [spreadsheet](https://github.com/zdavatz/spreadsheet) - this does not work with OpenDocument and even with Excel has issues in modyfying document. However since it is supposedly used, and has quite good syntax it might be inspirative. I also find the way this gem handles lazy writing of new rows to Spreadsheet object flawed, as well as strange accesibility of rows array object, which if assigned breaks consistency of sheet.
