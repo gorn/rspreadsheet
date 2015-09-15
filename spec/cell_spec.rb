@@ -271,13 +271,20 @@ describe Rspreadsheet::Cell do
     @sheet2.cells('BA177').should be @sheet2.cells(177,53)
     @sheet2.cells('ADA2').should be @sheet2.cells(2,781)
   end
-  it 'setting format in new file detaches the cell', :focus do
+  it 'setting format in new file detaches the cell' do
     @cell = @sheet1.cells(1,1)
     # bold
     @cell.format.bold.should be_falsey
     @cell.format.bold = true
     @cell.format.bold.should be_truthy
     @cell.mode.should eq :regular
+  end
+  it 'remembers formula when set', :focus do
+    @cell = @sheet1.cells(1,1)
+    # bold
+    @cell.formula.should be_nil
+    @cell.formula='=1+5'
+    @cell.formula.should eq '=1+5'
   end
 end
 

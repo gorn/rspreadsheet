@@ -1,6 +1,6 @@
 # @markup markdown
 # @author Jakub Tesinsky
-# @titel rspreadsheet Cell
+# @title rspreadsheet Cell
 
 require 'andand'
 require 'rspreadsheet/xml_tied'
@@ -178,6 +178,22 @@ class Cell < XMLTiedItem
   def address
     Tools.convert_cell_coordinates_to_address(coordinates)
   end
+  
+  def formula
+    rawformula = Tools.get_ns_attribute(xmlnode,'table','formula',nil).andand.value
+    if rawformula.nil?
+      nil 
+    elsif rawformula.match(/^of:(.*)$/)
+      $1
+    else
+      raise "Mischmatched value in table:formula attribute - does not start with of: (#{rawformula.to_s})"
+    end
+  end
+  def formula=(formulastring)
+    detach_if_needed
+    raise 'Formula string must begin with "=" character' unless formulastring[0,1] == '='
+    Tools.set_ns_attribute(xmlnode,'table','formula','of:'+formulastring.to_s)
+  end
 
 end
 
@@ -266,6 +282,7 @@ class CellFormat
     return nil if cellnode.nil?
     cellnode.doc.root.find("./office:automatic-styles#{xpath}").first 
   end
+
 end
 
 end

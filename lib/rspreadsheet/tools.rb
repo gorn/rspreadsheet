@@ -130,6 +130,7 @@ module Tools
   end
   # sets namespaced attribute "ns_prefix:key" in node to value. if value == delete_value then remove the attribute
   def self.set_ns_attribute(node,ns_prefix,key,value,delete_value=nil)
+    raise 'Tools.set_ns_attribute can not set attribute on nil node' if node.nil?
     ns = Tools.get_namespace(ns_prefix)
     attr = node.attributes.get_attribute_ns(ns.href, key)
     
