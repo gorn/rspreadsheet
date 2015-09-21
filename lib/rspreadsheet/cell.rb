@@ -73,7 +73,7 @@ class Cell < XMLTiedItem
       gt = guess_cell_type(avalue)
       case
         when gt == nil then raise 'This value type is not storable to cell'
-        when gt == Float 
+        when gt == Float then
           set_type_attribute('float')
           remove_all_value_attributes_and_content(xmlnode)
           Tools.set_ns_attribute(xmlnode,'office','value', avalue.to_s) 
@@ -87,7 +87,7 @@ class Cell < XMLTiedItem
           remove_all_value_attributes_and_content(xmlnode)
           Tools.set_ns_attribute(xmlnode,'office','date-value', avalue.strftime('%Y-%m-%d'))
           xmlnode << Tools.prepare_ns_node('text','p', avalue.strftime('%Y-%m-%d')) 
-        when gt == :percentage
+        when gt == :percentage then
           set_type_attribute('percentage')
           remove_all_value_attributes_and_content(xmlnode)
           Tools.set_ns_attribute(xmlnode,'office','value', '%0.2d%' % avalue.to_f) 
@@ -193,6 +193,7 @@ class Cell < XMLTiedItem
   def formula=(formulastring)
     detach_if_needed
     raise 'Formula string must begin with "=" character' unless formulastring[0,1] == '='
+    remove_all_value_attributes_and_content(xmlnode)
     Tools.set_ns_attribute(xmlnode,'table','formula','of:'+formulastring.to_s)
   end
 
