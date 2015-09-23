@@ -286,6 +286,16 @@ describe Rspreadsheet::Cell do
     @cell.formula='=1+5'
     @cell.formula.should eq '=1+5'
   end
+  it 'resets formula after assiging value', :focus do
+    @cell = @sheet1.cells(1,1)
+    @cell.value = 'ahoj'
+    @cell.type.should eq :string
+    @cell.formula='=1+5'
+    @cell.formula.should_not be_nil
+    @cell.value = 'baf'
+    @cell.type.should eq :string
+    @cell.formula.should be_nil
+  end
 end
 
 
