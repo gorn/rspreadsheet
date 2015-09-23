@@ -35,7 +35,7 @@ Guiding ideas
 ### Local testing and releasing (to github and rubygems).
 
 1. make changes
-2. test if all tests pass (run `bundle exex guard` to test automatically). If not go to 1
+2. test if all tests pass (run `bundle exec guard` to test automatically). If not go to 1
 3. build and install locally
     * ``rake build`` - builds the gem to pkg directory (if something gets wrong, sometimes comit go git gelps)
     * ``sudo rake install`` - installs gem to local system [^1]
