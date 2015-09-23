@@ -74,22 +74,22 @@ class Cell < XMLTiedItem
       case
         when gt == nil then raise 'This value type is not storable to cell'
         when gt == Float then
-          set_type_attribute('float')
           remove_all_value_attributes_and_content(xmlnode)
+          set_type_attribute('float')
           Tools.set_ns_attribute(xmlnode,'office','value', avalue.to_s) 
           xmlnode << Tools.prepare_ns_node('text','p', avalue.to_f.to_s)
         when gt == String then
-          set_type_attribute('string')
           remove_all_value_attributes_and_content(xmlnode)
+          set_type_attribute('string')
           xmlnode << Tools.prepare_ns_node('text','p', avalue.to_s)
         when gt == Date then 
-          set_type_attribute('date')
           remove_all_value_attributes_and_content(xmlnode)
+          set_type_attribute('date')
           Tools.set_ns_attribute(xmlnode,'office','date-value', avalue.strftime('%Y-%m-%d'))
           xmlnode << Tools.prepare_ns_node('text','p', avalue.strftime('%Y-%m-%d')) 
         when gt == :percentage then
-          set_type_attribute('percentage')
           remove_all_value_attributes_and_content(xmlnode)
+          set_type_attribute('percentage')
           Tools.set_ns_attribute(xmlnode,'office','value', '%0.2d%' % avalue.to_f) 
           xmlnode << Tools.prepare_ns_node('text','p', (avalue.to_f*100).round.to_s+'%')
       end
@@ -99,12 +99,16 @@ class Cell < XMLTiedItem
   end
   def set_type_attribute(typestring)
     Tools.set_ns_attribute(xmlnode,'office','value-type',typestring)
+    Tools.set_ns_attribute(xmlnode,'calcext','value-type',typestring)
   end
-  def remove_all_value_attributes_and_content(node)
+  def remove_all_value_attributes_and_content(node=xmlnode)
     if att = Tools.get_ns_attribute(node, 'office','value') then att.remove! end
     if att = Tools.get_ns_attribute(node, 'office','date-value') then att.remove! end
     if att = Tools.get_ns_attribute(node, 'table','formula') then att.remove! end
     node.content=''
+  end
+  def remove_all_type_attributes
+    set_type_attribute(nil)
   end
   def relative(rowdiff,coldiff)
     @worksheet.cells(self.rowi+rowdiff, self.coli+coldiff)
@@ -117,6 +121,7 @@ class Cell < XMLTiedItem
       when gct == Date   then :date
       when gct == :percentage then :percentage
       when gct == :unassigned then :unassigned
+      when gct == NilClass then :empty
       when gct == nil then :unknown
       else :unknown
     end
@@ -163,9 +168,11 @@ class Cell < XMLTiedItem
           typeguess
         end
       else # it not have a typeguess
-        if (String(avalue) rescue false) # convertible to String
+        if (avalue.nil?) # if nil then nil
+          NilClass
+        elsif (String(avalue) rescue false) # convertible to String
           String
-        else
+        else # giving up
           nil
         end
       end
@@ -195,6 +202,7 @@ class Cell < XMLTiedItem
     detach_if_needed
     raise 'Formula string must begin with "=" character' unless formulastring[0,1] == '='
     remove_all_value_attributes_and_content(xmlnode)
+    remove_all_type_attributes
     Tools.set_ns_attribute(xmlnode,'table','formula','of:'+formulastring.to_s)
   end
 

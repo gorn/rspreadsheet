@@ -141,7 +141,7 @@ describe Rspreadsheet::Cell do
     
     @cell = @sheet2.cells(16,4)
     @cell.range.should == (1..7)
-    @cell.value.should == ""
+    @cell.value.should == nil
     
     @sheet2.rows(15).range.should == (14..18)
     @sheet2.rows(16).range.should == (14..18)
@@ -155,11 +155,11 @@ describe Rspreadsheet::Cell do
     
     @cellA = @sheet2.cells(16,1)
     @cellA.range.should == (1..2)
-    @cellA.value.should == ""
+    @cellA.value.should be_nil
     
     @cellB = @sheet2.cells(16,5)
     @cellB.range.should == (4..8)
-    @cellB.value.should == ""
+    @cellB.value.should be_nil
 
   end
   it 'inserted has correct class' do # based on real error
@@ -232,7 +232,7 @@ describe Rspreadsheet::Cell do
     expect { @cell.rowi }.to raise_error
     expect { @cell.address }.to raise_error
     
-    @sheet1.cells(2,2).type.should == :string
+    @sheet1.cells(2,2).type.should == :empty
     @sheet1.cells(3,2).type.should == :unassigned
   end
   it 'switches to invalid_reference cell when its row is deleted' do
@@ -279,17 +279,24 @@ describe Rspreadsheet::Cell do
     @cell.format.bold.should be_truthy
     @cell.mode.should eq :regular
   end
-  it 'remembers formula when set', :focus do
+  it 'remembers formula when set' do
     @cell = @sheet1.cells(1,1)
     # bold
     @cell.formula.should be_nil
     @cell.formula='=1+5'
     @cell.formula.should eq '=1+5'
   end
-  it 'resets formula after assiging value', :focus do
+  it 'unsets cell type when formula set - we can not guess it correctly', :focus do
     @cell = @sheet1.cells(1,1)
     @cell.value = 'ahoj'
     @cell.type.should eq :string
+    @cell.formula='=1+5'
+    typ = @cell.xmlnode.nil? ? 'N/A' : @cell.xmlnode.attributes['value-type']
+    @cell.type.should_not eq :string
+    @cell.type.should eq :empty
+  end
+  it 'wipes out formula after assiging value' do
+    @cell = @sheet1.cells(1,1)
     @cell.formula='=1+5'
     @cell.formula.should_not be_nil
     @cell.value = 'baf'
