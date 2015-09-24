@@ -55,15 +55,13 @@ This is also pubished as Gist **where you can leave you comments and suggestions
 
 ## Installation
 
-Gem is on [Rubygems](https://rubygems.org/gems/rspreadsheet) so you can install it by:
+Gem is on [Rubygems](https://rubygems.org/gems/rspreadsheet) so you can install it by
 
     $ gem install rspreadsheet
 
-of add <code>gem 'rspreadsheet'</code> to your Gemfile and execute  <code>bundle</code>. 
+or add <code>gem 'rspreadsheet'</code> to your Gemfile and execute  <code>bundle</code>. 
 
-
-
-If you get this or similar error
+If you get this error
 
     mkmf.rb can't find header files for ruby at /usr/lib/ruby/include/ruby.h 
     
