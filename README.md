@@ -4,7 +4,7 @@
  
 Manipulating spreadsheets with Ruby. Read, **modify**, write or create new OpenDocument Spreadsheet files from ruby code. 
 
-The gem allows you to acces your file and modify any cell of it, **without** touching the rest of the file, which makes compatible all advanced existing and future features of ODS files. You do not have to worry if it supports feature XY, if it does not, it won't touch it. This itself makes it distinct from most of [similar gems](#motivation-and-ideas).
+The gem allows you to acces your file and modify any cell of it, **without** touching the rest of the file, which makes it compatible with all advanced features of ODS files (both existing and future ones). You do not have to worry if it supports feature XY, if it does not, it won't touch it. This itself makes it distinct from most of [similar gems](#motivation-and-ideas).
 
 ## Examples of usage
   
@@ -81,7 +81,7 @@ If you need any help or find a bug please [submit an issue](https://github.com/g
 
 Alhought this gem is still in beta stage I use in everyday and it works fine. Currently I am experimenting with syntax to get stabilized. **Any suggestions regarding the syntax is very welcomed**
  
-## Existing OpenDocument spreadsheet gems - what's wrong with them?
+## why another OpenDocument spreadsheet gem?
 
 I would be glad to safe myself work, but surprisingly, there are not that many gems for OpenDocument spreadsheets. Most of them also look abandoned and inactive, or can only read or write spreadsheets, but not modify them. I have investigated these options (you might as well):
 
