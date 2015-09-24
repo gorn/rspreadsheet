@@ -4,10 +4,10 @@
  
 Manipulating spreadsheets with Ruby. Read, **modify**, write or create new OpenDocument Spreadsheet files from ruby code. 
 
-The gem allows you to acces your file and modify any cell of it, **without** touching the rest of the file, which makes it compatible with all advanced features of ODS files (both existing and future ones). You do not have to worry if it supports feature XY, if it does not, it won't touch it. This itself makes it distinct from most of [similar gems](#motivation-and-ideas).
+The gem allows you to acces your file and modify any cell of it, **without** touching the rest of the file, which makes it compatible with all advanced features of ODS files (both existing and future ones). You do not have to worry if it supports feature XY, if it does not, it won't touch it. This itself makes it distinct from most of [similar gems](#why-another-opendocument-spreadsheet-gem). Alhought this gem is still in beta stage I use in everyday and it works fine.
 
 ## Examples of usage
-  
+
 ```ruby
 require 'rspreadsheet'
 book = Rspreadsheet.open('./test.ods')
@@ -77,9 +77,18 @@ then you might not have installed libxml for ruby. I.e. in debian something like
 
 ## Contibutions, ideas and wishes welcomed
 
+### Nonprogrammers
 If you need any help or find a bug please [submit an issue](https://github.com/gorn/rspreadsheet/issues) here. I appreciate any feedback and even if you can not help with code, it is interesting for me to hear from you. Different people have different needs and I want to hear about them. If you are a programmer and you have any ideas, wishes, etc you are welcomed to fork the repository and submit a pull request preferably including a failing test.
 
 Alhought this gem is still in beta stage I use in everyday and it works fine. Currently I am experimenting with syntax to get stabilized. **Any suggestions regarding the syntax is very welcomed**
+
+### Programmers
+
+1. [Fork it](http://github.com/gorn/rspreadsheet/fork)
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
  
 ## Why another OpenDocument spreadsheet gem?
 
@@ -93,14 +102,6 @@ I would be glad to safe myself work, but surprisingly, there are not that many g
   * [roo](https://github.com/roo-rb/roo) can only read spreadsheets and not modify and write them back.
 
 One of the main ideas is that the manipulation with OpenDOcument files should be forward compatible and as much current data preserving as possible. The parts of the file which are not needed for the change should not be changed. This is different to some of the mentioned gems, which generate the document from scratch, therefore any advanced features present in the original file which are not directly supported are lost.
-
-## Contributing
-
-1. [Fork it](http://github.com/gorn/rspreadsheet/fork)
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
 
 ## Further reading
 
