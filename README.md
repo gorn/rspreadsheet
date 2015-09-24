@@ -2,21 +2,16 @@
 
 [![Build Status](https://api.travis-ci.org/gorn/rspreadsheet.svg?branch=master)](https://travis-ci.org/gorn/rspreadsheet) [![Coverage Status](https://coveralls.io/repos/gorn/rspreadsheet/badge.png)](https://coveralls.io/r/gorn/rspreadsheet)
  
-Manipulating spreadsheets with Ruby. Read, modify, write or create new OpenDocument Spreadsheet files from ruby code. 
+Manipulating spreadsheets with Ruby. Read, **modify**, write or create new OpenDocument Spreadsheet files from ruby code. 
 
-## Contibutions, ideas and wishes welcomed
+The gem allows you to acces your file and modify any cell of it, **without** touching the rest of the file, which makes compatible all advanced existing and future features of ODS files. You do not have to worry if it supports feature XY, if it does not, it won't touch it. This itself makes it distinct from most of [similar gems](#motivation-and-ideas).
 
-If you need any help or find a bug please [submit an issue](https://github.com/gorn/rspreadsheet/issues) here. I appreciate any feedback and even if you can not help with code, it is interesting for me to hear from you. Different people have different needs and I want to hear about them. If you are a programmer and you have any ideas, wishes, etc you are welcomed to fork the repository and submit a pull request preferably including a failing test.
-
-Alhought this gem is still in alpha stage I use in my project it and it works fine. Currently I am experimenting with syntax to get stabilized. **Any suggestions regarding the syntax is very welcomed**
- 
 ## Examples of usage
   
 ```ruby
 require 'rspreadsheet'
 book = Rspreadsheet.open('./test.ods')
 sheet = book.worksheets(1)
-
 
 # get value of a cell B5 (there are more ways to do this)
 sheet.B5                       # => 'cell value'
@@ -32,12 +27,14 @@ sheet.cells(5,2).value = 1.78
 sheet.cells(5,2).format.bold = true
 sheet.cells(5,2).format.background_color = '#FF0000'
 
-# calculating sum of cells in row
+# calculate sum of cells in row
 sheet.rows(5).cellvalues.sum
 sheet.rows(5).cells.sum{ |cell| cell.value.to_f }
 
-# iterating over list of people and displaying the data
+# or set formula to a cell
+sheet.A1.formula='=SUM(A2:A9)'
 
+# iterating over list of people and displaying the data
 total = 0
 sheet.rows.each do |row|
   puts "Sponsor #{row[1]} with email #{row[2]} has donated #{row[3]} USD."
@@ -78,9 +75,15 @@ If you get this or similar error
     
 then you might not have installed libxml for ruby. I.e. in debian something like <code>sudo aptitude install ruby-libxml</code> or using equivalent command in other package managers.
 
-## Motivation and Ideas
+## Contibutions, ideas and wishes welcomed
 
-This project arised from the necessity. Alhought it is not true that there are no ruby gems allowing to acess OpenDOcument spreadsheet, I did not find another decent one which would suit my needs. Most of them also look abandoned and inactive. I have investigated these options:
+If you need any help or find a bug please [submit an issue](https://github.com/gorn/rspreadsheet/issues) here. I appreciate any feedback and even if you can not help with code, it is interesting for me to hear from you. Different people have different needs and I want to hear about them. If you are a programmer and you have any ideas, wishes, etc you are welcomed to fork the repository and submit a pull request preferably including a failing test.
+
+Alhought this gem is still in beta stage I use in everyday and it works fine. Currently I am experimenting with syntax to get stabilized. **Any suggestions regarding the syntax is very welcomed**
+ 
+## Existing OpenDocument spreadsheet gems - what's wrong with them?
+
+I would be glad to safe myself work, but surprisingly, there are not that many gems for OpenDocument spreadsheets. Most of them also look abandoned and inactive, or can only read or write spreadsheets, but not modify them. I have investigated these options (you might as well):
 
   * [ruby-ods](https://github.com/yalab/ruby-ods) - this one seems abandoned, or even as if it never really started
   * [rodf](https://github.com/thiagoarrais/rodf)- this only serves as builder, it can not read existing files or modify them
@@ -91,7 +94,6 @@ This project arised from the necessity. Alhought it is not true that there are n
 
 One of the main ideas is that the manipulation with OpenDOcument files should be forward compatible and as much current data preserving as possible. The parts of the file which are not needed for the change should not be changed. This is different to some of the mentioned gems, which generate the document from scratch, therefore any advanced features present in the original file which are not directly supported are lost.
 
-  
 ## Contributing
 
 1. [Fork it](http://github.com/gorn/rspreadsheet/fork)
