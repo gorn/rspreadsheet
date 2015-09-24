@@ -81,7 +81,7 @@ If you need any help or find a bug please [submit an issue](https://github.com/g
 
 Alhought this gem is still in beta stage I use in everyday and it works fine. Currently I am experimenting with syntax to get stabilized. **Any suggestions regarding the syntax is very welcomed**
  
-## why another OpenDocument spreadsheet gem?
+## Why another OpenDocument spreadsheet gem?
 
 I would be glad to safe myself work, but surprisingly, there are not that many gems for OpenDocument spreadsheets. Most of them also look abandoned and inactive, or can only read or write spreadsheets, but not modify them. I have investigated these options (you might as well):
 
