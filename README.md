@@ -55,14 +55,13 @@ This is also pubished as Gist **where you can leave you comments and suggestions
 
 ## Installation
 
-Install it by:
+Gem is on [Rubygems](https://rubygems.org/gems/rspreadsheet) so you can install it by:
 
     $ gem install rspreadsheet
-    
 
 of add <code>gem 'rspreadsheet'</code> to your Gemfile and execute  <code>bundle</code>. 
 
-gem is hosted on Rubygems - https://rubygems.org/gems/rspreadsheet
+
 
 If you get this or similar error
 
