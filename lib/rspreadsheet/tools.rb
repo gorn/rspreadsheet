@@ -11,7 +11,7 @@ module Tools
   # converts cell adress like 'F12' to pair od integers [row,col]
   def self.convert_cell_address_to_coordinates(*addr)
     if addr.length == 1
-      addr[0].match(/^([A-Za-z]{1,3})(\d{1,8})$/)
+      addr[0].to_s.match(/^([A-Za-z]{1,3})(\d{1,8})$/)
       colname = $~[1]
       rowname = $~[2].to_i
     elsif addr.length == 2

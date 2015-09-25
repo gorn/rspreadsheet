@@ -64,10 +64,12 @@ class XMLTiedItem < XMLTied
 
 end
 
-# abstrac class. All successort MUST implement: prepare_subitem
+# abstract class. All importers MUST implement: prepare_subitem (and delete)
 # terminology
 #  item, subitem is object from @itemcache (quite often subclass of XMLTiedItem)
 #  node, subnode is LibXML::XML::Node object
+#
+# this class is made to be included, not subclassed - the reason is in delete method which calls super
 # @private
 
 module XMLTiedArray
@@ -94,7 +96,7 @@ module XMLTiedArray
   def subitem(aindex)
     aindex = aindex.to_i
     if aindex.to_i<=0
-      nil
+      nil # TODO> maybe optionally raise 'Item index should be greater then 0'
     else 
       @itemcache[aindex] ||= prepare_subitem(aindex)
     end
@@ -109,11 +111,13 @@ module XMLTiedArray
   end
   
   def subitems_array
-    (1..(find_first_unused_index_respect_repeated(subitem_xml_options)-1)).collect do |i|
+    (1..self.size).collect do |i|
       subitem(i)
     end
   end
   
+  def size; find_first_unused_index_respect_repeated(subitem_xml_options)-1 end
+      
   def find_subnode_respect_repeated(axmlnode, aindex, options)
     result1, result2 = find_subnode_with_range_respect_repeated(axmlnode, aindex, options)
     return result1
@@ -189,6 +193,7 @@ module XMLTiedArray
   
   def find_first_unused_index_respect_repeated(options)
     index = 0
+    return 1 if xmlnode.nil?
     xmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
       repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
       index = index+repeated
@@ -222,7 +227,7 @@ module XMLTiedArray
       item.delete   # delete item - this destroys its subitems, xmlnode and invalidates it
       @itemcache.delete(key)  # delete the entry from the hash, normally this would mean this ceases to exist, if user does not have reference stored somewhere. Of he does, the object is invalidated anyways
     end
-    super # this for example for Row objects calls XMLTiedItem.delete
+    super # this for example for Row objects calls XMLTiedItem.delete because Row is subclass of XMLTiedItem
   end
 
   def find_nonempty_subnode_indexes(axmlnode, options)
@@ -238,6 +243,10 @@ module XMLTiedArray
     return result
   end
 
+  # truncate the item completely, deleting all its subitems
+  def truncate
+    subitems.reverse.each{ |subitem| subitem.delete }  # reverse je tu jen kvuli performanci, aby to mazal zezadu
+  end  
 end
 
 end 

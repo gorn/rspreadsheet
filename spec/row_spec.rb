@@ -11,10 +11,19 @@ describe Rspreadsheet::Row do
     @c.value = 3
     @c.value.should == 3 
   end
+  it 'allows access to cells using different syntax' do
+    @row = @sheet1.rows(1)
+    @row.cells(1).value = 77
+    @row.cells(1).value.should == 77
+    @row.cells.first.value.should == 77
+    @row.cells.first.value = 88
+    @row.cells(1).value.should == 88
+    @row[1]= 99
+    @row.cells(1).value.should == 99
+  end
   it 'can be detached and changes to unrepeated if done' do
     @row = @sheet1.rows(5)
     @row.xmlnode.andand.name.should_not == 'table-row'
-    
     @row2 = @row.detach
     @row2.xmlnode.name.should == 'table-row'
     @row2.is_repeated?.should == false    
@@ -204,6 +213,44 @@ describe Rspreadsheet::Row do
     @sheet1.rows(14).should be @row
     @sheet1.rows(14).cells(1).value.should eq 'data1'
   end
+  it 'has no cells when empty' do
+    @row = @sheet1.rows(2)
+    @row.cells.size.should == 0
+  end
+  it 'has 1 cells when assigned to first one' do
+    @row = @sheet1.rows(2)
+    @row.cells(1).value = 'foo'
+    @row.cells.size.should == 1
+  end
+  it 'can be mass assigned by cellvalues= method' do
+    @row = @sheet1.rows(2)
+#     @row.size.should == 0
+    @row.cellvalues= ['January',nil,3]
+    @row.size.should == 3
+    @row.cells(1).value.should == 'January' 
+    @row.cells(2).blank?.should be_truthy
+    @row.cells(3).value.should == 3
+    @row.cellvalues = [1]
+    @row.size.should == 1
+    @row.cells(1).value.should == 1
+    @row.cells(3).blank?.should be_truthy
+  end
+  it 'can be mass assigned by sheet[]= method', :focus do
+    @sheet1[1] = ['foo','baz']
+  end
+  it 'cells can be wiped out by truncate method' do
+    @row = @sheet1.rows(1)
+    @row[1]='data'
+    @row[3]='data3'
+    @row.size.should == 3
+    @row.truncate
+    @row.size.should == 0
+  end
 end
 
  
+
+
+
+
+

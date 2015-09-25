@@ -39,9 +39,20 @@ describe Rspreadsheet::Worksheet, :focus do
     @sheet[1,1].should == 'test text'
   end
   it 'value stored to A1 is accesible using different syntax' do
-    @sheet[1,1] = 'test text'
-    @sheet[1,1].should == 'test text'
-    @sheet.cells(1,1).value.should == 'test text'
+    @sheet[2,2] = 'test text'
+    @sheet[2,2].should == 'test text'
+    @sheet.B2.should == 'test text'
+    @sheet['B2'].should == 'test text'
+    @sheet['2','2'].should == 'test text'
+    @sheet['2','B'].should == 'test text'
+    @sheet[2,'B'].should == 'test text'
+    @sheet['B',2].should == 'test text'
+    @sheet['B','2'].should == 'test text'
+    
+    @sheet.cells(2,2).value.should == 'test text'
+    @sheet.cells('B2').value.should == 'test text'
+    @sheet.cells('B','2').value.should == 'test text'
+    @sheet.cells(2,'B').value.should == 'test text'
   end
   it 'makes Cell object accessible' do
     @sheet.cells(1,1).value = 'test text'

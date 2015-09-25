@@ -63,9 +63,17 @@ class Worksheet
   def [](*params)
     cells(*params).andand.value
   end
-  # Aets value of the cell given either by  row,column integer coordinates of by address. It also sets the type of the cell according to type of the value. For details #see Cell.value=
+  # Sets value of the cell given either by  row,column integer coordinates of by address. 
+  # It also sets the type of the cell according to type of the value. For details #see Cell.value=
+  # This also allows syntax like
+  #
+  #      @sheet[1] = ['Jan', 'Feb', 'Mar']
   def []=(*params)
-    cells(*params[0..-2]).andand.value = params.last 
+    if (params.size == 2) and params[0].kind_of?(Integer) 
+      rows(params[0]).cellvalues = params[1]
+    else
+      cells(*params[0..-2]).andand.value = params.last 
+    end
   end
   # Returns a Cell object placed in row and column or on a Cell on string address
   # @param [(Integer,Integer), String] either row and column of the cell (i.e. 3,5) or a string containing it address i.e. 'F12'

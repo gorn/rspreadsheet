@@ -205,6 +205,7 @@ class Cell < XMLTiedItem
     remove_all_type_attributes
     Tools.set_ns_attribute(xmlnode,'table','formula','of:'+formulastring.to_s)
   end
+  def blank?; self.type==:empty or self.type==:unassigned end
 
 end
 
@@ -293,7 +294,6 @@ class CellFormat
     return nil if cellnode.nil?
     cellnode.doc.root.find("./office:automatic-styles#{xpath}").first 
   end
-
 end
 
 end

@@ -2,7 +2,7 @@ See [GUIDE.md](GUIDE.md#conventions) for syntax conventions.
 
 ## Ideas/wishlist
 
-  * In future inntroduce syntax like ``sheet.range('C3:E4')`` for mass operations. Also maybe ``sheet.cells('C3')`` or ``sheet.cells(3, 'C')`` etc.
+  * In future inntroduce syntax like `sheet.range('C3:E4')` for mass operations.
   * Trying to make row Enumerable - perhaps skipping empty or undefined cells.
   * Maybe insted two syntaxes for accessing cell, we make both of them do the same and return Proxy object which would act either as value or cell.
   * Document that there is a little distinction betwean RSpreadsheet and RSpreadsheet::Workbook. The former delegates everythink to the other.
@@ -18,6 +18,9 @@ Guiding ideas
   * no duplication of data. Objects like RowArray should containg minimum information. This one exists solely to speed up cell search. Taken to extream it is questionable, whether we need such objects at all, it might be possible to always work with xml directly.
   * all cells and rows only server as proxy. they hold index and worksheet pointer and everytime read or write is done, the xml is newly searched. until there is a xmlnode caching we have no problem
   * all cells returned for particular coordinates are **always the same object**. This way we have no problem to synchronize changes.
+    
+## Known Issues
+  * currently there is a confusing syntax @worksheet.rows(1).cells[5] which returns a cell object in SIXT column, which is not intended. It is side effecto of Row#cells returning an array
     
 ## Developing this gem
 

@@ -9,15 +9,18 @@ module Rspreadsheet
 #
 #     @row = @worksheet.rows(5)
 #
-# Mostly you will this object to access row cells
+# Mostly you will this object to access row cells values
 #
-#     @row.cells(2)     # identical to @worksheet.rows(5).cells(2)
-#     @row[2]           # identical to @worksheet[5,2] or @row.cells(2)
+#     @row[2]           # identical to @worksheet[5,2] or @row.cells(2).value
 #
-# or manipulate rows
+# or directly row `Cell` objects
+#
+#     @row.cells(2)     # => identical to @worksheet.rows(5).cells(2)
+#
+# You can use it to manipulate rows
 #
 #     @row.add_row_above   # adds empty row above
-#     @row.delete          # deletes row
+#     @row.delete          # deletes row 
 #
 # and shifts all other rows down/up appropriatelly.
 
@@ -43,12 +46,35 @@ class Row < XMLTiedItem
   
   ## @return [String or Float or Date] value of the cell
   # @param coli [Integer] colum index of the cell 
-  # returns value of the cell at column `coli`
+  # returns value of the cell at column `coli`. 
+  #  
+  #     @row = @worksheet.rows(5)     # with cells containing names of months
+  #     @row[1]                       # => "January" 
+  #     @row.cells(2).value           # => "February"  
+  #     @row[1].class                 # => String
   def [](coli); cells(coli).value end
-  ## @param coli [Integer] colum index of the cell 
-  # @param avalue [String or Float or Date] colum index of the cell  
-  # sets value of the cell at column `coli`
+  # @param avalue [Array] 
+  # sets value of cell in column `coli`
   def []=(coli,avalue); cells(coli).value=avalue end
+  # @param avalue [Array] array with values 
+  # sets values of cells of row to values from `avalue`. *Attention*: it deletes the rest of row
+  #  
+  #     @row = @worksheet.rows(5)     
+  #     @row.values = ["January", "Feb", nil, 4] # =>  | January | Feb |  | 4 |
+  #     @row[2] = "foo")                         # =>  | January | foo |  | 4 |
+  def cellvalues=(avalue)
+    self.truncate
+    avalue.each_with_index{ |val,i| self[i+1] = val }
+  end
+  ## @return [Array
+  # return array of cell values 
+  # 
+  #     @worksheet[3,3] = "text"
+  #     @worksheet[3,1] = 123
+  #     @worksheet.rows(3).cellvalues            # => [123, nil, "text"]
+  def cellvalues
+    cells.collect{|c| c.value}
+  end
  # @!endgroup
   
  # @!group Other methods
@@ -71,9 +97,6 @@ class Row < XMLTiedItem
   # Inserts row above itself (and shifts itself and all following rows down)
   def add_row_above
     parent.add_row_above(rowi)
-  end
-  def cellvalues
-    cells.collect{|c| c.value}
   end
   
  # @!group Private methods, which should not be called directly
