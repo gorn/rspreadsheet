@@ -16,15 +16,15 @@ See [GUIDE.md](GUIDE.md#conventions) for syntax conventions.
  
  ```ruby
 RSpreadsheet.generate('pricelist.ods') do
-  row 'Icecream name', 'Price'
-  { 'Vanilla' => 2, 'Banana' => 3, 'Strawbery' => 2.7 }.each do |icecream, price|
-   row icecream, price
-   row '2x 'icecream, price * 1.8
-  end
-  skip_line
-  row 'Menu made by rspreadsheet', :format => {:font => {:size => 5}}
-  move_to A5
-  cell 'Have a nice day!'
+   row 'Icecream name', 'Price'
+   { 'Vanilla' => 2, 'Banana' => 3, 'Strawbery' => 2.7 }.each do |icecream, price|
+     row icecream, price
+     row '2x 'icecream, price * 1.8
+   end
+   skip_line
+   row 'Menu made by rspreadsheet', :format => {:font => {:size => 5}}
+   move_to A5
+   cell 'Have a nice day!'
  end
 ```
 
