@@ -15,7 +15,7 @@ describe Rspreadsheet::Worksheet do
   end
 end
 
-describe Rspreadsheet::Worksheet, :focus do
+describe Rspreadsheet::Worksheet do
   before do
     book = Rspreadsheet.new
     @sheet = book.create_worksheet

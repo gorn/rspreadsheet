@@ -38,6 +38,9 @@ class Workbook
       else raise 'method worksheets requires Integer index of the sheet or its String name'
     end
   end
+  alias :worksheet :worksheets
+  alias :sheet :worksheets
+  alias :sheets :worksheets
   def [](index_or_name); self.worksheets(index_or_name) end
   #@!group Loading and saving related methods  
   def initialize(afilename=nil)

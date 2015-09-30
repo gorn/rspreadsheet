@@ -47,4 +47,12 @@ describe Rspreadsheet::Workbook do
     book['test'].should be book.worksheets(1)
     book[1].should be book.worksheets(1)
   end
+  it 'can access sheet with alternative syntax and always returns the same object' do
+    book = Rspreadsheet::Workbook.new
+    book.create_worksheet('test')
+    sheet = book.worksheets(1)
+    book.worksheet(1).should == sheet
+    book.sheet(1).should == sheet
+    book.sheets(1).should == sheet
+  end
 end 
