@@ -32,7 +32,7 @@ RSpreadsheet.generate('pricelist.ods') do
    * appendRaw(rowContents)
    * concept of active sheets with methods like - deleteActiveSheet, getActiveSheet, duplicateActiveSheet(), getActiveCell()
   * `@sheet.delete_column(2), @sheet.delete_columns(from, howmany), @sheet.delete_row(2), ...`
-  * GS API uses `@worsksheet.deletesheet(@sheet)` but it is nor very ruby way. What about `@worksheet.delete` or `@workbook.delete_sheet(2)` as syntactic shugar to `@workbook.worksheets(2).delete`
+  * GS API uses `@workbook.deletesheet(@sheet)` but it is nor very ruby way. What about `@worksheet.delete` or `@workbook.delete_sheet(2)` as syntactic shugar to `@workbook.worksheets(2).delete`
   * getAs(contentType) - Return the data inside this object as a blob converted to the specified content type. Maybe something like `@workbook.worksheets(2).to_pdf` or `@workbook.worksheets(2).to_blob('application/pdf')`. Is there anything like Blob in ruby?
   * getDataRange() - Returns a Range corresponding to the dimensions in which data is present
   * setActiveRange(range),  setActiveSelection(range) - ? what is the difference
