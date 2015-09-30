@@ -12,6 +12,19 @@ See [GUIDE.md](GUIDE.md#conventions) for syntax conventions.
   * `sheet.rows(1).cells` returns list of cells objects and `sheet.rows(1).cellvalues` return array of values with nils when empty
   * implement to_csv
   * longterm plan - go through other used libraries and try to find out whose syntax could be adopted, so this library is drop in replacement (possibly with some config options) for them
+  * iterative generation like this
+   
+    RSpreadsheet.generate('pricelist.ods') do
+      row 'Icecream name', 'Price'
+      { 'Vanilla' => 2, 'Banana' => 3, 'Strawbery' => 2.7 }.each do |icecream, price|
+        row icecream, price
+        row '2x 'icecream, price * 1.8
+      end
+      skip_line
+      row 'Menu made by rspreadsheet', :format => {:font => {:size => 5}}
+      move_to A5
+      cell 'Have a nice day!'
+    end
 
 Guiding ideas
   * xml document is always synchronized with the data. So the save is trivial.

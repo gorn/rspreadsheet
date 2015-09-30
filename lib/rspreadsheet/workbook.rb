@@ -5,31 +5,6 @@ module Rspreadsheet
 class Workbook
   attr_reader :filename
   attr_reader :xmlnode # debug
-  def initialize(afilename=nil)
-    @worksheets=[]
-    @filename = afilename
-    @content_xml = Zip::File.open(@filename || File.dirname(__FILE__)+'/empty_file_template.ods') do |zip|
-      LibXML::XML::Document.io zip.get_input_stream('content.xml')
-    end
-    @xmlnode = @content_xml.find_first('//office:spreadsheet')
-    @xmlnode.find('./table:table').each do |node|
-      create_worksheet_from_node(node)
-    end
-  end
-  def save(new_filename=nil)
-    if @filename.nil? and new_filename.nil? then raise 'New file should be named on first save.' end
-    # if the filename has changed than first copy the original file to new location (or template if it is a new file)
-    if new_filename
-      FileUtils.cp(@filename || File.dirname(__FILE__)+'/empty_file_template.ods', new_filename)
-      @filename = new_filename
-    end
-    Zip::File.open(@filename) do |zip|
-      # it is easy, because @xmlnode in in sync with contents all the time
-      zip.get_output_stream('content.xml') do |f|
-        f.write @content_xml.to_s(:indent => false)
-      end
-    end
-  end
   def xmldoc; @xmlnode.doc end
   
   #@!group Worskheets methods
@@ -64,6 +39,39 @@ class Workbook
     end
   end
   def [](index_or_name); self.worksheets(index_or_name) end
+  #@!group Loading and saving related methods  
+  def initialize(afilename=nil)
+    @worksheets=[]
+    @filename = afilename
+    @content_xml = Zip::File.open(@filename || File.dirname(__FILE__)+'/empty_file_template.ods') do |zip|
+      LibXML::XML::Document.io zip.get_input_stream('content.xml')
+    end
+    @xmlnode = @content_xml.find_first('//office:spreadsheet')
+    @xmlnode.find('./table:table').each do |node|
+      create_worksheet_from_node(node)
+    end
+  end
+  # @param [String] Optional new filename
+  # Saves the worksheet. Optionally you can provide new filename.
+  def save(new_filename=nil)
+    if @filename.nil? and new_filename.nil? then raise 'New file should be named on first save.' end
+    # if the filename has changed than first copy the original file to new location (or template if it is a new file)
+    if new_filename
+      FileUtils.cp(@filename || File.dirname(__FILE__)+'/empty_file_template.ods', new_filename)
+      @filename = new_filename
+    end
+    Zip::File.open(@filename) do |zip|
+      # it is easy, because @xmlnode in in sync with contents all the time
+      zip.get_output_stream('content.xml') do |f|
+        f.write @content_xml.to_s(:indent => false)
+      end
+    end
+  end
+  # @return Mime of the file
+  def mime; 'application/vnd.oasis.opendocument.spreadsheet' end
+  # @return [String] Prefered file extension
+  def mime_preferred_extension; 'ods' end
+  alias :mime_default_extension :mime_preferred_extension
   
   private 
   def register_worksheet(worksheet)
