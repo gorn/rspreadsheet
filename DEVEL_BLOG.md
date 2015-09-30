@@ -27,9 +27,10 @@ RSpreadsheet.generate('pricelist.ods') do
      cell 'Have a nice day!'
  end
 ```
+
 * possible ideas from [Google Spreadsheet API](https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet) (issue #9). For now just raw list of what could be used
-  * appendRaw(rowContents)
-  * concept of active sheets with methods like - deleteActiveSheet, getActiveSheet, duplicateActiveSheet(), getActiveCell()
+   * appendRaw(rowContents)
+   * concept of active sheets with methods like - deleteActiveSheet, getActiveSheet, duplicateActiveSheet(), getActiveCell()
   * `@sheet.delete_column(2), @sheet.delete_columns(from, howmany), @sheet.delete_row(2), ...`
   * GS API uses `@worsksheet.deletesheet(@sheet)` but it is nor very ruby way. What about `@worksheet.delete` or `@workbook.delete_sheet(2)` as syntactic shugar to `@workbook.worksheets(2).delete`
   * getAs(contentType) - Return the data inside this object as a blob converted to the specified content type. Maybe something like `@workbook.worksheets(2).to_pdf` or `@workbook.worksheets(2).to_blob('application/pdf')`. Is there anything like Blob in ruby?
