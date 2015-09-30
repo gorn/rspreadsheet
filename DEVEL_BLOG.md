@@ -13,20 +13,22 @@ See [GUIDE.md](GUIDE.md#conventions) for syntax conventions.
   * implement to_csv
   * longterm plan - go through other used libraries and try to find out whose syntax could be adopted, so this library is drop in replacement (possibly with some config options) for them
   * iterative generation like this
-   
-    RSpreadsheet.generate('pricelist.ods') do
-      row 'Icecream name', 'Price'
-      { 'Vanilla' => 2, 'Banana' => 3, 'Strawbery' => 2.7 }.each do |icecream, price|
-        row icecream, price
-        row '2x 'icecream, price * 1.8
-      end
-      skip_line
-      row 'Menu made by rspreadsheet', :format => {:font => {:size => 5}}
-      move_to A5
-      cell 'Have a nice day!'
-    end
+ 
+ ```
+RSpreadsheet.generate('pricelist.ods') do
+   row 'Icecream name', 'Price'
+   { 'Vanilla' => 2, 'Banana' => 3, 'Strawbery' => 2.7 }.each do |icecream, price|
+     row icecream, price
+     row '2x 'icecream, price * 1.8
+   end
+   skip_line
+   row 'Menu made by rspreadsheet', :format => {:font => {:size => 5}}
+   move_to A5
+   cell 'Have a nice day!'
+ end
+```
 
-Guiding ideas
+##Guiding ideas
   * xml document is always synchronized with the data. So the save is trivial.
   * no duplication of data. Objects like RowArray should containg minimum information. This one exists solely to speed up cell search. Taken to extream it is questionable, whether we need such objects at all, it might be possible to always work with xml directly.
   * all cells and rows only server as proxy. they hold index and worksheet pointer and everytime read or write is done, the xml is newly searched. until there is a xmlnode caching we have no problem
