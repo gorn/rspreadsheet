@@ -1,3 +1,33 @@
+## Guide to basic functionality
+### Opening the file
+
+You can open ODS file like this
+````ruby
+@workbook = Rspreadsheet.open('./test.ods')
+````
+and access its first sheet like this
+````ruby
+@sheet = @workbook.worksheets(1)
+````
+### Accessing cells
+
+you can get and set contents of cells using "verbatim" syntax like
+````ruby
+@sheet.rows(5).cells(4).value 
+@sheet.rows(5).cells(4).value = 10
+````
+or using "brief" syntax like
+````ruby
+@sheet[5,4]
+@sheet[5,4] = 10
+````
+
+You can mix these two at will, for example like this
+````ruby
+@row = @sheet.rows(5)
+@row[4] = 10
+````
+
 ## Examples
 
   * [basic functionality](https://gist.github.com/gorn/42e33d086d9b4fda10ec) 
