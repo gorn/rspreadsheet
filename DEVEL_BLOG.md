@@ -14,17 +14,17 @@ See [GUIDE.md](GUIDE.md#conventions) for syntax conventions.
   * longterm plan - go through other used libraries and try to find out whose syntax could be adopted, so this library is drop in replacement (possibly with some config options) for them
   * iterative generation like this
  
- ```
+ ```ruby
 RSpreadsheet.generate('pricelist.ods') do
-   row 'Icecream name', 'Price'
-   { 'Vanilla' => 2, 'Banana' => 3, 'Strawbery' => 2.7 }.each do |icecream, price|
-     row icecream, price
-     row '2x 'icecream, price * 1.8
-   end
-   skip_line
-   row 'Menu made by rspreadsheet', :format => {:font => {:size => 5}}
-   move_to A5
-   cell 'Have a nice day!'
+  row 'Icecream name', 'Price'
+  { 'Vanilla' => 2, 'Banana' => 3, 'Strawbery' => 2.7 }.each do |icecream, price|
+   row icecream, price
+   row '2x 'icecream, price * 1.8
+  end
+  skip_line
+  row 'Menu made by rspreadsheet', :format => {:font => {:size => 5}}
+  move_to A5
+  cell 'Have a nice day!'
  end
 ```
 
