@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/gorn/rspreadsheet.png?label=ready&title=Ready)](https://waffle.io/gorn/rspreadsheet)
 # rspreadsheet
 
 [![Build Status](https://api.travis-ci.org/gorn/rspreadsheet.svg?branch=master)](https://travis-ci.org/gorn/rspreadsheet) [![Coverage Status](https://coveralls.io/repos/gorn/rspreadsheet/badge.png)](https://coveralls.io/r/gorn/rspreadsheet)
