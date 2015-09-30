@@ -21,12 +21,32 @@ RSpreadsheet.generate('pricelist.ods') do
        row icecream, price
        row '2x 'icecream, price * 1.8
      end
-     skip_line
+     skip_row
      row 'Menu made by rspreadsheet', :format => {:font => {:size => 5}}
      move_to A5
      cell 'Have a nice day!'
  end
 ```
+* possible ideas from [Google Spreadsheet API](https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet) (issue #9). For now just raw list of what could be used
+  * appendRaw(rowContents)
+  * concept of active sheets with methods like - deleteActiveSheet, getActiveSheet, duplicateActiveSheet(), getActiveCell()
+  * `@sheet.delete_column(2), @sheet.delete_columns(from, howmany), @sheet.delete_row(2), ...`
+  * GS API uses `@worsksheet.deletesheet(@sheet)` but it is nor very ruby way. What about `@worksheet.delete` or `@workbook.delete_sheet(2)` as syntactic shugar to `@workbook.worksheets(2).delete`
+  * getAs(contentType) - Return the data inside this object as a blob converted to the specified content type. Maybe something like `@workbook.worksheets(2).to_pdf` or `@workbook.worksheets(2).to_blob('application/pdf')`. Is there anything like Blob in ruby?
+  * getDataRange() - Returns a Range corresponding to the dimensions in which data is present
+  * setActiveRange(range),  setActiveSelection(range) - ? what is the difference
+  * @sheet. getFrozenColumns(),  @sheet.getFrozenColumns() 
+  * getLastColumn(),  getLastRow()  
+  * getRange(a1Notation), getRangeByName(name), range.get_values
+  * getRowHeight(rowPosition)
+  * hideColumn(column), unhideColumn(column), insertColumnAfter(afterPosition), insertColumnsAfter(afterPosition, howMany), insertImage(blob, column, row)
+  * moveActiveSheet(pos) 
+  * sort(columnPosition,ascending=true) - Sorts a sheet by column. 
+  * Range#breakApart() - Break any multi-column cells in the range into individual cells again.
+  * Range#canEdit()
+  * Range#copyTo(destination)
+  * Range#merge() - Merges the cells in the range together into a single block.
+
 
 ##Guiding ideas
   * xml document is always synchronized with the data. So the save is trivial.
