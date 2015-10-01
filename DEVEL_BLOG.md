@@ -47,7 +47,7 @@ RSpreadsheet.generate('pricelist.ods') do
   * Range#canEdit()
   * Range#copyTo(destination)
   * Range#merge() - Merges the cells in the range together into a single block.
-
+* @book.sheet_names - Array of names of sheets.
 
 ##Guiding ideas
   * xml document is always synchronized with the data. So the save is trivial.
