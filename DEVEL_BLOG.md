@@ -73,11 +73,9 @@ RSpreadsheet.generate('pricelist.ods') do
 
 ### Local testing and releasing (to github and rubygems).
 
-1. make changes
-2. test if all tests pass (run `bundle exec guard` to test automatically). If not go to 1
-3. build and install locally
-    * ``rake build`` - builds the gem to pkg directory (if something gets wrong, sometimes comit go git gelps)
-    * ``sudo rake install`` - installs gem to local system [^1]
+1. Make changes
+2. Test if all tests pass (run `bundle exec guard` to test automatically). If not go to 1.
+3. Build and install locally using script `./reinstall_local_gem.sh` (see [details](reinstall_local_gem.sh))
 4. Now can locally and manually use/test the gem. This should not be replacement for automated testing. If you make some changes, go to 1.
 5. When happy, increment the version number and `git add .; git commit -am'commit message'; git push`
 6. ``rake release`` - creates a version tag in git and pushes the code to github + Rubygems. After this is succesfull the new version appears as release in Github and RubyGems.
@@ -87,8 +85,6 @@ gem alternativa to points 3-6
     gem build rspreadsheet.gemspec              -\   These two lines together are in install.sh
     sudo gem install rspreadsheet-x.y.z.gem     -/   which should be invoked from parent directory
     gem push rspreadsheet-x.y.z.gem             releases the gem, do not forgot to update version in rspreadsheet.gemspec before doing this
-
-[^1]:  if this fails with "mkmf.rb can't find header files for ruby at /usr/lib/ruby/include/ruby.h" you may want to ``sudo aptitude install ruby-dev``
 
 ### Naming conventions
 

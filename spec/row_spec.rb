@@ -103,15 +103,18 @@ describe Rspreadsheet::Row do
     @sheet1.rows(17).style_name = 'newstylename2'
     @sheet1.rows(17).xmlnode.attributes.get_attribute_ns(table_ns_href,'style-name').value.should == 'newstylename2'
   end
-  it 'ignores negative and zero row indexes or raises exception depending on configuration' do
+  it 'returns nil on negative and zero row indexes or raises exception depending on configuration' do
+    pom = Rspreadsheet.raise_on_negative_coordinates
     # default is to raise exception
     expect { @sheet1.rows(0) }.to raise_error
-    expect { @sheet1.rows(78) }.to raise_error
+    expect { @sheet1.rows(-78) }.to raise_error
 
     # if configured, it needs to ignore it (and return nil)
     Rspreadsheet.raise_on_negative_coordinates = false
     @sheet1.rows(0).should be_nil
     @sheet1.rows(-78).should be_nil
+    
+    Rspreadsheet.raise_on_negative_coordinates = pom  # reset the setting back
   end
   it 'has correct rowindex' do
     @sheet1.rows(5).detach

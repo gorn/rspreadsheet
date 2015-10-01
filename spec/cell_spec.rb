@@ -52,10 +52,18 @@ describe Rspreadsheet::Cell do
     @cell.range.should == (1..4)
     @cell.mode.should == :repeated
   end
-  it 'does not accept negative and zero coordinates' do
-    @sheet2.cells(0,5).should be(nil)
+  it 'returns nil on negative and zero cell indexes or raises exception depending on configuration' do
+    pom = Rspreadsheet.raise_on_negative_coordinates
+    # default is to raise error
+    expect {@sheet2.cells(0,5) }.to raise_error
+  
+    # return nil if configured to do so
+    Rspreadsheet.raise_on_negative_coordinates = false
+    @sheet2.cells(0,5).should be_nil
     @sheet2.cells(2,-5).should be(nil)
     @sheet2.cells(-2,-5).should be(nil)
+    
+    Rspreadsheet.raise_on_negative_coordinates = pom  # reset the setting back
   end
   it 'has nonempty parents' do
     @cell = @sheet2.cells(13,5)

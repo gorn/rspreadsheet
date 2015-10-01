@@ -68,13 +68,28 @@ describe Rspreadsheet::Worksheet do
       @sheet.name = 'Cofee'
       @sheet.name.should == 'Cofee'    
     end
-    it 'out of range indexes return nil value' do
-      @sheet[-1,-1].should == nil
-      @sheet[0,0].should == nil
+    it 'out of range indexes return nil value or raise if configured to do so' do
       @sheet[999,999].should == nil
+
+      pom = Rspreadsheet.raise_on_negative_coordinates
+      expect { @sheet[-1,-1] }.to raise_error   # default is to raise error
+      expect { @sheet[0,0] }.to raise_error
+      expect { @sheet[-2,-5] }.to raise_error
+      
+      Rspreadsheet.raise_on_negative_coordinates = false
+      @sheet[-1,-1].should be_nil               # return nil if configured to do so
+      @sheet[0,0].should be_nil
+      @sheet[-2,-5].should be_nil
+      
+      Rspreadsheet.raise_on_negative_coordinates = pom  # reset the setting back
     end
-    it 'returns nil with negative index' do
-      @sheet.rows(-1).should == nil
+    it 'returns nil with negative index or raise if configured to do so' do
+      pom = Rspreadsheet.raise_on_negative_coordinates
+      expect { @sheet.rows(-1) }.to raise_error          # default is to raise error
+      
+      Rspreadsheet.raise_on_negative_coordinates = false
+      @sheet.rows(-1).should == nil                      # return nil if configured to do so
+      Rspreadsheet.raise_on_negative_coordinates = pom   # reset the setting back
     end
   end
-end 
+end

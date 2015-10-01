@@ -23,7 +23,7 @@ class Worksheet
   end
   
   # name of the worksheet
-  # @returns [String]
+  # @returns [String] the name of the worksheet
   def name; Tools.get_ns_attribute_value(@xmlnode,'table','name') end
   def name=(value); Tools.set_ns_attribute(@xmlnode,'table','name', value) end
   
