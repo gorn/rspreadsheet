@@ -53,7 +53,7 @@ This is also pubished as Gist **where you can leave you comments and suggestions
   * [extended examples](https://gist.github.com/gorn/b432e6a69e82628349e6) of lots of alternative syntax
   * [GUIDE.md](GUIDE.md) some other notes
 
-## Installation
+## Installation and Configuration
 
 Gem is on [Rubygems](https://rubygems.org/gems/rspreadsheet) so you can install it by
 
@@ -98,6 +98,7 @@ One of the main ideas is that the manipulation with OpenDOcument files should be
 ## Further reading
 
 * [Advanced Guide](GUIDE.md) how to use the gem
+* [Configuration](CONFIGURATION.md) of the gem
 * [Code documentation](http://www.rubydoc.info/github/gorn/rspreadsheet) is hosted on [rubydoc.info](http://www.rubydoc.info/)
 * [Changelog](CHANGELOG.md)
 * [Documentation for developers](DEVEL_BLOG.md) containing ideas for future development and documentation on testing tools
