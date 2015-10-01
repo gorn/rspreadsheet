@@ -50,9 +50,10 @@ describe Rspreadsheet::Workbook do
   it 'can access sheet with alternative syntax and always returns the same object' do
     book = Rspreadsheet::Workbook.new
     book.create_worksheet('test')
+    book.create_worksheet('test2')
     sheet = book.worksheets(1)
     book.worksheet(1).should == sheet
     book.sheet(1).should == sheet
-    book.sheets(1).should == sheet
+    book.sheets(2).should_not == sheet
   end
 end 

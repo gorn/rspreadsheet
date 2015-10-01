@@ -13,7 +13,7 @@ class Workbook
     register_worksheet(sheet)
     return sheet
   end
-  def create_worksheet(name = "Strana #{worksheets_count}")
+  def create_worksheet(name = "Sheet#{worksheets_count+1}")
     sheet = Worksheet.new(name)
     register_worksheet(sheet)
     return sheet
