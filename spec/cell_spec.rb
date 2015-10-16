@@ -94,6 +94,8 @@ describe Rspreadsheet::Cell do
     @sheet2.cells(3,1).type.should eq :float
     @sheet2.cells(3,2).type.should eq :percentage
     @sheet2.cells(4,2).type.should eq :string
+    @sheet2.cells('B22').type.should eq :currency
+    @sheet2.cells('B23').type.should eq :currency
     @sheet2.cells(200,200).type.should eq :unassigned
   end
   it 'returns value of correct type' do
@@ -310,6 +312,16 @@ describe Rspreadsheet::Cell do
     @cell.value = 'baf'
     @cell.type.should eq :string
     @cell.formula.should be_nil
+  end
+  it 'works well with currency types' do
+    @usdcell = @sheet2.cells('B22')
+    @usdcell.type.should eq :currency
+    @usdcell.value.should == -147984.84
+    @usdcell.format.currency.should == 'USD'
+    
+    @czkcell = @sheet2.cells('B23')
+    @czkcell.value.should == 344.to_d
+    @czkcell.format.currency.should == 'CZK'
   end
 end
 
