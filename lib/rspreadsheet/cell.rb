@@ -5,8 +5,8 @@
 require 'andand'
 require 'rspreadsheet/xml_tied'
 require 'date'
-
-
+require 'bigdecimal'
+require 'bigdecimal/util' # for to_d method
 
 module Rspreadsheet
 
@@ -60,6 +60,7 @@ class Cell < XMLTiedItem
         when gt == String then xmlnode.elements.first.andand.content.to_s
         when gt == Date then Date.strptime(xmlnode.attributes['date-value'].to_s, '%Y-%m-%d')
         when gt == :percentage then xmlnode.attributes['value'].to_f
+        when gt == :currency then xmlnode.attributes['value'].to_d
       end
     elsif self.mode == :outbound
       nil
@@ -121,6 +122,7 @@ class Cell < XMLTiedItem
       when gct == Date   then :date
       when gct == :percentage then :percentage
       when gct == :unassigned then :unassigned
+      when gct == :currency then :currency
       when gct == NilClass then :empty
       when gct == nil then :unknown
       else :unknown
@@ -146,6 +148,7 @@ class Cell < XMLTiedItem
         when 'date' then Date
         when 'percentage' then :percentage
         when 'N/A' then :unassigned
+        when 'currency' then :currency
         else 
           if xmlnode.children.size == 0
             nil
@@ -293,6 +296,9 @@ class CellFormat
   def style_node_with_partial_xpath(xpath)
     return nil if cellnode.nil?
     cellnode.doc.root.find("./office:automatic-styles#{xpath}").first 
+  end
+  def currency
+    Tools.get_ns_attribute_value(cellnode,'office','currency',nil) 
   end
 end
 
