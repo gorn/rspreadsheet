@@ -2,7 +2,6 @@
 # @author Jakub Tesinsky
 # @title rspreadsheet Cell
 
-require 'andand'
 require 'rspreadsheet/xml_tied'
 require 'date'
 require 'bigdecimal'
@@ -23,7 +22,7 @@ class Cell < XMLTiedItem
   # `xml_options[:xml_items_node_name]` gives the name of the tag representing cell
   # `xml_options[:number-columns-repeated]` gives the name of the previous tag which sais how many times the item is repeated
   def xml_options; {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'} end
-  
+
   ## defining abstract methods from XMLTiedItem
   # returns parent XMLTiedArray object of myself (XMLTiedItem)
   def parent; row end
@@ -54,10 +53,10 @@ class Cell < XMLTiedItem
   def value
     gt = guess_cell_type
     if (self.mode == :regular) or (self.mode == :repeated)
-      case 
+      case
         when gt == nil then nil
         when gt == Float then xmlnode.attributes['value'].to_f
-        when gt == String then xmlnode.elements.first.andand.content.to_s
+        when gt == String then xmlnode.elements.first && xmlnode.elements.first.content.to_s
         when gt == Date then Date.strptime(xmlnode.attributes['date-value'].to_s, '%Y-%m-%d')
         when gt == :percentage then xmlnode.attributes['value'].to_f
         when gt == :currency then xmlnode.attributes['value'].to_d
@@ -77,21 +76,21 @@ class Cell < XMLTiedItem
         when gt == Float then
           remove_all_value_attributes_and_content(xmlnode)
           set_type_attribute('float')
-          Tools.set_ns_attribute(xmlnode,'office','value', avalue.to_s) 
+          Tools.set_ns_attribute(xmlnode,'office','value', avalue.to_s)
           xmlnode << Tools.prepare_ns_node('text','p', avalue.to_f.to_s)
         when gt == String then
           remove_all_value_attributes_and_content(xmlnode)
           set_type_attribute('string')
           xmlnode << Tools.prepare_ns_node('text','p', avalue.to_s)
-        when gt == Date then 
+        when gt == Date then
           remove_all_value_attributes_and_content(xmlnode)
           set_type_attribute('date')
           Tools.set_ns_attribute(xmlnode,'office','date-value', avalue.strftime('%Y-%m-%d'))
-          xmlnode << Tools.prepare_ns_node('text','p', avalue.strftime('%Y-%m-%d')) 
+          xmlnode << Tools.prepare_ns_node('text','p', avalue.strftime('%Y-%m-%d'))
         when gt == :percentage then
           remove_all_value_attributes_and_content(xmlnode)
           set_type_attribute('percentage')
-          Tools.set_ns_attribute(xmlnode,'office','value', '%0.2d%' % avalue.to_f) 
+          Tools.set_ns_attribute(xmlnode,'office','value', '%0.2d%' % avalue.to_f)
           xmlnode << Tools.prepare_ns_node('text','p', (avalue.to_f*100).round.to_s+'%')
       end
     else
@@ -116,7 +115,7 @@ class Cell < XMLTiedItem
   end
   def type
     gct = guess_cell_type
-    case 
+    case
       when gct == Float  then :float
       when gct == String then :string
       when gct == Date   then :date
@@ -149,10 +148,10 @@ class Cell < XMLTiedItem
         when 'percentage' then :percentage
         when 'N/A' then :unassigned
         when 'currency' then :currency
-        else 
+        else
           if xmlnode.children.size == 0
             nil
-          else 
+          else
             raise "Unknown type at #{coordinates.to_s} from #{xmlnode.to_s} / children size=#{xmlnode.children.size.to_s} / type=#{xmlnode.attributes['value-type'].to_s}"
           end
       end
@@ -165,7 +164,7 @@ class Cell < XMLTiedItem
           elsif (String(avalue) rescue false) # otherwise try string
             String
           else # if not convertible to anything concious then nil
-            nil 
+            nil
           end
         else             # without value we just beleive typeguess
           typeguess
@@ -179,7 +178,7 @@ class Cell < XMLTiedItem
           nil
         end
       end
-    elsif valueguess == Float and xmlnode.andand.attributes['value-type'] == 'percentage'
+    elsif valueguess == Float and (xmlnode && xmlnode.attributes['value-type'] == 'percentage')
       result = :percentage
     end
     result
@@ -190,11 +189,11 @@ class Cell < XMLTiedItem
   def address
     Tools.convert_cell_coordinates_to_address(coordinates)
   end
-  
+
   def formula
-    rawformula = Tools.get_ns_attribute(xmlnode,'table','formula',nil).andand.value
+    rawformula = Tools.get_ns_attribute(xmlnode,'table','formula',nil) && Tools.get_ns_attribute(xmlnode,'table','formula',nil).value
     if rawformula.nil?
-      nil 
+      nil
     elsif rawformula.match(/^of:(.*)$/)
       $1
     else
@@ -219,10 +218,10 @@ class CellFormat
     @cell = cell
   end
   def cellnode; @cell.xmlnode end
-  
+
   # text style attribute readers
   def bold;      get_text_style_node_attribute('font-weight') == 'bold' end
-  alias :bold? :bold 
+  alias :bold? :bold
   def italic;    get_text_style_node_attribute('font-style') == 'italic' end
   def color;     get_text_style_node_attribute('color') end
   def font_size; get_text_style_node_attribute('font-size') end
@@ -233,7 +232,7 @@ class CellFormat
   def get_cell_style_node_attribute(attribute_name)
     cell_style_node.nil? ? nil : Tools.get_ns_attribute_value(cell_style_node,'fo',attribute_name)
   end
-  
+
   # text style attribute writers
   def bold=(value);     set_text_style_node_attribute('font-weight', value ? 'bold' : 'normal') end
   def italic=(value);   set_text_style_node_attribute('font-style',  value ? 'italic' : 'normal') end
@@ -255,7 +254,7 @@ class CellFormat
     end
     Tools.set_ns_attribute(cell_style_node,'fo',attribute_name,value)
   end
-  
+
  # @!group initialization of style related nodes, if they do not exist
   def create_text_style_node
     create_style_node if style_name.nil? or style_node.nil?
@@ -280,11 +279,11 @@ class CellFormat
     automatic_styles_node << anode
     raise 'Style node was not correctly initialized' if style_node.nil?
   end
-  
+
   def unused_cell_style_name
     last = (cellnode.nil? ? [] : cellnode.doc.root.find('./office:automatic-styles/style:style')).
       collect {|node| node['name']}.
-      collect{ |name| /^ce(\d*)$/.match(name); $1.andand.to_i}.
+      collect{ |name| /^ce(\d*)$/.match(name); $1 && $1.to_i}.
       compact.max || 0
     "ce#{last+1}"
   end
@@ -295,10 +294,10 @@ class CellFormat
   def cell_style_node; style_node_with_partial_xpath("/style:style[@style:name=\"#{style_name}\"]/style:table-cell-properties") end
   def style_node_with_partial_xpath(xpath)
     return nil if cellnode.nil?
-    cellnode.doc.root.find("./office:automatic-styles#{xpath}").first 
+    cellnode.doc.root.find("./office:automatic-styles#{xpath}").first
   end
   def currency
-    Tools.get_ns_attribute_value(cellnode,'office','currency',nil) 
+    Tools.get_ns_attribute_value(cellnode,'office','currency',nil)
   end
 end
 

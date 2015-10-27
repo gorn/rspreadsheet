@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Rspreadsheet::Row do
-  before do 
+  before do
     @sheet1 = Rspreadsheet.new.create_worksheet
     @sheet2 = Rspreadsheet.new($test_filename).worksheets(1)
   end
@@ -9,7 +9,7 @@ describe Rspreadsheet::Row do
     @row = @sheet2.rows(1)
     @c = @row.cells(1)
     @c.value = 3
-    @c.value.should == 3 
+    @c.value.should == 3
   end
   it 'allows access to cells using different syntax' do
     @row = @sheet1.rows(1)
@@ -23,38 +23,38 @@ describe Rspreadsheet::Row do
   end
   it 'can be detached and changes to unrepeated if done' do
     @row = @sheet1.rows(5)
-    @row.xmlnode.andand.name.should_not == 'table-row'
+    @row.xmlnode && @row.xmlnode.name.should_not == 'table-row'
     @row2 = @row.detach
     @row2.xmlnode.name.should == 'table-row'
-    @row2.is_repeated?.should == false    
+    @row2.is_repeated?.should == false
   end
   it 'is the synchronized object, now matter how you access it' do
     @row1 = @sheet1.rows(5)
     @row2 = @sheet1.rows(5)
     @row1.should equal(@row2)
-    
+
     @sheet1.rows(5).cells(2).value = 'nejakydata'
     @row1 = @sheet1.rows(5)
     @row2 = @sheet1.rows(5)
     @row1.should equal(@row2)
-  
+
   end
   it 'cells in row are settable through sheet' do
     @sheet1.rows(9).cells(1).value = 2
     @sheet1.rows(9).cells(1).value.should == 2
-    
+
     @sheet1.rows(7).cells(1).value = 7
     @sheet1.rows(7).cells(1).value.should == 7
-    
+
     @sheet1.rows(5).cells(1).value = 5
     @sheet1.rows(5).cells(1).value.should == 5
 
     (2..5).each { |i| @sheet1.rows(3).cells(i).value = i }
-    (2..5).each { |i| 
+    (2..5).each { |i|
       a = @sheet1.rows(3)
       c = a.cells(i)
-      c.value.should == i 
-    } 
+      c.value.should == i
+    }
   end
   it 'is found even in empty sheets' do
     @sheet1.rows(5).should be_kind_of(Rspreadsheet::Row)
@@ -77,26 +77,26 @@ describe Rspreadsheet::Row do
   end
   it 'detachment assigns correct namespaces to node' do
     @sheet1.rows(5).detach
-    @xmlnode = @sheet1.rows(5).xmlnode 
+    @xmlnode = @sheet1.rows(5).xmlnode
     @xmlnode.namespaces.to_a.size.should >5
     @xmlnode.namespaces.namespace.should_not be_nil
-    @xmlnode.namespaces.namespace.prefix.should == 'table'   
+    @xmlnode.namespaces.namespace.prefix.should == 'table'
   end
   it 'by assigning value, the repeated row is automatically detached' do
     @sheet1.rows(15).detach
-  
+
     @sheet1.rows(2).repeated?.should == true
     @sheet1.rows(2).cells(2).value = 'nejakydata'
     @sheet1.rows(2).repeated?.should == false
-    
+
     @sheet1.rows(22).repeated?.should == true
     @sheet1.rows(22).cells(7).value = 'nejakydata'
     @sheet1.rows(22).repeated?.should == false
-  end    
+  end
   it 'styles can be assigned to rows' do
     @sheet1.rows(5).detach
     table_ns_href = "urn:oasis:names:tc:opendocument:xmlns:table:1.0"
-    
+
     @sheet1.rows(5).style_name = 'newstylename'
     @sheet1.rows(5).xmlnode.attributes.get_attribute_ns(table_ns_href,'style-name').value.should == 'newstylename'
 
@@ -113,7 +113,7 @@ describe Rspreadsheet::Row do
     Rspreadsheet.raise_on_negative_coordinates = false
     @sheet1.rows(0).should be_nil
     @sheet1.rows(-78).should be_nil
-    
+
     Rspreadsheet.raise_on_negative_coordinates = pom  # reset the setting back
   end
   it 'has correct rowindex' do
@@ -141,9 +141,9 @@ describe Rspreadsheet::Row do
 
     ## attributes have namespaces
     @sheet2.rows(1).xmlnode.attributes.each { |attr| attr.ns.should_not be_nil}
-    
+
     ## attributes are not douubled
-    xmlattrs = @sheet2.rows(1).xmlnode.attributes.to_a.collect{ |a| [a.ns.andand.prefix.to_s,a.name].reject{|x| x.empty?}.join(':')}
+    xmlattrs = @sheet2.rows(1).xmlnode.attributes.to_a.collect{ |a| [a.ns && a.ns.prefix.to_s,a.name].reject{|x| x.empty?}.join(':')}
     duplication_hash = xmlattrs.inject(Hash.new(0)){ |h,e| h[e] += 1; h }
     duplication_hash.each { |k,v| v.should_not >1 }  # should not contain duplicates
   end
@@ -156,7 +156,7 @@ describe Rspreadsheet::Row do
   it 'nonempty cells work properly' do
     nec = @sheet2.rows(1).nonemptycells
     nec.collect{ |c| c.coordinates}.should == [[1,1],[1,2]]
-    
+
     nec = @sheet2.rows(19).nonemptycells
     nec.collect{ |c| c.coordinates}.should == [[19,6]]
   end
@@ -169,12 +169,12 @@ describe Rspreadsheet::Row do
     @row2 = @sheet2.rows(15)
     @row2.mode.should == :repeated
     @row2.range.should == (14..18)
-    
+
     @sheet1.rows(15).detach
-  
+
     @sheet1.rows(2).repeated?.should == true
     @sheet1.rows(2).range.should  == (1..14)
-    
+
     @sheet1.rows(22).repeated?.should == true
     @sheet1.rows(22).range.should  == (16..Float::INFINITY)
   end
@@ -182,16 +182,16 @@ describe Rspreadsheet::Row do
     @sheet1.rows(15).detach
     @sheet1.rows(20).detach
     @row = @sheet1.rows(16)
-    
+
     @row.range.should == (16..19)
     @row.rowi.should == 16
-    
+
     @sheet1.add_row_above(7)
     @sheet1.rows(17).range.should == (17..20)
     @row.range.should == (17..20)
     @row.rowi.should == 17
     @sheet1.rows(17).should equal(@row)
-    
+
     @row.add_row_above
     @row.rowi.should == 18
   end
@@ -213,9 +213,9 @@ describe Rspreadsheet::Row do
     @row[1] = 'data1'
     @row[1].should eq 'data1'
     @row.rowi.should == 15
-    
+
     @sheet1.rows(7).delete
-    
+
     @row[1].should eq 'data1'
     @row.rowi.should == 14
 
@@ -236,7 +236,7 @@ describe Rspreadsheet::Row do
 #     @row.size.should == 0
     @row.cellvalues= ['January',nil,3]
     @row.size.should == 3
-    @row.cells(1).value.should == 'January' 
+    @row.cells(1).value.should == 'January'
     @row.cells(2).blank?.should be_truthy
     @row.cells(3).value.should == 3
     @row.cellvalues = [1]
@@ -257,4 +257,4 @@ describe Rspreadsheet::Row do
   end
 end
 
- 
+

@@ -4,7 +4,7 @@ module Rspreadsheet
 module Tools
   def self.only_letters?(x); x.kind_of?(String) and x.match(/^[A-Za-z]*$/) != nil end
   def self.kind_of_integer?(x)
-    (x.kind_of?(Numeric) and x.to_i==x) or 
+    (x.kind_of?(Numeric) and x.to_i==x) or
     (x.kind_of?(String) and x.match(/^\d*(\.0*)?$/) != nil)
   end
 
@@ -17,7 +17,7 @@ module Tools
     elsif addr.length == 2
       a = addr[0]; b = addr[1]
       if a.kind_of?(Integer) and b.kind_of?(Integer) # most common case first
-        colname,rowname = b,a 
+        colname,rowname = b,a
       elsif only_letters?(a)
         if kind_of_integer?(b)
           colname,rowname = a,b.to_i
@@ -32,20 +32,20 @@ module Tools
         else
           raise 'Wrong second out of two paremeters - mix of digits and numbers'
         end
-      else 
+      else
         raise 'Wrong first out of two paremeters - mix of digits and numbers'
       end
     else
       raise 'Wrong number of arguments'
     end
-     
+
     ## first possibility how to implement it
     # colname=colname.rjust(3,'@')
     # col = (colname[-1].ord-64)+(colname[-2].ord-64)*26+(colname[-3].ord-64)*26*26
 
     ## second possibility how to implement it
     # col=(colname.to_i(36)-('A'*colname.size).to_i(36)).to_s(36).to_i(26)+('1'*colname.size).to_i(26)
-    
+
     if colname.kind_of?(Integer)
       col=colname
     else
@@ -53,7 +53,7 @@ module Tools
       s=colname.size
       col=(colname.upcase.to_i(36)-(36**s-1).div(3.5)).to_s(36).to_i(26)+(26**s-1)/25
     end
-    
+
     row = rowname
     return [row,col]
   end
@@ -133,7 +133,7 @@ module Tools
     raise 'Tools.set_ns_attribute can not set attribute on nil node' if node.nil?
     ns = Tools.get_namespace(ns_prefix)
     attr = node.attributes.get_attribute_ns(ns.href, key)
-    
+
     unless value==delete_value # set attribute
       if attr.nil? # create attribute if needed
         attr = LibXML::XML::Attr.new(node, key,'temporarilyempty')
@@ -142,7 +142,7 @@ module Tools
       attr.value = value.to_s
       attr
     else # remove attribute
-      attr.remove! unless attr.nil? 
+      attr.remove! unless attr.nil?
       nil
     end
   end
@@ -155,20 +155,20 @@ module Tools
   end
   def self.get_ns_attribute_value(node,ns_prefix,key,default=:undefined_default)
     if default==:undefined_default
-      Tools.get_ns_attribute(node,ns_prefix,key).andand.value
+      Tools.get_ns_attribute(node,ns_prefix,key) && Tools.get_ns_attribute(node,ns_prefix,key).value
     else
-      node.nil? ? default : Tools.get_ns_attribute(node,ns_prefix,key,nil).andand.value || default
+      node.nil? ? default : (Tools.get_ns_attribute(node,ns_prefix,key,nil) && Tools.get_ns_attribute(node,ns_prefix,key,nil).value) || default
     end
   end
   def self.remove_ns_attribute(node,ns_prefix,key)
     node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key)
-    attr.remove! unless attr.nil? 
+    attr.remove! unless attr.nil?
   end
   def self.prepare_ns_node(ns_prefix,nodename,value=nil)
     LibXML::XML::Node.new(nodename,value, Tools.get_namespace(ns_prefix))
   end
 end
- 
+
 end
 
 # @private
