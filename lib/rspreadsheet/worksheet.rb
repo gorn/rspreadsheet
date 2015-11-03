@@ -1,4 +1,5 @@
 require 'rspreadsheet/row'
+require 'rspreadsheet/column'
 require 'rspreadsheet/tools'
 # require 'forwardable'
 
@@ -54,6 +55,7 @@ class Worksheet
   
   #@!group XMLTiedArray connected methods
   def rows(*params); subitems(*params) end
+  alias :row :rows
   def prepare_subitem(rowi); Row.new(self,rowi) end
   def rowcache; @itemcache end
   
@@ -82,9 +84,14 @@ class Worksheet
       when 0 then raise 'Not implemented yet' #TODO: return list of all cells
       when 1..2
         r,c = Rspreadsheet::Tools.a2c(*params)
-        rows(r).andand.cells(c)
+        row(r).andand.cell(c)
       else raise Exception.new('Wrong number of arguments.')
     end
+  end
+  alias :cell :cells
+  def column(param)
+    r,coli = Rspreadsheet::Tools.a2c(1,param)
+    Column.new(self,coli)
   end
   # Allows syntax like sheet.F15. TO catch errors easier, allows only up to three uppercase letters in colum part, althought it won't be necessarry to restrict.
   def method_missing method_name, *args, &block

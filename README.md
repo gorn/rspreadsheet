@@ -16,20 +16,20 @@ sheet = book.worksheets(1)
 # get value of a cell B5 (there are more ways to do this)
 sheet.B5                       # => 'cell value'
 sheet[5,2]                     # => 'cell value'
-sheet.rows(5).cells(2).value   # => 'cell value'
+sheet.row(5).cell(2).value   # => 'cell value'
 
 # set value of a cell B5
 sheet.F5 = 'text'
 sheet[5,2] = 7
-sheet.cells(5,2).value = 1.78
+sheet.cell(5,2).value = 1.78
 
 # working with cell format
-sheet.cells(5,2).format.bold = true
-sheet.cells(5,2).format.background_color = '#FF0000'
+sheet.cell(5,2).format.bold = true
+sheet.cell(5,2).format.background_color = '#FF0000'
 
 # calculate sum of cells in row
-sheet.rows(5).cellvalues.sum
-sheet.rows(5).cells.sum{ |cell| cell.value.to_f }
+sheet.row(5).cellvalues.sum
+sheet.row(5).cells.sum{ |cell| cell.value.to_f }
 
 # or set formula to a cell
 sheet.A1.formula='=SUM(A2:A9)'

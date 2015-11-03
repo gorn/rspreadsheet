@@ -66,8 +66,8 @@ end
 
 # abstract class. All importers MUST implement: prepare_subitem (and delete)
 # terminology
-#  item, subitem is object from @itemcache (quite often subclass of XMLTiedItem)
-#  node, subnode is LibXML::XML::Node object
+#   item, subitem is object from @itemcache (quite often subclass of XMLTiedItem)
+#   node, subnode is LibXML::XML::Node object
 #
 # this class is made to be included, not subclassed - the reason is in delete method which calls super
 # @private

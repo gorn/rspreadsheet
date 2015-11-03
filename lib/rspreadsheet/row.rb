@@ -7,7 +7,7 @@ module Rspreadsheet
 # Represents a row in a spreadsheet which has coordinates, contains value, formula and can be formated.
 # You can get this object like this (suppose that @worksheet contains {Rspreadsheet::Worksheet} object)
 #
-#     @row = @worksheet.rows(5)
+#     @row = @worksheet.row(5)
 #
 # Mostly you will this object to access row cells values
 #
@@ -15,7 +15,7 @@ module Rspreadsheet
 #
 # or directly row `Cell` objects
 #
-#     @row.cells(2)     # => identical to @worksheet.rows(5).cells(2)
+#     @row.cell(2)     # => identical to @worksheet.rows(5).cells(2)
 #
 # You can use it to manipulate rows
 #
@@ -43,6 +43,7 @@ class Row < XMLTiedItem
     
  # @!group Syntactic sugar
   def cells(*params); subitems(*params) end
+  alias :cell :cells
   
   ## @return [String or Float or Date] value of the cell
   # @param coli [Integer] colum index of the cell 
