@@ -49,6 +49,10 @@ RSpreadsheet.generate('pricelist.ods') do
   * Range#merge() - Merges the cells in the range together into a single block.
 * @book.sheet_names - Array of names of sheets.
 
+
+* array returned by rows of cells can have predefined dummy object as defaults for out of range indexes
+
+
 ##Guiding ideas
   * xml document is always synchronized with the data. So the save is trivial.
   * no duplication of data. Objects like RowArray should containg minimum information. This one exists solely to speed up cell search. Taken to extream it is questionable, whether we need such objects at all, it might be possible to always work with xml directly.
