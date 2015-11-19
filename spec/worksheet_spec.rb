@@ -1,4 +1,5 @@
 require 'spec_helper'
+using ClassExtensions
 
 describe Rspreadsheet::Worksheet do
   describe "from test workbook file" do 

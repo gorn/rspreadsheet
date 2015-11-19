@@ -7,8 +7,10 @@ require 'rspreadsheet/xml_tied'
 require 'date'
 require 'bigdecimal'
 require 'bigdecimal/util' # for to_d method
+require 'helpers/class_extensions'
 
 module Rspreadsheet
+using ClassExtensions
 
 ###
 # Represents a cell in spreadsheet which has coordinates, contains value, formula and can be formated.

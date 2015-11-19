@@ -1,4 +1,8 @@
+require 'helpers/class_extensions'
+
 module Rspreadsheet
+
+using ClassExtensions
 
 # @private
 class XMLTied

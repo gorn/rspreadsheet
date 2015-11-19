@@ -1,4 +1,5 @@
 require 'spec_helper'
+using ClassExtensions
 
 describe Rspreadsheet do
   it 'can open ods testfile and reads its content correctly' do
@@ -42,7 +43,7 @@ describe Rspreadsheet do
     @content_xml2.root.first_diff(@content_xml1.root).should be_nil
     @content_xml1.root.first_diff(@content_xml2.root).should be_nil
     
-    @content_xml1.root.equals?(@content_xml2.root).should == true
+    @content_xml1.root.should == @content_xml2.root
   end
   it 'when open and save file modified, than the file is different' do
     tmp_filename = '/tmp/testfile1.ods'        # first delete temp file
@@ -87,7 +88,7 @@ describe Rspreadsheet do
       sheet.cells(5,2).format.bold = true
       sheet.cells(5,2).format.background_color = '#FF0000'
     }.not_to raise_error
-    
+
     sheet.rows(4).cellvalues.sum{|val| val.to_f}.should eq 4+7*4
     sheet.rows(4).cells.sum{ |cell| cell.value.to_f }.should eq 4+7*4
 
