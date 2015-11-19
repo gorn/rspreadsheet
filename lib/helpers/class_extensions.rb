@@ -53,6 +53,11 @@ else
           
         return nil
       end
+      def elements
+        result = []
+        each_element { |e| result << e }
+        return result
+      end
     end
     
   end # module ClassExtensions
