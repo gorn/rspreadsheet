@@ -1,5 +1,5 @@
 require 'spec_helper'
-using ClassExtensions if RUBY_VERSION > '2.0'
+using ClassExtensions if RUBY_VERSION > '2.1'
 
 describe Rspreadsheet do
   it 'can open ods testfile and reads its content correctly' do
@@ -89,7 +89,7 @@ describe Rspreadsheet do
       sheet.cells(5,2).format.background_color = '#FF0000'
     }.not_to raise_error
 
-    if RUBY_VERSION < '2.0'
+    if RUBY_VERSION > '2.1'
       sheet.rows(4).cellvalues.sum{|val| val.to_f}.should eq 4+7*4
       sheet.rows(4).cells.sum{ |cell| cell.value.to_f }.should eq 4+7*4
     else
