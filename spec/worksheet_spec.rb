@@ -1,5 +1,5 @@
 require 'spec_helper'
-using ClassExtensions
+using ClassExtensions if RUBY_VERSION > '2.0'
 
 describe Rspreadsheet::Worksheet do
   describe "from test workbook file" do 

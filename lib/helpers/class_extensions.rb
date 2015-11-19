@@ -1,8 +1,11 @@
-# @private
-
-class LibXML::XML::Node
-
-
+module ClassExtensionsForOlderRuby
+  def self.sum(array, identity = 0, &block)
+    if block_given?
+      self.sum(array.map(&block), identity)
+    else
+      array.inject(0){ |sum, element| sum.to_f + element.to_f } || identity
+    end
+  end
 end
 
 module ClassExtensions
