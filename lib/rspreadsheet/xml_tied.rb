@@ -81,7 +81,7 @@ module XMLTiedArray
 
   def find_my_subnode_range_respect_repeated(aindex, options)
     index = 0
-    xmlnode.children.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
+    xmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
       repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
       if index+repeated >= aindex
         return (index+1..index+repeated)
@@ -130,7 +130,7 @@ module XMLTiedArray
     
   def find_subnode_with_range_respect_repeated(axmlnode, aindex, options)
     index = 0
-    axmlnode.children.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
+    axmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
       repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
       oldindex = index
       index = index+repeated
@@ -199,7 +199,7 @@ module XMLTiedArray
   def find_first_unused_index_respect_repeated(options)
     index = 0
     return 1 if xmlnode.nil?
-    xmlnode.children.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
+    xmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
       repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
       index = index+repeated
     end
@@ -238,7 +238,7 @@ module XMLTiedArray
   def find_nonempty_subnode_indexes(axmlnode, options)
     index = 0
     result = []
-    axmlnode.children.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
+    axmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
       repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
       index = index + repeated
       if !(node.content.nil? or node.content.empty? or node.content =='') and (repeated==1)

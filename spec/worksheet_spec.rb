@@ -7,7 +7,7 @@ describe Rspreadsheet::Worksheet do
       @sheet = Rspreadsheet.new($test_filename).worksheets(1)
     end
     it 'contains nonempty xml in rows for testfile' do
-      @sheet.rows(1).xmlnode.children.size.should be >1
+      @sheet.rows(1).xmlnode.elements.size.should be >1
     end
     it 'uses detach_my_subnode_respect_repeated well' do
       @sheet.detach_my_subnode_respect_repeated(50, {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})

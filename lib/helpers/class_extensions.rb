@@ -40,8 +40,8 @@ else
           return "#{where}> Attribute #{attr} have diffent values: #{attr.value} != #{node2.attributes[attr.name]}" unless node2.attributes[attr.name] == attr.value
         end
         
-        elems1 = self.children
-        elems2 = node2.children
+        elems1 = self.elements
+        elems2 = node2.elements
     #     return "#{where}> elements have different number of subelements #{elems1.length} !=  #{elems2.length}" if (elems1.length != elems2.length) 
         elems1.length.times do |i|
           if (elems1[i].node_type_name == 'text') && ((elems1[i].to_s != elems2[i].to_s) )
