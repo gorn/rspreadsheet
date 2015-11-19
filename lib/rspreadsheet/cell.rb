@@ -10,7 +10,7 @@ require 'bigdecimal/util' # for to_d method
 require 'helpers/class_extensions'
 
 module Rspreadsheet
-using ClassExtensions
+using ClassExtensions if RUBY_VERSION > '2.1'
 
 ###
 # Represents a cell in spreadsheet which has coordinates, contains value, formula and can be formated.
