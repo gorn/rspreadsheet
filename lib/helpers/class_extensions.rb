@@ -26,11 +26,6 @@ else
       def ==(node2)  #TODO redefine == with this
         self.simplification_of?(node2) and node2.simplification_of?(self)
       end
-      def elements
-        result = []
-        each_element { |e| result << e }
-        return result
-      end # == children
       # if node2 contains at least all that I do
       def simplification_of?(node2)
         first_diff(node2).nil?
@@ -45,8 +40,8 @@ else
           return "#{where}> Attribute #{attr} have diffent values: #{attr.value} != #{node2.attributes[attr.name]}" unless node2.attributes[attr.name] == attr.value
         end
         
-        elems1 = self.elements
-        elems2 = node2.elements
+        elems1 = self.children
+        elems2 = node2.children
     #     return "#{where}> elements have different number of subelements #{elems1.length} !=  #{elems2.length}" if (elems1.length != elems2.length) 
         elems1.length.times do |i|
           if (elems1[i].node_type_name == 'text') && ((elems1[i].to_s != elems2[i].to_s) )

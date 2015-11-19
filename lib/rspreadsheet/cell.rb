@@ -59,7 +59,7 @@ class Cell < XMLTiedItem
       case 
         when gt == nil then nil
         when gt == Float then xmlnode.attributes['value'].to_f
-        when gt == String then xmlnode.elements.first.andand.content.to_s
+        when gt == String then xmlnode.children.first.andand.content.to_s
         when gt == Date then Date.strptime(xmlnode.attributes['date-value'].to_s, '%Y-%m-%d')
         when gt == :percentage then xmlnode.attributes['value'].to_f
         when gt == :currency then xmlnode.attributes['value'].to_d
