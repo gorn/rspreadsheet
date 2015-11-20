@@ -1,6 +1,7 @@
 require 'rspreadsheet/row'
 require 'rspreadsheet/column'
 require 'rspreadsheet/tools'
+require 'helpers/class_extensions'
 # require 'forwardable'
 
 module Rspreadsheet 
