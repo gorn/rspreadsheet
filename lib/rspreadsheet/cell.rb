@@ -7,8 +7,10 @@ require 'rspreadsheet/xml_tied'
 require 'date'
 require 'bigdecimal'
 require 'bigdecimal/util' # for to_d method
+require 'helpers/class_extensions'
 
 module Rspreadsheet
+using ClassExtensions if RUBY_VERSION > '2.1'
 
 ###
 # Represents a cell in spreadsheet which has coordinates, contains value, formula and can be formated.
@@ -40,7 +42,7 @@ class Cell < XMLTiedItem
   def coordinates; [rowi,coli] end
   def to_s; value.to_s end
   def valuexml; self.valuexmlnode.andand.inner_xml end
-  def valuexmlnode; self.xmlnode.children.first end
+  def valuexmlnode; self.xmlnode.elements.first end
   # use this to find node in cell xml. ex. xmlfind('.//text:a') finds all link nodes
   def valuexmlfindall(path)
     valuexmlnode.nil? ? [] : valuexmlnode.find(path)
@@ -150,10 +152,10 @@ class Cell < XMLTiedItem
         when 'N/A' then :unassigned
         when 'currency' then :currency
         else 
-          if xmlnode.children.size == 0
+          if xmlnode.elements.size == 0
             nil
           else 
-            raise "Unknown type at #{coordinates.to_s} from #{xmlnode.to_s} / children size=#{xmlnode.children.size.to_s} / type=#{xmlnode.attributes['value-type'].to_s}"
+            raise "Unknown type at #{coordinates.to_s} from #{xmlnode.to_s} / elements size=#{xmlnode.elements.size.to_s} / type=#{xmlnode.attributes['value-type'].to_s}"
           end
       end
 

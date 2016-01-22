@@ -42,20 +42,29 @@ class Workbook
   alias :sheet :worksheets
   alias :sheets :worksheets
   def [](index_or_name); self.worksheets(index_or_name) end
-  #@!group Loading and saving related methods  
+  #@!group Loading and saving related methods
+  
+  # @return Mime of the file
+  def mime; 'application/vnd.oasis.opendocument.spreadsheet'.freeze end
+  # @return [String] Prefered file extension
+  def mime_preferred_extension; 'ods'.freeze end
+  alias :mime_default_extension :mime_preferred_extension
+  
   def initialize(afilename=nil)
     @worksheets=[]
     @filename = afilename
-    @content_xml = Zip::File.open(@filename || File.dirname(__FILE__)+'/empty_file_template.ods') do |zip|
-      LibXML::XML::Document.io zip.get_input_stream('content.xml')
+    @content_xml = Zip::File.open(@filename || TEMPLATE_FILE) do |zip|
+      LibXML::XML::Document.io zip.get_input_stream(CONTENT_FILE_NAME)
     end
     @xmlnode = @content_xml.find_first('//office:spreadsheet')
     @xmlnode.find('./table:table').each do |node|
       create_worksheet_from_node(node)
     end
   end
+  
   # @param [String] Optional new filename
   # Saves the worksheet. Optionally you can provide new filename.
+
   def save(new_filename_or_io_object=nil)
     if @filename.nil? and new_filename_or_io_object.nil? then raise 'New file should be named on first save.' end
     
@@ -76,13 +85,29 @@ class Workbook
       end
     end
   end
-  # @return Mime of the file
-  def mime; 'application/vnd.oasis.opendocument.spreadsheet' end
-  # @return [String] Prefered file extension
-  def mime_preferred_extension; 'ods' end
-  alias :mime_default_extension :mime_preferred_extension
+  
+  # Saves the worksheet to IO stream.
+  def save_to_io(io = ::StringIO.new)
+    ::Zip::OutputStream.write_buffer(io) do |output|
+      ::Zip::File.open(TEMPLATE_FILE) do |input|
+        input.
+          select { |entry| entry.file? }.
+          select { |entry| entry.name != CONTENT_FILE_NAME }.
+          each do |entry|
+            output.put_next_entry(entry.name)
+            output.write(entry.get_input_stream.read)
+          end
+      end
+
+      output.put_next_entry(CONTENT_FILE_NAME)
+      output.write(@content_xml.to_s(indent: false))
+    end
+  end
+  alias :to_io :save_to_io 
   
   private 
+  CONTENT_FILE_NAME = 'content.xml'
+  TEMPLATE_FILE = (File.dirname(__FILE__)+'/empty_file_template.ods').freeze
   def register_worksheet(worksheet)
     index = worksheets_count+1
     @worksheets[index-1]=worksheet

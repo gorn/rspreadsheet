@@ -1,4 +1,8 @@
+require 'helpers/class_extensions'
+
 module Rspreadsheet
+
+using ClassExtensions if RUBY_VERSION > '2.1'
 
 # @private
 class XMLTied
