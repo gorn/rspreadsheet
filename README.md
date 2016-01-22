@@ -1,4 +1,6 @@
 
+**News: travis currently changed something, and since than I am trying to make the gem pass, but the tests are failing currently. Locally the gem behaves correctly.** See also https://github.com/chingor13/json_api_client/pull/156
+
 # rspreadsheet
  
 Manipulating spreadsheets with Ruby. Read, **modify**, write or create new OpenDocument Spreadsheet files from ruby code. 
