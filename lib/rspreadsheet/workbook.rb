@@ -56,17 +56,23 @@ class Workbook
   end
   # @param [String] Optional new filename
   # Saves the worksheet. Optionally you can provide new filename.
-  def save(new_filename=nil)
-    if @filename.nil? and new_filename.nil? then raise 'New file should be named on first save.' end
-    # if the filename has changed than first copy the original file to new location (or template if it is a new file)
-    if new_filename
-      FileUtils.cp(@filename || File.dirname(__FILE__)+'/empty_file_template.ods', new_filename)
-      @filename = new_filename
-    end
-    Zip::File.open(@filename) do |zip|
-      # it is easy, because @xmlnode in in sync with contents all the time
-      zip.get_output_stream('content.xml') do |f|
-        f.write @content_xml.to_s(:indent => false)
+  def save(new_filename_or_io_object=nil)
+    if @filename.nil? and new_filename_or_io_object.nil? then raise 'New file should be named on first save.' end
+    
+    if new_filename_or_io_object.kind_of? StringIO
+      new_filename_or_io_object.write(@content_xml.to_s(indent: false))
+    elsif new_filename_or_io_object.nil? or new_filename_or_io_object.kind_of? String
+     
+      if new_filename_or_io_object.kind_of? String   # the filename has changed 
+        # first copy the original file to new location (or template if it is a new file)
+        FileUtils.cp(@filename || File.dirname(__FILE__)+'/empty_file_template.ods', new_filename_or_io_object)
+        @filename = new_filename_or_io_object
+      end
+      Zip::File.open(@filename) do |zip|
+        # it is easy, because @xmlnode in in sync with contents all the time
+        zip.get_output_stream('content.xml') do |f|
+          f.write @content_xml.to_s(:indent => false)
+        end
       end
     end
   end

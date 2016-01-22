@@ -25,25 +25,6 @@ describe Rspreadsheet do
       @sheet2[cell.rowi,cell.coli].should == cell.value
     end
   end
-  it 'can open and save file, and saved file is exactly same as original' do
-    tmp_filename = '/tmp/testfile1.ods'        # first delete temp file
-    File.delete(tmp_filename) if File.exists?(tmp_filename)
-    book = Rspreadsheet.new($test_filename)    # than open test file
-    book.save(tmp_filename)                    # and save it as temp file
-    
-    # now compare them
-    @content_xml1 = Zip::File.open($test_filename) do |zip|
-      LibXML::XML::Document.io zip.get_input_stream('content.xml')
-    end
-    @content_xml2 = Zip::File.open(tmp_filename) do |zip|
-      LibXML::XML::Document.io zip.get_input_stream('content.xml')
-    end
-    
-    @content_xml2.root.first_diff(@content_xml1.root).should be_nil
-    @content_xml1.root.first_diff(@content_xml2.root).should be_nil
-    
-    @content_xml1.root.equals?(@content_xml2.root).should == true
-  end
   it 'when open and save file modified, than the file is different' do
     tmp_filename = '/tmp/testfile1.ods'        # first delete temp file
     File.delete(tmp_filename) if File.exists?(tmp_filename)
