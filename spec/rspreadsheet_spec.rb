@@ -26,6 +26,7 @@ describe Rspreadsheet do
       @sheet2[cell.rowi,cell.coli].should == cell.value
     end
   end
+
   it 'can open and save file, and saved file is exactly same as original' do
     tmp_filename = '/tmp/testfile1.ods'        # first delete temp file
     File.delete(tmp_filename) if File.exists?(tmp_filename)
@@ -45,6 +46,7 @@ describe Rspreadsheet do
     
     @content_xml1.root.should == @content_xml2.root
   end
+
   it 'when open and save file modified, than the file is different' do
     tmp_filename = '/tmp/testfile1.ods'        # first delete temp file
     File.delete(tmp_filename) if File.exists?(tmp_filename)
