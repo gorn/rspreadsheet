@@ -11,8 +11,9 @@ if  RUBY_VERSION > '2.1'
         end
       end
     end
-
+    
     refine LibXML::XML::Node do
+      def equals?(node2); raise 'nic' end
       def ==(node2)  
         self.simplification_of?(node2) and node2.simplification_of?(self)
       end
@@ -29,7 +30,7 @@ if  RUBY_VERSION > '2.1'
         self.attributes.each do |attr|
           return "#{where}> Attribute #{attr} have diffent values: #{attr.value} != #{node2.attributes[attr.name]}" unless node2.attributes[attr.name] == attr.value
         end
-        
+
         elems1 = self.elements
         elems2 = node2.elements
     #     return "#{where}> elements have different number of subelements #{elems1.length} !=  #{elems2.length}" if (elems1.length != elems2.length) 
@@ -48,12 +49,12 @@ if  RUBY_VERSION > '2.1'
         each_element { |e| result << e }
         return result
       end
-
     end
     
   end # module ClassExtensions
 
 else # Monkeypatching
+
   class Array
     def sum(identity = 0, &block)
       if block_given?
@@ -100,6 +101,6 @@ else # Monkeypatching
       each_element { |e| result << e }
       return result
     end
-
   end
+
 end

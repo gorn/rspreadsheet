@@ -1,4 +1,5 @@
 require 'spec_helper'
+using ClassExtensions
 
 describe Rspreadsheet do
   it 'can open spreadsheet and save it to file, resulting file has same content as original' do
@@ -24,15 +25,15 @@ describe Rspreadsheet do
 end
 
 def contents_of_files_are_identical(filename1,filename2)
-    @content_xml1 = Zip::File.open(filename1) do |zip|
-      LibXML::XML::Document.io zip.get_input_stream('content.xml')
-    end
-    @content_xml2 = Zip::File.open(filename2) do |zip|
-      LibXML::XML::Document.io zip.get_input_stream('content.xml')
-    end
-    
-    @content_xml2.root.first_diff(@content_xml1.root).should be_nil
-    @content_xml1.root.first_diff(@content_xml2.root).should be_nil
-    
-    @content_xml1.root.equals?(@content_xml2.root).should == true
+  @content_xml1 = Zip::File.open(filename1) do |zip|
+    LibXML::XML::Document.io zip.get_input_stream('content.xml')
+  end
+  @content_xml2 = Zip::File.open(filename2) do |zip|
+    LibXML::XML::Document.io zip.get_input_stream('content.xml')
+  end
+  
+  @content_xml2.root.first_diff(@content_xml1.root).should be_nil
+  @content_xml1.root.first_diff(@content_xml2.root).should be_nil
+  
+  (@content_xml1.root == @content_xml2.root).should == true
 end

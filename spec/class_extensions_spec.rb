@@ -1,21 +1,7 @@
 require 'spec_helper'
 
 if RUBY_VERSION > '2.1'
-  using ClassExtensions 
-
-  describe Array do
-    it 'can sum simple array' do
-      a = [1,2,3,4]
-      a.sum.should == 10
-    end
-    it 'ignores text and nils while summing' do
-      a = [1,nil, nil,2,3,'foo',5.0]
-      a.sum.should == 11
-      [nil, 'nic'].sum.should == 0
-      [].sum.should == 0
-    end
-  end
-
+  # testing ClassExtensionsForSpec
   describe LibXML::XML::Node do
     before do 
       @n = LibXML::XML::Node.new('a')
@@ -43,4 +29,21 @@ if RUBY_VERSION > '2.1'
     end
   end
 
+  # testing ClassExtensions
+  begin
+    using ClassExtensions
+
+    describe Array do
+      it 'can sum simple array' do
+        a = [1,2,3,4]
+        a.sum.should == 10
+      end
+      it 'ignores text and nils while summing' do
+        a = [1,nil, nil,2,3,'foo',5.0]
+        a.sum.should == 11
+        [nil, 'nic'].sum.should == 0
+        [].sum.should == 0
+      end
+    end
+  end
 end

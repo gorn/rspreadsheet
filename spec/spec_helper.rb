@@ -1,4 +1,3 @@
-
 # This tells Bundler only load gems in side gemspec (not the locally installed ones). See http://stackoverflow.com/questions/4398262/setup-rspec-to-test-a-gem-not-rails
 require 'bundler/setup'
 Bundler.setup

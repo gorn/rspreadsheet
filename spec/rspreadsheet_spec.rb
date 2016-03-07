@@ -1,5 +1,5 @@
 require 'spec_helper'
-using ClassExtensions if RUBY_VERSION > '2.1'
+using ClassExtensions
 
 describe Rspreadsheet do
   it 'can open ods testfile and reads its content correctly' do
@@ -91,7 +91,7 @@ describe Rspreadsheet do
       sheet.cells(5,2).format.background_color = '#FF0000'
     }.not_to raise_error
 
-    sheet.rows(4).cellvalues.sum{|val| val.to_f}.should eq 4+7*4
+    sheet.rows(4).cellvalues.sum.should eq 4+7*4
     sheet.rows(4).cells.sum{ |cell| cell.value.to_f }.should eq 4+7*4
 
     total = 0
@@ -106,7 +106,7 @@ describe Rspreadsheet do
     expect do 
       book = Rspreadsheet::Workbook.new
       sheet = book.create_worksheet 'Top icecreams'
-      
+
       sheet[1,1] = 'My top 5'
       p sheet[1,1].class # => String
       p sheet[1,1] # => "My top 5"
