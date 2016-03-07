@@ -1,5 +1,4 @@
-
-**News: travis currently changed something, and since than I am trying to make the gem pass, but the tests are failing currently. Locally the gem behaves correctly.** See also https://github.com/chingor13/json_api_client/pull/156
+[![Build Status](https://api.travis-ci.org/gorn/rspreadsheet.svg?branch=master)](https://travis-ci.org/gorn/rspreadsheet) [![Coverage Status](https://coveralls.io/repos/gorn/rspreadsheet/badge.svg?branch=master&service=github)](https://coveralls.io/r/gorn/rspreadsheet) [![User opinion wanted](https://badge.waffle.io/gorn/rspreadsheet.png?label=user opinion wanted&title=User opinion wanted)](https://waffle.io/gorn/rspreadsheet)
 
 # rspreadsheet
  
