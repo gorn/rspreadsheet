@@ -1,5 +1,5 @@
 require 'spec_helper'
-using ClassExtensions
+using ClassExtensions if RUBY_VERSION > '2.1'
 
 describe Rspreadsheet do
   it 'can open spreadsheet and save it to file, resulting file has same content as original' do

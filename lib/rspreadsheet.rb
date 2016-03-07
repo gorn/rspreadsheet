@@ -4,7 +4,6 @@ require 'rspreadsheet/worksheet'
 require 'helpers/configuration'
 # refinements
 require 'helpers/class_extensions'
-using ClassExtensions
 
 module Rspreadsheet
   extend Configuration
