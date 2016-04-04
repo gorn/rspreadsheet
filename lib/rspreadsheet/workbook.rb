@@ -64,6 +64,7 @@ class Workbook
   
   # @param [String] Optional new filename
   # Saves the worksheet. Optionally you can provide new filename.
+
   def save(new_filename_or_io_object=nil)
     if @filename.nil? and new_filename_or_io_object.nil? then raise 'New file should be named on first save.' end
     
@@ -114,6 +115,3 @@ class Workbook
   end
 end
 end
-
-# bylo firefox.spam -> doposud prazdne tam to chi prenyst
-#  spam.firefox odsud to chci prenest

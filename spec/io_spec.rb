@@ -14,14 +14,14 @@ describe Rspreadsheet do
     contents_of_files_are_identical($test_filename,tmp_filename)
   end
   
-  it 'can open spreadsheet and store it to IO object', :xpending => 'Under development' do
-    spreadsheet = Rspreadsheet.new($test_filename)                 # open a file
-    
-    stringio = StringIO.new
-    spreadsheet.save(stringio)
-    raise stringio.read
-  
-  end
+#   it 'can open spreadsheet and store it to IO object', :xpending => 'Under development' do
+#     spreadsheet = Rspreadsheet.new($test_filename)                 # open a file
+#     
+#     stringio = StringIO.new
+#     spreadsheet.save(stringio)
+#     raise stringio.read
+#   
+#   end
 end
 
 def contents_of_files_are_identical(filename1,filename2)

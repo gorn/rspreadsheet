@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # runtime dependencies
-#   spec.add_runtime_dependency 'libxml-ruby', '~>2.7'   # parsing XML files
+  spec.add_runtime_dependency 'libxml-ruby', '~>2.7'   # parsing XML files
   spec.add_runtime_dependency 'rubyzip', '~>1.1'       # opening zip files
   spec.add_runtime_dependency 'andand', '~>1.3'
 
@@ -32,8 +32,8 @@ Gem::Specification.new do |spec|
 
   # optional and testing
   spec.add_development_dependency "coveralls", '~>0.7'
-  spec.add_development_dependency "guard", '~>2.13'
-  spec.add_development_dependency "guard-rspec", '~>4.6'
+  spec.add_development_dependency "guard", '~>2.6'
+  spec.add_development_dependency "guard-rspec", '~>2.6'
 #   spec.add_development_dependency 'equivalent-xml'     # implementing xml diff
 
 end
