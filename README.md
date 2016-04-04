@@ -76,12 +76,12 @@ Alhought this gem is still in beta stage I use in everyday and it works fine. Cu
 
 ### Programmers
 
-1. [Fork it](http://github.com/gorn/rspreadsheet/fork)
+1. [Fork it](http://github.com/gorn/rspreadsheet/fork) and clone it ([troubleshooting](https://github.com/gorn/rspreadsheet/blob/master/DEVEL_BLOG.md#installation-troubleshooting))
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
- 
+
 ## Why another OpenDocument spreadsheet gem?
 
 I would be glad to safe myself work, but surprisingly, there are not that many gems for OpenDocument spreadsheets. Most of them also look abandoned and inactive, or can only read or write spreadsheets, but not modify them. I have investigated these options (you might as well):
