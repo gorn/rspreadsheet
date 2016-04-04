@@ -18,9 +18,9 @@ group :normal do
 end
 
 # see http://stackoverflow.com/questions/18501471/guard-how-to-run-specific-tags-from-w-in-guards-console
-group :focus do
-  guard 'rspec', cmd: '--tag focus' do watch_all end
-end
+#group :focus do
+#  guard 'rspec', cmd: 'rspec --tag focus' do watch_all end
+#end
 
 #group :f do
 #  guard 'rspec', cli: '--tag focus' do watch_all end
