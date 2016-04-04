@@ -38,7 +38,7 @@ describe Rspreadsheet::Workbook do
     book.create_worksheet('test')
     book.worksheets('test').should eq book.worksheets(1)
     book.create_worksheet('another')
-    book.worksheets('another').should eq book.worksheets(2)    
+    book.worksheets('another').should eq book.worksheets(2)
   end
   it 'can access sheets with brief syntax' do
     book = Rspreadsheet::Workbook.new
@@ -52,8 +52,12 @@ describe Rspreadsheet::Workbook do
     book.create_worksheet('test')
     book.create_worksheet('test2')
     sheet = book.worksheets(1)
+    sheet2 = book.worksheets(1)
     book.worksheet(1).should == sheet
     book.sheet(1).should == sheet
     book.sheets(2).should_not == sheet
+    book.sheets(-1).should == sheet2
+    book.sheets(-1).should_not == sheet
+    book.sheets(-2).should == sheet
   end
 end 

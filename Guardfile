@@ -19,7 +19,7 @@ end
 
 # see http://stackoverflow.com/questions/18501471/guard-how-to-run-specific-tags-from-w-in-guards-console
 group :focus do
-  guard 'rspec', cli: '--tag focus' do watch_all end
+  guard 'rspec', cmd: '--tag focus' do watch_all end
 end
 
 #group :f do
