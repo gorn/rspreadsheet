@@ -1,5 +1,13 @@
 See [GUIDE.md](GUIDE.md#conventions) for syntax conventions.
 
+## Installation troubleshooting
+
+After you have cloned the source run `bundle` command in gem directory to install needed tools. If there are any errors make sure that necessary tools are installed. In debian based distros you may try this
+
+   apt-get install make gcc
+
+in other distros, use their native way to install tools.
+
 ## Ideas/wishlist
 
   * In future inntroduce syntax like `sheet.range('C3:E4')` for mass operations.
