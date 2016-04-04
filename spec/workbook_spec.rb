@@ -56,4 +56,31 @@ describe Rspreadsheet::Workbook do
     book.sheet(1).should == sheet
     book.sheets(2).should_not == sheet
   end
+  it 'can access sheet using negative indexes and returns the same object' do
+    book = Rspreadsheet::Workbook.new
+    book.create_worksheet('test')
+    book.create_worksheet('test2')
+    sheet1 = book.worksheets(1)
+    sheet2 = book.worksheets(2)
+    book.worksheet(-1).should == sheet2
+    book.sheet(-2).should == sheet1
+    book[-2].should == sheet1
+  end
+  it 'raises error when attemting to use nonsence index' do
+    book = Rspreadsheet::Workbook.new
+    expect { book.worksheet(Array.new()) }.to raise_error
+  end
 end 
+
+
+
+
+
+
+
+
+
+
+
+
+
