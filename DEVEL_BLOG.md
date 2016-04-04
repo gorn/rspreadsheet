@@ -6,7 +6,7 @@ After you have cloned the source run `bundle` command in gem directory to instal
 
     apt-get install make gcc
 
-in other distros, use their native way to install tools.
+in other distros, use their native way to install tools. If you have installed `ruby-libxml` than you may want to comment out the line containing libxml-ruby dependency in rspreadseet.gemspec file before running bundle.
 
 ## Ideas/wishlist
 
