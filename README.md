@@ -32,7 +32,7 @@ sheet.row(5).cellvalues.sum
 sheet.row(5).cells.sum{ |cell| cell.value.to_f }
 
 # or set formula to a cell
-sheet.A1.formula='=SUM(A2:A9)'
+sheet.cell('A1').formula='=SUM(A2:A9)'
 
 # iterating over list of people and displaying the data
 total = 0
