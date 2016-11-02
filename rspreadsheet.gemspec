@@ -32,8 +32,11 @@ Gem::Specification.new do |spec|
 
   # optional and testing
   spec.add_development_dependency "coveralls", '~>0.7'
-  spec.add_development_dependency "guard", '~>2.13'
-  spec.add_development_dependency "guard-rspec", '~>4.6'
+
+## commentig out because ruby_dep starts to require ruby 2.2.5
+#   spec.add_development_dependency "guard", '~>2.13'
+#   spec.add_development_dependency "guard-rspec", '~>4.6'
+  
 #   spec.add_development_dependency 'equivalent-xml'     # implementing xml diff
 
 end
