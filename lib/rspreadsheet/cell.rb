@@ -51,7 +51,7 @@ class Cell < XMLTiedItem
     valuexmlfindall(path).first
   end
   def inspect
-    "#<Rspreadsheet::Cell:Cell\n row:#{rowi}, col:#{coli} address:#{address}\n type: #{guess_cell_type.to_s}, value:#{value}\n mode: #{mode}\n>"
+    "#<Rspreadsheet::Cell\n row:#{rowi}, col:#{coli} address:#{address}\n type: #{guess_cell_type.to_s}, value:#{value}\n mode: #{mode}, format: #{format.inspect}\n>"
   end
   def value
     gt = guess_cell_type
@@ -211,6 +211,11 @@ class Cell < XMLTiedItem
     Tools.set_ns_attribute(xmlnode,'table','formula','of:'+formulastring.to_s)
   end
   def blank?; self.type==:empty or self.type==:unassigned end
+  
+  def border_top;    format.border_top end
+  def border_right;  format.border_right end
+  def border_bottom; format.border_bottom end
+  def border_left;   format.border_left end
 
 end
 
@@ -251,6 +256,7 @@ class CellFormat
   end
   def background_color=(value); set_cell_style_node_attribute('background-color',  value) end
   def set_cell_style_node_attribute(attribute_name,value)
+    @cell.detach if @cell.mode != :regular
     if cell_style_node.nil?
       self.create_cell_style_node
       raise 'Style node was not correctly initialized' if cell_style_node.nil?
@@ -302,9 +308,72 @@ class CellFormat
   def currency
     Tools.get_ns_attribute_value(cellnode,'office','currency',nil) 
   end
+  #returns object representing top border of the cell
+  def top;    @top    ||= Border.new(self,:top)  end
+  def bottom; @bottom ||= Border.new(self,:bottom) end
+  def left;   @left   ||= Border.new(self,:left) end
+  def right;  @right  ||= Border.new(self,:right) end
+  alias :border_top :top
+  alias :border_right :right
+  alias :border_bottom :bottom
+  alias :border_left :left
+  
+  def inspect
+    "#<Rspreadsheet::CellFormat bold:#{bold?.inspect}, borders:#{top.get_value_string.inspect} #{right.get_value_string.inspect} #{bottom.get_value_string.inspect} #{left.get_value_string.inspect}>"
+  end
+  
 end
 
+# represents one of the borders of a cell
+class Border
+  def initialize(cellformat,side)
+    @cellformat = cellformat
+    @side = side.to_s
+    raise "Wrong side of border object, can be top, bottom, left or right" unless ['left','right','top','bottom'].include? @side
+  end
+  def cellnode; @cell.xmlnode end
+  def attribute_name; "border-#{@side}" end
+  
+  def width=(value); set_border_string_part(1, value) end
+  def style=(value); set_border_string_part(2, value.to_s) end
+  def color=(value); set_border_string_part(3, value) end
+  def width; get_border_string_part(1).to_f end
+  def style; get_border_string_part(2) end
+  def color; get_border_string_part(3) end
+  
+  # set parth-th part of string which represents the border. String looks like "0.06pt solid #00ee00"
+  # part is 1 for width, 2 for style or 3 for color
+  def set_border_string_part(part,value)
+    current_value = @cellformat.get_cell_style_node_attribute(attribute_name)
+    
+    if current_value.nil? or (current_value=='none')
+      value_array = ['0.75pt', 'solid', '#000000']  # set default values
+    else
+      value_array = current_value.split(' ')  
+    end
+    raise 'Strange border attribute value. Does not have 3 parts' unless value_array.length == 3
+    value_array[part-1]=value
+    @cellformat.set_cell_style_node_attribute(attribute_name, value_array.join(' '))
+  end
+  
+  def get_border_string_part(part)
+    current_value = @cellformat.get_cell_style_node_attribute(attribute_name) || @cellformat.get_cell_style_node_attribute('border')
+    if current_value.nil? or (current_value=='none')
+      return nil
+    else
+      value_array = current_value.split(' ')  
+      raise 'Strange border attribute value. Does not have 3 parts' unless value_array.length == 3
+      return value_array[part-1]
+    end
+  end
+  
+  def get_value_string
+    @cellformat.get_cell_style_node_attribute(attribute_name)
+  end
+  
 end
+
+end # module
 
 
 
