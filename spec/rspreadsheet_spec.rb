@@ -95,8 +95,8 @@ describe Rspreadsheet do
     sheet.rows(4).cells.sum{ |cell| cell.value.to_f }.should eq 4+7*4
 
     total = 0
-    sheet.rows.each do |row|
-      expect {"Sponsor #{row[1]} with email #{row[2]} has donated #{row[3]} USD." }.not_to raise_error
+    sheet.rows[0..9].each do |row|
+      expect {"Adding number #{row[1]} to the result" }.not_to raise_error
       total += row[1].to_f
     end
     total.should eq 55
