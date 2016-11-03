@@ -344,11 +344,54 @@ describe Rspreadsheet::Cell do
     end    
   end
   it 'returns correct border parameters for the cell' do
-#     raise @sheet2.cell('C8').inspect
     @sheet2.cell('C8').format.top.style.should == 'solid'
     @sheet2.cell('E8').format.left.color.should == '#ff3333'
     @sheet2.cell('E8').format.left.style.should == 'solid'
     @sheet2.cell('F8').format.top.color.should == '#009900'
     @sheet2.cell('F8').format.top.style.should == 'dotted'
   end
+  it 'modifies borders correctly' do
+    ## initially solid everywhere
+    @sheet2.cell('C8').format.top.style.should == 'solid'
+    @sheet2.cell('C8').format.bottom.style.should == 'solid'
+    @sheet2.cell('C8').format.left.style.should == 'solid'
+    @sheet2.cell('C8').format.right.style.should == 'solid'
+    ## change top and right to dotted and observe
+    @sheet2.cell('C8').format.top.style = 'dotted'
+    @sheet2.cell('C8').format.right.style = 'dotted'
+    @sheet2.cell('C8').format.bottom.style.should == 'solid'
+    @sheet2.cell('C8').format.left.style.should == 'solid'
+    @sheet2.cell('C8').format.top.style.should == 'dotted'
+    @sheet2.cell('C8').format.right.style.should == 'dotted'
+  end
+  it 'deletes borders correctly', :pending=> 'consider how to deal with deleted borders' do
+    @cell = @sheet1.cell(1,1)
+    
+    [@cell.format.top,@cell.format.left,@cell.format.right,@cell.format.bottom].each do |border|
+      border.style = 'dashed'
+      border.should_not be_nil
+      border.delete
+      border.should be_nil
+    end 
+    
+    # delete right border in existing file and observe
+    @sheet2.cell('C8').format.right.delete
+    @sheet2.cell('C8').format.right.should == nil
+  end
+  
+  it 'can delete borders in many ways', :pending => 'consider what syntax to support' do
+    @cell=@sheet2.cell('C8')
+    @cell.border_right.should_not be_nil
+    @cell.border_right.delete
+    @cell.border_right.should be_nil
+    
+    @cell.border_left.should_not be_nil
+    @cell.border_left = nil
+    @cell.border_left.should be_nil
+    
+    @cell.format.top.should_not_be_nil
+    @cell.format.top.style = 'none'
+    @cell.border_top.should_not be_nil ## ?????
+  end
+  
 end

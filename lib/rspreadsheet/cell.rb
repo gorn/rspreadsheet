@@ -19,6 +19,8 @@ using ClassExtensions if RUBY_VERSION > '2.1'
 #     @worksheet.cells(5,2)
 #
 # Note that when using syntax like `@worksheet[5,2]` or `@worksheet.B5` you won't get this object, but rather the value of the cell.
+# More precisely it is equvalient to @worksheet.cells(5,2).value.
+# 
 
 class Cell < XMLTiedItem
   attr_accessor :worksheet, :coli, :rowi
@@ -340,7 +342,13 @@ class Border
   def width; get_border_string_part(1).to_f end
   def style; get_border_string_part(2) end
   def color; get_border_string_part(3) end
-  
+  def delete
+    @cellformat.set_cell_style_node_attribute(attribute_name, 'none')
+  end
+    
+    
+  ## internals  
+   
   # set parth-th part of string which represents the border. String looks like "0.06pt solid #00ee00"
   # part is 1 for width, 2 for style or 3 for color
   def set_border_string_part(part,value)

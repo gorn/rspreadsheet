@@ -1,7 +1,6 @@
 require 'rspreadsheet/cell'
 require 'rspreadsheet/xml_tied'
 
-
 module Rspreadsheet
 
 # Represents a row in a spreadsheet which has coordinates, contains value, formula and can be formated.
@@ -9,7 +8,7 @@ module Rspreadsheet
 #
 #     @row = @worksheet.row(5)
 #
-# Mostly you will this object to access row cells values
+# Mostly you will this object to access values of cells in the row
 #
 #     @row[2]           # identical to @worksheet[5,2] or @row.cells(2).value
 #
