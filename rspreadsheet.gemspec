@@ -41,8 +41,8 @@ Gem::Specification.new do |spec|
 
   if RUBY_VERSION.split('.')[0] !=  "1"
     # ruby_dep starts to require ruby 2.2.5 which raises errors with ruby 1.9.3
-    spec.add_development_dependency "guard", '~>2.13'
-    spec.add_development_dependency "guard-rspec", '~>4.6'
+#     spec.add_development_dependency "guard", '~>2.13'
+#     spec.add_development_dependency "guard-rspec", '~>4.6'
   end
   
 #   spec.add_development_dependency 'equivalent-xml'     # implementing xml diff
