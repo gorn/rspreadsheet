@@ -269,6 +269,13 @@ describe Rspreadsheet::Cell do
     @cell.value.month.should eq 1
     @cell.value.day.should eq 2
   end
+  it 'stores time correctly' do
+    @cell = @sheet1.cell(1,1)
+    @cell.value= Time.parse('2:42 pm')
+    @cell.value.hour.should eq 14
+    @cell.value.min.should eq 42
+    @cell.value.sec.should eq 0
+  end
   it 'can be addressed by even more ways and all are identical' do
     @cell = @sheet1.cell(2,2)
     @sheet1.cell('B2').value = 'zaseste'
