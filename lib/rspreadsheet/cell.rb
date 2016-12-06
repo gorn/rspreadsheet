@@ -5,6 +5,7 @@
 require 'andand'
 require 'rspreadsheet/xml_tied'
 require 'date'
+require 'time'
 require 'bigdecimal'
 require 'bigdecimal/util' # for to_d method
 require 'helpers/class_extensions'
@@ -24,6 +25,8 @@ using ClassExtensions if RUBY_VERSION > '2.1'
 
 class Cell < XMLTiedItem
   attr_accessor :worksheet, :coli, :rowi
+  DateFormat = '%Y-%m-%d'
+  TimeFormat = 'PT%HH%MM%SS'
   # `xml_options[:xml_items_node_name]` gives the name of the tag representing cell
   # `xml_options[:number-columns-repeated]` gives the name of the previous tag which sais how many times the item is repeated
   def xml_options; {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'} end
@@ -62,7 +65,8 @@ class Cell < XMLTiedItem
         when gt == nil then nil
         when gt == Float then xmlnode.attributes['value'].to_f
         when gt == String then xmlnode.elements.first.andand.content.to_s
-        when gt == Date then Date.strptime(xmlnode.attributes['date-value'].to_s, '%Y-%m-%d')
+        when gt == Date then Date.strptime(xmlnode.attributes['date-value'].to_s, DateFormat)
+        when gt == Time then Time.strptime(xmlnode.attributes['time-value'].to_s, TimeFormat)
         when gt == :percentage then xmlnode.attributes['value'].to_f
         when gt == :currency then xmlnode.attributes['value'].to_d
       end
@@ -90,8 +94,14 @@ class Cell < XMLTiedItem
         when gt == Date then 
           remove_all_value_attributes_and_content(xmlnode)
           set_type_attribute('date')
-          Tools.set_ns_attribute(xmlnode,'office','date-value', avalue.strftime('%Y-%m-%d'))
-          xmlnode << Tools.prepare_ns_node('text','p', avalue.strftime('%Y-%m-%d')) 
+          avalue = avalue.strftime(DateFormat)
+          Tools.set_ns_attribute(xmlnode,'office','date-value', avalue)
+          xmlnode << Tools.prepare_ns_node('text','p', avalue)
+        when gt == Time then
+          remove_all_value_attributes_and_content(xmlnode)
+          set_type_attribute('time')
+          Tools.set_ns_attribute(xmlnode,'office','time-value', avalue.strftime(TimeFormat))
+          xmlnode << Tools.prepare_ns_node('text','p', avalue.strftime('%H:%M'))
         when gt == :percentage then
           remove_all_value_attributes_and_content(xmlnode)
           set_type_attribute('percentage')
@@ -136,6 +146,7 @@ class Cell < XMLTiedItem
     # try guessing by value
     valueguess = case avalue
       when Numeric then Float
+      when Time then Time
       when Date then Date
       when String,nil then nil
       else nil
@@ -149,6 +160,7 @@ class Cell < XMLTiedItem
         when nil then nil
         when 'float' then Float
         when 'string' then String
+        when 'time' then Time
         when 'date' then Date
         when 'percentage' then :percentage
         when 'N/A' then :unassigned
