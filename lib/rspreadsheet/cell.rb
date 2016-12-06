@@ -119,6 +119,7 @@ class Cell < XMLTiedItem
   def remove_all_value_attributes_and_content(node=xmlnode)
     if att = Tools.get_ns_attribute(node, 'office','value') then att.remove! end
     if att = Tools.get_ns_attribute(node, 'office','date-value') then att.remove! end
+    if att = Tools.get_ns_attribute(node, 'office','time-value') then att.remove! end
     if att = Tools.get_ns_attribute(node, 'table','formula') then att.remove! end
     node.content=''
   end
