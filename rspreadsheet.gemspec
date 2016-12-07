@@ -17,13 +17,13 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
-  
-  def package_installed(pkgname)
+
+  def self.package_installed?(pkgname)
     system("dpkg-query -l #{pkgname} | grep -q '^i'")
   end
-
+  
   # runtime dependencies
-  unless package_installed('ruby-libxml')
+  unless package_installed?('ruby-libxml')
     spec.add_runtime_dependency 'libxml-ruby', '~>2.7'   # parsing XML files
   end
   spec.add_runtime_dependency 'rubyzip', '~>1.1'       # opening zip files

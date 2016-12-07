@@ -269,6 +269,13 @@ describe Rspreadsheet::Cell do
     @cell.value.month.should eq 1
     @cell.value.day.should eq 2
   end
+  it 'stores time correctly' do
+    @cell = @sheet1.cell(1,1)
+    @cell.value= Date.parse('2014-01-02')
+    @cell.value.year.should eq 2014
+    @cell.value.month.should eq 1
+    @cell.value.day.should eq 2
+  end
   it 'can be addressed by even more ways and all are identical' do
     @cell = @sheet1.cell(2,2)
     @sheet1.cell('B2').value = 'zaseste'
@@ -393,5 +400,8 @@ describe Rspreadsheet::Cell do
     @cell.format.top.style = 'none'
     @cell.border_top.should_not be_nil ## ?????
   end
+  it 'correctly works with time cells' do
   
+    
+  end
 end

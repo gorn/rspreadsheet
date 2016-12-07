@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # remove previously build gems
-rm -f pkg/rspreadsheet-0.*.gem
-rm -f Gemfile.lock
+sudo rm -f pkg/rspreadsheet-0.*.gem
+sudo rm -f Gemfile.lock
 
 # this is to update git index, because git lsfiles is used in .gemspec
 git add .
