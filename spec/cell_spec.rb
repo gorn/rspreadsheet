@@ -271,11 +271,19 @@ describe Rspreadsheet::Cell do
   end
   it 'stores time correctly' do
     @cell = @sheet1.cell(1,1)
-    @cell.value= Date.parse('2014-01-02')
-    @cell.value.year.should eq 2014
-    @cell.value.month.should eq 1
-    @cell.value.day.should eq 2
+    @cell.value= Time.parse('2:42 pm')
+    @cell.value.hour.should eq 14
+    @cell.value.min.should eq 42
+    @cell.value.sec.should eq 0
   end
+  it 'can read various types of times', :pending => 'see is' do
+    raise @sheet2.cell('D23').xml.inspect
+    expect {@cell = @sheet2.cell('D22'); @cell.value }.not_to raise_error
+    expect {@cell = @sheet2.cell('D23'); @cell.value }.not_to raise_error
+    
+    @cell.value.should == Time.new(2005,5,5,3,33,00)
+  end
+  
   it 'can be addressed by even more ways and all are identical' do
     @cell = @sheet1.cell(2,2)
     @sheet1.cell('B2').value = 'zaseste'
@@ -399,9 +407,5 @@ describe Rspreadsheet::Cell do
     @cell.format.top.should_not_be_nil
     @cell.format.top.style = 'none'
     @cell.border_top.should_not be_nil ## ?????
-  end
-  it 'correctly works with time cells' do
-  
-    
   end
 end
