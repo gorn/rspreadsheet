@@ -68,7 +68,7 @@ class Cell < XMLTiedItem
         when gt == Float then xmlnode.attributes['value'].to_f
         when gt == String then xmlnode.elements.first.andand.content.to_s
         when gt == Date then Date.strptime(xmlnode.attributes['date-value'].to_s, InternalDateFormat)
-        when gt == Time then Time.strptime(xmlnode.attributes['time-value'].to_s, InternalTimeFormat)
+        when gt == Time then self.time_value
         when gt == :percentage then xmlnode.attributes['value'].to_f
         when gt == :currency then xmlnode.attributes['value'].to_d
       end
@@ -78,6 +78,47 @@ class Cell < XMLTiedItem
       raise "Unknown cell mode #{self.mode}"
     end
   end
+  ## according to http://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-part1.html#__RefHeading__1417674_253892949
+  ## the value od time-value is in a "duration" format defined here https://www.w3.org/TR/xmlschema-2/#duration
+  ## this method converts the time-value to Time object. Note that it does not check if the cell is in time-value
+  ## or not, this is the responibility of caller
+  def time_value
+    Cell.parse_time_value(xmlnode.attributes['time-value'].to_s)
+  end
+  def self.parse_time_value(svalue)
+    begin
+      Time.strptime(svalue, 'PT%HH%MM%SS') # first iteration which does fail - see issue #23
+    rescue
+      begin
+        Time.parse(svalue) # maybe add defaults for year-mont-day
+      rescue  
+        # ultimate manual parse
+        m = /^P((?<years>[0-9]+)Y)?((?<months>[0-9]+)M)?((?<days>[0-9]+)D)?T((?<hours>[0-9]+)H)?((?<minutes>[0-9]+)M)?((?<seconds>[0-9]+(\.[0-9]+)?)S)$/ .match(svalue.delete(' '))
+        
+        seconds = m[:seconds].to_f
+        minutes = m[:minutes].to_i
+        hours = m[:hours].to_i
+        days = m[:days].to_i
+        months = m[:months].to_i
+        years = m[:years].to_i
+        
+        if seconds >= 61 
+          divisor = (seconds / 60).floor
+          minutes,  = minutes + divisor
+          seconds  = seconds - divisor * 60
+        end
+        
+        if minutes >= 60
+          divisor = (seconds / 60).floor
+          minutes,  = minutes + divisor
+          seconds  = seconds - divisor * 60
+        end
+        
+        raise m[:years].inspect if m
+      end  
+    end
+  end
+  
   def value=(avalue)
     detach_if_needed
     if self.mode == :regular
