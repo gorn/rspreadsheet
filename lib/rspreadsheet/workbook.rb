@@ -28,10 +28,10 @@ class Workbook
     case index_or_name
       when Integer then begin
         case index_or_name
-          when 0 then nil 
+          when 0 then nil
           when 1..Float::INFINITY then @worksheets[index_or_name-1]
           when -Float::INFINITY..-1 then @worksheets[index_or_name]    # zaporne indexy znamenaji pocitani zezadu
-        end  
+        end
       end
       when String then @worksheets.select{|ws| ws.name == index_or_name}.first
       when NilClass then nil

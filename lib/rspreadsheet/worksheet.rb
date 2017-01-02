@@ -13,7 +13,7 @@ class Worksheet
   def subitem_xml_options; {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'} end
 
   def initialize(xmlnode_or_sheet_name)
-    @itemcache = Hash.new  #TODO: move to module XMLTiedArray_WithRepeatableItems
+    super()
     # set up the @xmlnode according to parameter
     case xmlnode_or_sheet_name
       when LibXML::XML::Node
@@ -56,7 +56,7 @@ class Worksheet
   end
   
   def images_object
-    @images ||= Images.new
+    @images ||= Images.new(self)
   end
   def images(*params)
     images_object.subitems(*params) 

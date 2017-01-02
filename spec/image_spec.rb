@@ -7,9 +7,11 @@ describe Rspreadsheet::Image do
     @testimage_filename = "./spec/#{@testimage_basename}"
     @sheet = Rspreadsheet.new(@testbook_images_filename).worksheets(1)
   end
-  it 'is accesible when included in spreadsheet ', :pending do
+  it 'is accesible when included in spreadsheet', :pending do
     @sheet.images.count.should == 1
     @image = @sheet.images(1)
+    
+    raise @image.xmlnode.to_s.inspect
     @image.name.should == 'Obr-a'
     @sheet.insert_image(@testimage_filename)  ## should it be named this way?
     

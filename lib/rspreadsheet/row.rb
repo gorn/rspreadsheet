@@ -33,12 +33,12 @@ class Row < XMLTiedItem
   attr_reader :rowi 
     
   def initialize(aworksheet,arowi)
+    super()
     @worksheet = aworksheet
     @rowi = arowi
-    @itemcache = Hash.new  #TODO: move to module XMLTiedArray_WithRepeatableItems
   end
   
-  def xmlnode; parent.find_my_subnode_respect_repeated(index, xml_options)  end
+#   def xmlnode; parent.find_my_subnode_respect_repeated(index, xml_options)  end
     
  # @!group Syntactic sugar
   def cells(*params); subitems(*params) end

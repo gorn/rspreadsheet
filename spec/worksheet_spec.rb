@@ -22,6 +22,10 @@ describe Rspreadsheet::Worksheet do
       @book = Rspreadsheet.new
       @sheet = @book.create_worksheet
     end
+    it 'array of rows is empty Array' do
+      @sheet.subitems_array.should == []
+      @sheet.images.count.should == 0
+    end
     it 'has correctly namespaced xmlnode' do
       @xmlnode = @sheet.xmlnode
       @xmlnode.namespaces.to_a.size.should >5

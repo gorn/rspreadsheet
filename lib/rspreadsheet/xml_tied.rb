@@ -25,8 +25,7 @@ class XMLTiedItem < XMLTied
   def repeated?; mode==:repeated || mode==:outbound end
   alias :is_repeated? :repeated?
   def xmlnode
-    parentnode = parent.xmlnode
-    if parentnode.nil?
+    if parent.xmlnode.nil?
       nil
     else
       parent.find_my_subnode_respect_repeated(index, xml_options)
@@ -85,11 +84,23 @@ end
 #   * item, subitem is object from @itemcache (quite often subclass of XMLTiedItem)
 #   * node, subnode is LibXML::XML::Node object
 #
-# this class is made to be included
+# this class is made to be included.
+#
+# Note for developers:
+# Beware that the implementation of methods needs to be done in a way that it continues to
+# work when items are "repeatable" - see XMLTiedArray_WithRepeatableItems. When impractical or impossible
+# please implement the corresponding method in XMLTiedArray_WithRepeatableItems or at least override it there
+# and make it raise exception.
+# 
 # @private
 module XMLTiedArray
+  attr_reader :itemcache
   
-  # returns an array of subitems (when called without parameter) or an item on paricular index (when called with parameter)
+  def initialize
+    @itemcache = Hash.new
+  end
+  
+  # Returns an array of subitems (when called without parameter) or an item on paricular index (when called with parameter). 
   def subitems(*params)
     case params.length 
       when 0 then subitems_array
@@ -98,7 +109,18 @@ module XMLTiedArray
     end
   end
   
-  #@private 
+  # vrátí item na souřadnici aindex
+  def subitem(aindex)
+    aindex = aindex.to_i
+    if aindex.to_i<=0
+      raise 'Item index should be greater then 0' if Rspreadsheet.raise_on_negative_coordinates
+      nil 
+    else 
+      @itemcache[aindex] ||= prepare_subitem(aindex)
+    end
+  end
+
+  # vrátí pole subitemů
   def subitems_array
     (1..self.size).collect do |i|
       subitem(i)
@@ -106,7 +128,21 @@ module XMLTiedArray
   end
   
   def size; find_first_unused_subitem_index-1 end
-
+    
+  # array containing subnodes of xmlnode which represent subitems
+  def subitems_nodes
+    return [] if xmlnode.nil?
+    xmlnode.elements.select{|node| node.name == subitem_xml_options[:xml_items_node_name]}
+  end
+    
+  def find_first_unused_subitem_index
+    1 + subitems_nodes.sum { |node| how_many_times_node_is_repeated(node) }
+  end
+  
+  # This is used in find_first_unused_subitem_index so it is flexible and can be reused in XMLTiedArray_WithRepeatableItems
+  # @private
+  def how_many_times_node_is_repeated(node); 1 end
+  
 end
 
 # Abstract class similar to XMLTiedArray but with support to "repeatable" items. This is notion specific
@@ -118,11 +154,10 @@ end
 
 module XMLTiedArray_WithRepeatableItems
   include XMLTiedArray
-  attr_reader :itemcache
 
   def find_my_subnode_range_respect_repeated(aindex, options)
     index = 0
-    xmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
+    subitems_nodes.each do |node|
       repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
       if index+repeated >= aindex
         return (index+1..index+repeated)
@@ -136,16 +171,6 @@ module XMLTiedArray_WithRepeatableItems
   # vrátí xmlnode na souřadnici aindex
   def find_my_subnode_respect_repeated(aindex, options)
     find_subnode_respect_repeated(xmlnode,aindex, options)
-  end
-  # vrátí item na souřadnici aindex
-  def subitem(aindex)
-    aindex = aindex.to_i
-    if aindex.to_i<=0
-      raise 'Item index should be greater then 0' if Rspreadsheet.raise_on_negative_coordinates
-      nil 
-    else 
-      @itemcache[aindex] ||= prepare_subitem(aindex)
-    end
   end
 
   def find_subnode_respect_repeated(axmlnode, aindex, options)
@@ -221,20 +246,10 @@ module XMLTiedArray_WithRepeatableItems
     subitem(aindex).xmlnode.remove!
   end
   
-  ## overridea method from XMLTiedArray module
-  def find_first_unused_subitem_index; find_first_unused_index_respect_repeated end 
-  
-  def find_first_unused_index_respect_repeated
-    options = subitem_xml_options
-    index = 0
-    return 1 if xmlnode.nil?
-    xmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
-      repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
-      index = index+repeated
-    end
-    return index+1
+  def how_many_times_node_is_repeated(node)   # adding respect to repeated nodes
+    (node.attributes[subitem_xml_options[:xml_repeated_attribute]] || 1).to_i
   end
-
+  
   def add_empty_subitem_before(aindex)
     @itemcache.keys.sort.reverse.select{|i| i>=aindex }.each do |i| 
       @itemcache[i+1]=@itemcache.delete(i)
