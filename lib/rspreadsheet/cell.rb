@@ -34,7 +34,7 @@ class Cell < XMLTiedItem
   def xml_options; {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'} end
   
   ## defining abstract methods from XMLTiedItem
-  # returns parent XMLTiedArray object of myself (XMLTiedItem)
+  # returns parent object (XMLTiedArray or module XMLTiedArray_WithRepeatableItems) of myself (XMLTiedItem)
   def parent; row end
   def index; @coli end
   def set_index(value); @coli=value end

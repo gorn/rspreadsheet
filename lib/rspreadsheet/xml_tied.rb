@@ -68,15 +68,56 @@ class XMLTiedItem < XMLTied
 
 end
 
-# abstract class. All importers MUST implement: prepare_subitem (and delete)
-# terminology
-#   item, subitem is object from @itemcache (quite often subclass of XMLTiedItem)
-#   node, subnode is LibXML::XML::Node object
+# Abstract class representing and array which is tied to a particular element of XML file.
+# It uses cashing to make access to array more effective. Implements the following methods:
+#
+#   * subitems(index) - returns subitem object on index 
+#   * subitems - returns array of all subitems. Please note that first item is always nil so the array can be accessed using 1-based indexes.
+#   
+# Importer must provide:
+#
+#   * prepare_subitem(aindex) - must return newly created object representing item on aindex
+#   * delete - ???
+#   * xmlnode - must return xmlnode to which the array is tied.
+#   * subitem_xml_options - options used to locate subitems in xml (TODO: rewrite in clear way)
+#
+# Terminology
+#   * item, subitem is object from @itemcache (quite often subclass of XMLTiedItem)
+#   * node, subnode is LibXML::XML::Node object
+#
+# this class is made to be included
+# @private
+module XMLTiedArray
+  
+  # returns an array of subitems (when called without parameter) or an item on paricular index (when called with parameter)
+  def subitems(*params)
+    case params.length 
+      when 0 then subitems_array
+      when 1 then subitem(params[0]) 
+      else raise Exception.new('Wrong number of arguments.')
+    end
+  end
+  
+  #@private 
+  def subitems_array
+    (1..self.size).collect do |i|
+      subitem(i)
+    end
+  end
+  
+  def size; find_first_unused_subitem_index-1 end
+
+end
+
+# Abstract class similar to XMLTiedArray but with support to "repeatable" items. This is notion specific
+# to OpenDocument files - whnewer a row repeats more times (or a cell), one can either make many identical
+# copies of the same xml or only make one xml representing one item and add attribute xml_repeated.
 #
 # this class is made to be included, not subclassed - the reason is in delete method which calls super
 # @private
 
-module XMLTiedArray
+module XMLTiedArray_WithRepeatableItems
+  include XMLTiedArray
   attr_reader :itemcache
 
   def find_my_subnode_range_respect_repeated(aindex, options)
@@ -106,23 +147,7 @@ module XMLTiedArray
       @itemcache[aindex] ||= prepare_subitem(aindex)
     end
   end
-  
-  def subitems(*params)
-    case params.length 
-      when 0 then subitems_array
-      when 1 then subitem(params[0]) 
-      else raise Exception.new('Wrong number of arguments.')
-    end
-  end
-  
-  def subitems_array
-    (1..self.size).collect do |i|
-      subitem(i)
-    end
-  end
-  
-  def size; find_first_unused_index_respect_repeated(subitem_xml_options)-1 end
-      
+
   def find_subnode_respect_repeated(axmlnode, aindex, options)
     result1, result2 = find_subnode_with_range_respect_repeated(axmlnode, aindex, options)
     return result1
@@ -185,7 +210,7 @@ module XMLTiedArray
       node.remove!                                                         # remove the original node
     else # insert outbound xmlnode
       [index+1..aindex-1,aindex..aindex].reject {|range| range.size<1}.each do |range|
-	axmlnode << XMLTiedArray.prepare_repeated_subnode(range.size, options)
+        axmlnode << XMLTiedArray_WithRepeatableItems.prepare_repeated_subnode(range.size, options)
       end  
     end
     return find_subnode_respect_repeated(axmlnode, aindex, options)
@@ -196,7 +221,11 @@ module XMLTiedArray
     subitem(aindex).xmlnode.remove!
   end
   
-  def find_first_unused_index_respect_repeated(options)
+  ## overridea method from XMLTiedArray module
+  def find_first_unused_subitem_index; find_first_unused_index_respect_repeated end 
+  
+  def find_first_unused_index_respect_repeated
+    options = subitem_xml_options
     index = 0
     return 1 if xmlnode.nil?
     xmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|

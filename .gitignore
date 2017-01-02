@@ -44,3 +44,6 @@ Gemfile.lock
 # specific to the project
 /*.ods
 /spec/testfile1/
+
+#temporary
+/w

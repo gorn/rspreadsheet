@@ -1,5 +1,6 @@
 require 'rspreadsheet/row'
 require 'rspreadsheet/column'
+require 'rspreadsheet/image'
 require 'rspreadsheet/tools'
 require 'helpers/class_extensions'
 # require 'forwardable'
@@ -7,12 +8,12 @@ require 'helpers/class_extensions'
 module Rspreadsheet 
 
 class Worksheet
-  include XMLTiedArray
+  include XMLTiedArray_WithRepeatableItems
   attr_accessor :xmlnode
   def subitem_xml_options; {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'} end
 
   def initialize(xmlnode_or_sheet_name)
-    @itemcache = Hash.new  #TODO: move to module XMLTiedArray
+    @itemcache = Hash.new  #TODO: move to module XMLTiedArray_WithRepeatableItems
     # set up the @xmlnode according to parameter
     case xmlnode_or_sheet_name
       when LibXML::XML::Node
@@ -30,11 +31,11 @@ class Worksheet
   def name=(value); Tools.set_ns_attribute(@xmlnode,'table','name', value) end
   
   def rowxmlnode(rowi)
-    find_my_subnode_respect_repeated(rowi, {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
+    find_my_subnode_respect_repeated(rowi, subitem_xml_options)
   end
     
   def first_unused_row_index
-    find_first_unused_index_respect_repeated({:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
+    find_first_unused_subitem_index
   end
   
   def add_row_above(arowi)
@@ -47,14 +48,21 @@ class Worksheet
   end
   
   def detach_row_in_xml(rowi)
-    return detach_my_subnode_respect_repeated(rowi, {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
+    return detach_my_subnode_respect_repeated(rowi, subitem_xml_options)
   end
   
   def nonemptycells
     used_rows_range.collect{ |rowi| rows(rowi).nonemptycells }.flatten
   end
   
-  #@!group XMLTiedArray connected methods
+  def images_object
+    @images ||= Images.new
+  end
+  def images(*params)
+    images_object.subitems(*params) 
+  end
+  
+  #@!group XMLTiedArray_WithRepeatableItems connected methods
   def rows(*params); subitems(*params) end
   alias :row :rows
   def prepare_subitem(rowi); Row.new(self,rowi) end

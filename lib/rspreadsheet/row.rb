@@ -24,7 +24,7 @@ module Rspreadsheet
 # and shifts all other rows down/up appropriatelly.
 
 class Row < XMLTiedItem
-  include XMLTiedArray
+  include XMLTiedArray_WithRepeatableItems
   ## @return [Worksheet] worksheet which contains the row
   # @!attribute [r] worksheet
   attr_reader :worksheet
@@ -35,7 +35,7 @@ class Row < XMLTiedItem
   def initialize(aworksheet,arowi)
     @worksheet = aworksheet
     @rowi = arowi
-    @itemcache = Hash.new  #TODO: move to module XMLTiedArray
+    @itemcache = Hash.new  #TODO: move to module XMLTiedArray_WithRepeatableItems
   end
   
   def xmlnode; parent.find_my_subnode_respect_repeated(index, xml_options)  end
@@ -102,14 +102,14 @@ class Row < XMLTiedItem
  # @!group Private methods, which should not be called directly
   # @private
   # shifts internal represetation of row by diff. This should not be called directly
-  # by user, it is only used by XMLTiedArray as hook when shifting around rows
+  # by user, it is only used by XMLTiedArray_WithRepeatableItems as hook when shifting around rows
   def _shift_by(diff)
     super
     @itemcache.each_value{ |cell| cell.set_rowi(@rowi) }
   end
   
  private
-  # @!group XMLTiedArray related methods
+  # @!group XMLTiedArray_WithRepeatableItems related methods
   def subitem_xml_options; {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'} end
   def prepare_subitem(coli); Cell.new(@worksheet,@rowi,coli) end
   # @!group XMLTiedItem related methods and extensions
