@@ -46,6 +46,4 @@ Gemfile.lock
 /spec/testfile1/
 
 #temporary
-!/w/test.rb
-!/w/time.ods
 /w
