@@ -5,19 +5,31 @@ module Rspreadsheet
 class Images
   include XMLTiedArray_WithRepeatableItems
   def initialize(parent_worksheet)
-    super()
+    initialize_xml_tied_array
     @worksheet = parent_worksheet
   end
   def xmlnode; @worksheet.xmlnode.find('./table:shapes').first end
 
   # @!group XMLTiedArray_WithRepeatableItems related methods    
   def subitem_xml_options; {:xml_items_node_name => 'frame'} end
-  def prepare_subitem(index); Image.new end
+  def prepare_subitem(index); Image.new(self,index) end
 
 end
 
-class Image
-  def name; end
+class Image < XMLTiedItem
+  def name
+    Tools.get_ns_attribute_value(xmlnode, 'draw', 'name', nil)
+  end
+    
+  # @!group XMLTiedItem related methods
+  def xml_options; {:xml_items_node_name => 'frame'} end
+
+
+#    
+# Note: when creating new empty image we might have included xlink:type attribute but specification
+# says it has default value simple [1] so we omit it. The same goes for 
+# [1](http://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-part1.html#attribute-xlink_type)
+# 
 end
-  
+
 end

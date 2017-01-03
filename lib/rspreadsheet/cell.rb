@@ -24,26 +24,23 @@ using ClassExtensions if RUBY_VERSION > '2.1'
 # 
 
 class Cell < XMLTiedItem
-  attr_accessor :worksheet, :coli, :rowi
+  attr_accessor :worksheet 
+  attr_reader :rowi
   InternalDateFormat = '%Y-%m-%d'
   InternalTimeFormat = 'PT%HH%MM%SS'
 #   InternalTimeFormat = 'PT%HH%MM%SS,%LS'
   
-  # `xml_options[:xml_items_node_name]` gives the name of the tag representing cell
-  # `xml_options[:number-columns-repeated]` gives the name of the previous tag which sais how many times the item is repeated
+  # @!group XMLTiedItem related methods and extensions  
   def xml_options; {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'} end
-  
-  ## defining abstract methods from XMLTiedItem
-  # returns parent object (XMLTiedArray or module XMLTiedArray_WithRepeatableItems) of myself (XMLTiedItem)
   def parent; row end
-  def index; @coli end
-  def set_index(value); @coli=value end
+  def coli; index end
+    
   def set_rowi(arowi); @rowi = arowi end # this should ONLY be used by parent row
   def initialize(aworksheet,arowi,acoli)
     raise "First parameter should be Worksheet object not #{aworksheet.class}" unless aworksheet.kind_of?(Rspreadsheet::Worksheet)
     @worksheet = aworksheet
     @rowi = arowi
-    @coli = acoli
+    initialize_xml_tied_item(row,acoli)
   end
   def row; @worksheet.rows(rowi) end
   def coordinates; [rowi,coli] end

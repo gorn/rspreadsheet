@@ -13,7 +13,7 @@ class Worksheet
   def subitem_xml_options; {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'} end
 
   def initialize(xmlnode_or_sheet_name)
-    super()
+    initialize_xml_tied_array
     # set up the @xmlnode according to parameter
     case xmlnode_or_sheet_name
       when LibXML::XML::Node

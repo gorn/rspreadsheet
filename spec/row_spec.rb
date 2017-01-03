@@ -255,6 +255,10 @@ describe Rspreadsheet::Row do
     @row.truncate
     @row.size.should == 0
   end
+  it 'remembers its parent correctly' do
+    @row = @sheet1.rows(5)
+    @row.worksheet.should == @sheet1
+  end
 end
 
  

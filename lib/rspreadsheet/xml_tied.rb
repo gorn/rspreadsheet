@@ -11,9 +11,52 @@ class XMLTied
   end
 end
   
+# Note for developers: In case you want to represent a node containing many identical subnodes
+# (like row contains cells, worksheet contains rows or images part includes images) than
+#   1. Include module XMLTiedArray into parent class
+#   2. Subclass XMLTiedItem by object which will represent individual items
+#   3. Implement methods which are mentioned at both of these and the rest should work itself.
+#   4. prepare_subitem calls method new of the item and usually sends index and parent + some
+#      more so subitem can implement parent and index methods.
+
 # @private
-# abstrac class. All successort MUST implement: set_index,xml_options,parent,index
+# abstract class. All successors have some options. MUST implement: 
+#   * xml_options
+#
+# If you override intializer make sure you call initialize_xml_tied_item(aparent,aindex).
+# 
+# Optionally you may implement method which makes index accessible under more meaningful name
+# like column or so. Optionally you may implement method which makes parent accessible under 
+# more meaningful name like worksheet or so.
+#
+# By default parent is stored at initialization and never changed. If you do not want to cache
+# it like this (to prevent inconsistencies) just override parent method to dfind the parent 
+# dynamically (see Cell). If you do so you may want to disable the default parent handling by
+# calling initialize_xml_tied_item(nil,index) in initializer (or do not call it at all if you
+# have overridden index as well.
+#
+# Note: If there is a object representing parent (presumably using XMLTiedArray) than initialize
+# signature must be reflected in parent prepare_subitem method
+# 
 class XMLTiedItem < XMLTied
+  
+  def initialize(aparent,aindex)
+    initialize_xml_tied_item(aparent,aindex)
+  end
+  def parent; @xml_tied_parent end
+  def index; @xml_tied_item_index end
+  def set_index(aindex); @xml_tied_item_index=aindex end
+  def index=(aindex); @xml_tied_item_index=aindex end
+  
+  # `xml_options[:xml_items_node_name]` gives the name of the tag representing cell
+  # `xml_options[:number-columns-repeated]` gives the name of the previous tag which sais how many times the item is repeated
+  def xml_options; abstract end
+    
+  def initialize_xml_tied_item(aparent,aindex)
+    @xml_tied_parent = aparent unless aparent.nil?
+    @xml_tied_item_index = aindex unless aindex.nil?
+  end
+    
   def mode
    case
      when xmlnode.nil? then :outbound
@@ -56,6 +99,9 @@ class XMLTiedItem < XMLTied
     end
     self.singleton_class.send(:define_method, :inspect, -> { "#<%s:0x%x destroyed cell>" % [self.class,object_id] })  # define descriptive inspect
     self.singleton_class.send(:define_method, :invalid_reference?, -> { true }) # define invalid_reference? method
+    # invalidate variables
+    @xml_tied_parent=nil
+    @xml_tied_item_index=nil
 #     self.instance_variables.each do |variable|
 #       instance_variable_set(variable,nil)
 #     end
@@ -71,14 +117,18 @@ end
 # It uses cashing to make access to array more effective. Implements the following methods:
 #
 #   * subitems(index) - returns subitem object on index 
-#   * subitems - returns array of all subitems. Please note that first item is always nil so the array can be accessed using 1-based indexes.
+#   * subitems - returns array of all subitems. Please note that first item is always nil so 
+#     the array can be accessed using 1-based indexes.
 #   
 # Importer must provide:
 #
 #   * prepare_subitem(aindex) - must return newly created object representing item on aindex
 #   * delete - ???
-#   * xmlnode - must return xmlnode to which the array is tied.
-#   * subitem_xml_options - options used to locate subitems in xml (TODO: rewrite in clear way)
+#   * xmlnode - must return xmlnode to which the array is tied. If speed is not a concern, 
+#               consider not cashing it into variable, but finding it through document or parent. 
+#               This prevents "broken" links.
+#   * subitem_xml_options - returns hash of options used to locate subitems in xml (TODO: rewrite in clear way)
+#   * intilize must call initialize_xml_tied_array
 #
 # Terminology
 #   * item, subitem is object from @itemcache (quite often subclass of XMLTiedItem)
@@ -96,10 +146,12 @@ end
 module XMLTiedArray
   attr_reader :itemcache
   
-  def initialize
+  def initialize_xml_tied_array
     @itemcache = Hash.new
   end
   
+  
+  # @!group accessing items
   # Returns an array of subitems (when called without parameter) or an item on paricular index (when called with parameter). 
   def subitems(*params)
     case params.length 
@@ -109,7 +161,7 @@ module XMLTiedArray
     end
   end
   
-  # vrátí item na souřadnici aindex
+  # Returns item with index aindex
   def subitem(aindex)
     aindex = aindex.to_i
     if aindex.to_i<=0
@@ -120,13 +172,14 @@ module XMLTiedArray
     end
   end
 
-  # vrátí pole subitemů
+  # Returns array of subitems (repeated friendly)
   def subitems_array
     (1..self.size).collect do |i|
       subitem(i)
     end
   end
   
+  # Number of subitems
   def size; find_first_unused_subitem_index-1 end
     
   # array containing subnodes of xmlnode which represent subitems
@@ -134,7 +187,8 @@ module XMLTiedArray
     return [] if xmlnode.nil?
     xmlnode.elements.select{|node| node.name == subitem_xml_options[:xml_items_node_name]}
   end
-    
+  
+  # Finds first unused subitem index
   def find_first_unused_subitem_index
     1 + subitems_nodes.sum { |node| how_many_times_node_is_repeated(node) }
   end
@@ -142,7 +196,27 @@ module XMLTiedArray
   # This is used in find_first_unused_subitem_index so it is flexible and can be reused in XMLTiedArray_WithRepeatableItems
   # @private
   def how_many_times_node_is_repeated(node); 1 end
-  
+    
+  # @!group inserting new items  
+  def insert_my_subnode_before_respect_repeated(aindex, options)
+    axmlnode = xmlnode
+    
+    node,index_range = find_subnode_with_range_respect_repeated(axmlnode, aindex, options)
+    
+    if !node.nil? # found the node, now do the insert
+      [index_range.begin+1..aindex-1,aindex..index_range.end].reject {|range| range.size<1}.each do |range| # split  original node by cloning
+        clone_before_and_set_repeated_attribute(node,range.size,options)
+      end
+      clone_before_and_set_repeated_attribute(node.prev,1,options)         # insert new node
+      node.remove!                                                         # remove the original node
+    else # insert outbound xmlnode
+      [index+1..aindex-1,aindex..aindex].reject {|range| range.size<1}.each do |range|
+        axmlnode << XMLTiedArray_WithRepeatableItems.prepare_repeated_subnode(range.size, options)
+      end  
+    end
+    return find_subnode_respect_repeated(axmlnode, aindex, options)
+  end
+ 
 end
 
 # Abstract class similar to XMLTiedArray but with support to "repeatable" items. This is notion specific
@@ -222,25 +296,6 @@ module XMLTiedArray_WithRepeatableItems
     return find_subnode_respect_repeated(axmlnode, aindex, options)
   end
   
-  def insert_my_subnode_before_respect_repeated(aindex, options)
-    axmlnode = xmlnode
-    
-    node,index_range = find_subnode_with_range_respect_repeated(axmlnode, aindex, options)
-    
-    if !node.nil? # found the node, now do the insert
-      [index_range.begin+1..aindex-1,aindex..index_range.end].reject {|range| range.size<1}.each do |range| # split  original node by cloning
-        clone_before_and_set_repeated_attribute(node,range.size,options)
-      end
-      clone_before_and_set_repeated_attribute(node.prev,1,options)         # insert new node
-      node.remove!                                                         # remove the original node
-    else # insert outbound xmlnode
-      [index+1..aindex-1,aindex..aindex].reject {|range| range.size<1}.each do |range|
-        axmlnode << XMLTiedArray_WithRepeatableItems.prepare_repeated_subnode(range.size, options)
-      end  
-    end
-    return find_subnode_respect_repeated(axmlnode, aindex, options)
-  end
-
   def delete_my_subnode_respect_repeated(aindex,options)
     detach_my_subnode_respect_repeated(aindex,options) #TODO: tohle neni uplne spravne, protoze to zanecha skupinu rozdelenou na dve casti
     subitem(aindex).xmlnode.remove!
