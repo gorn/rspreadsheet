@@ -57,18 +57,18 @@ module XMLTiedArray_WithRepeatableItems
       [index_range.begin..aindex-1,aindex..index_range.end].reject {|range| range.size<1}.each do |range| # split  original node by cloning
         clone_before_and_set_repeated_attribute(node,range.size,options)
       end
-      node.prev.prev =  prepare_repeated_subnode(1, options) # insert new node
-      node.remove!                                                         # remove the original node
+      node.prev.prev =  prepare_repeated_subnode(1, options)   # insert new node
+      node.remove!                                             # remove the original node
     else # insert outbound xmlnode
       [index+1..aindex-1,aindex..aindex].reject {|range| range.size<1}.each do |range|
         axmlnode << XMLTiedArray_WithRepeatableItems.prepare_repeated_subnode(range.size, options)
       end  
-    end
+    end #TODO: Out of bounds indexes handling
     return my_subnode(aindex)
   end
   
   def prepare_repeated_subnode(times_repeated,options)
-    result = LibXML::XML::Node.new(options[:xml_items_node_name],nil, Tools.get_namespace('table'))
+    result = prepare_empty_subnode
     Tools.set_ns_attribute(result,'table',options[:xml_repeated_attribute],times_repeated, 1)
     result
   end

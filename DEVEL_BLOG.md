@@ -62,7 +62,7 @@ RSpreadsheet.generate('pricelist.ods') do
 * array returned by rows of cells can have predefined dummy object as defaults for out of range indexes
 
 
-##Guiding ideas
+## Guiding ideas
   * xml document is always synchronized with the data. So the save is trivial.
   * no duplication of data. Objects like RowArray should containg minimum information. This one exists solely to speed up cell search. Taken to extream it is questionable, whether we need such objects at all, it might be possible to always work with xml directly.
   * all cells and rows only server as proxy. they hold index and worksheet pointer and everytime read or write is done, the xml is newly searched. until there is a xmlnode caching we have no problem
@@ -70,6 +70,11 @@ RSpreadsheet.generate('pricelist.ods') do
     
 ## Known Issues
   * currently there is a confusing syntax @worksheet.rows(1).cells[5] which returns a cell object in SIXT column, which is not intended. It is side effecto of Row#cells returning an array
+    
+## Release notes
+
+  2017-01
+  * bug corrected: inserted row was not empty, but rather copy of the row below.
     
 ## Developing this gem
 
@@ -93,7 +98,7 @@ RSpreadsheet.generate('pricelist.ods') do
 5. When happy, increment the version number and `git add .; git commit -am'commit message'; git push`
 6. ``rake release`` - creates a version tag in git and pushes the code to github + Rubygems. After this is succesfull the new version appears as release in Github and RubyGems.
 
-gem alternativa to points 3-6
+gem alternative to points 3-6
 
     gem build rspreadsheet.gemspec              -\   These two lines together are in install.sh
     sudo gem install rspreadsheet-x.y.z.gem     -/   which should be invoked from parent directory

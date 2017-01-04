@@ -84,7 +84,7 @@ module XMLTiedArray
       
   # Finds first unused subitem index
   def first_unused_subitem_index
-    1 + xmlsubnodes.sum { |node| how_many_times_node_is_repeated(node) }
+    (1 + xmlsubnodes.sum { |node| how_many_times_node_is_repeated(node) }).to_i
   end
   
   # @!group inserting new items  
@@ -121,24 +121,23 @@ module XMLTiedArray
 
   # @!group inserting new subnodes TODO: refactor out repeatable connected code
   def insert_new_empty_subnode_before(aindex)
-    axmlnode = xmlnode
-    options = subitem_xml_options
-    node,index_range = find_subnode_with_range(aindex)
+    node_after = my_subnode(aindex)
     
-    if !node.nil? # found the node, now do the insert
-      [index_range.begin..aindex-1,aindex..index_range.end].reject {|range| range.size<1}.each do |range| # split  original node by cloning
-        clone_before_and_set_repeated_attribute(node,range.size,options)
-      end
-      clone_before_and_set_repeated_attribute(node.prev,1,options)         # insert new node
-      node.remove!                                                         # remove the original node
-    else # insert outbound xmlnode
-      [index+1..aindex-1,aindex..aindex].reject {|range| range.size<1}.each do |range|
-        axmlnode << XMLTiedArray_WithRepeatableItems.prepare_repeated_subnode(range.size, options)
-      end  
+    if !node_after.nil?
+      node_after.prev = prepare_empty_subnode
+      return node_after.prev
+    elsif aindex==size+1
+      xmlnode <<  prepare_empty_subnode
+      return xmlnode.last
+    else
+      raise IndexError.new("Index #{aindex} out of bounds (1..#{self.size})")
     end
-    return my_subnode(aindex)
-  end
+  end    
  
+  def prepare_empty_subnode
+    LibXML::XML::Node.new(subitem_xml_options[:xml_items_node_name],nil, Tools.get_namespace('table'))
+  end
+  
   # @!supergroup internal procedures dealing solely with xml structure ==========
   
   # @!group finding and accessing subnodes
