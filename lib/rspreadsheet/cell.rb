@@ -3,7 +3,7 @@
 # @title rspreadsheet Cell
 
 require 'andand'
-require 'rspreadsheet/xml_tied'
+require 'rspreadsheet/xml_tied_item'
 require 'date'
 require 'time'
 require 'bigdecimal'

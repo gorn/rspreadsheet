@@ -1,5 +1,5 @@
 require 'rspreadsheet/cell'
-require 'rspreadsheet/xml_tied'
+require 'rspreadsheet/xml_tied_repeatable'
 
 module Rspreadsheet
 

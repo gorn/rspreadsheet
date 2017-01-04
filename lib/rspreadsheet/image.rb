@@ -3,17 +3,21 @@ module Rspreadsheet
 # Represents an image included in the spreadsheet.
 
 class Images
-  include XMLTiedArray_WithRepeatableItems
+  include XMLTiedArray
   def initialize(parent_worksheet)
     initialize_xml_tied_array
     @worksheet = parent_worksheet
   end
-  def xmlnode; @worksheet.xmlnode.find('./table:shapes').first end
+    
+  def insert_image(filename)
+    push_new
+    last.filename = filename
+  end
 
   # @!group XMLTiedArray_WithRepeatableItems related methods    
   def subitem_xml_options; {:xml_items_node_name => 'frame'} end
   def prepare_subitem(index); Image.new(self,index) end
-
+  def xmlnode; @worksheet.xmlnode.find('./table:shapes').first end
 end
 
 class Image < XMLTiedItem
@@ -23,7 +27,6 @@ class Image < XMLTiedItem
     
   # @!group XMLTiedItem related methods
   def xml_options; {:xml_items_node_name => 'frame'} end
-
 
 #    
 # Note: when creating new empty image we might have included xlink:type attribute but specification

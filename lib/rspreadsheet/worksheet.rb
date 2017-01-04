@@ -31,24 +31,24 @@ class Worksheet
   def name=(value); Tools.set_ns_attribute(@xmlnode,'table','name', value) end
   
   def rowxmlnode(rowi)
-    find_my_subnode_respect_repeated(rowi, subitem_xml_options)
+    my_subnode(rowi)
   end
     
   def first_unused_row_index
-    find_first_unused_subitem_index
+    first_unused_subitem_index
   end
   
   def add_row_above(arowi)
-    add_empty_subitem_before(arowi)
+    insert_new_empty_subitem_before(arowi)
   end
   
-  def insert_cell_before(arowi,acoli)
+  def insert_cell_before(arowi,acoli)        # TODO: maybe move this to row level
     detach_row_in_xml(arowi)
-    rows(arowi).add_empty_subitem_before(acoli)
+    rows(arowi).insert_new_item(acoli)  
   end
   
   def detach_row_in_xml(rowi)
-    return detach_my_subnode_respect_repeated(rowi, subitem_xml_options)
+    return detach_my_subnode_respect_repeated(rowi)
   end
   
   def nonemptycells
