@@ -84,7 +84,7 @@ module XMLTiedArray
       
   # Finds first unused subitem index
   def first_unused_subitem_index
-    1 + subitems_nodes.sum { |node| how_many_times_node_is_repeated(node) }
+    1 + xmlsubnodes.sum { |node| how_many_times_node_is_repeated(node) }
   end
   
   # @!group inserting new items  
@@ -100,6 +100,10 @@ module XMLTiedArray
   end
   alias :insert_new_empty_subitem_before :insert_new_item
   
+  def push_new
+    insert_new_item(first_unused_subitem_index)
+  end
+  
   # @!group other subitems methods
   # This is used (i.e. in first_unused_subitem_index) so it is flexible and can be reused in XMLTiedArray_WithRepeatableItems
   # @private
@@ -107,51 +111,19 @@ module XMLTiedArray
   
   # @!supergroup XML STRUCTURE internal handling methods #######################################
 
-  # @!group accessing subnodes
-#   def my_subnode(aindex)
-#     result1, result2 = find_subnode_with_range(xmlnode, aindex)
-#     return result1
-#   end
-#   
-#   def find_subnode_with_range(axmlnode, aindex)
-#     rightindex = 0
-#     axmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
-#       repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
-#       leftindex = rightindex + 1 
-#       rightindex = rightindex+repeated
-#       if rightindex>= aindex
-#         return node, leftindex..rightindex
-#       end
-#     end
-#     return nil, rightindex+1..Float::INFINITY
-#   end
-#     
-#   def find_subnode_with_range(axmlnode, aindex)
-#     rightindex = 0
-#     axmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
-#       repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
-#       leftindex = rightindex + 1 
-#       rightindex = rightindex+repeated
-#       if rightindex>= aindex
-#         return node, leftindex..rightindex
-#       end
-#     end
-#     return nil, rightindex+1..Float::INFINITY
-#   end
-
-  
-  
-  # array containing subnodes of xmlnode which represent subitems
-  def subitems_nodes
-    return [] if xmlnode.nil?
-    xmlnode.elements.select{|node| node.name == subitem_xml_options[:xml_items_node_name]}
+#   # @!group accessing subnodes
+  # returns xmlnode with index
+  # DOES not respect repeated_attribute
+  def my_subnode(aindex)
+    raise 'Using method which does not respect repeated_attribute with options that are using it. You probably donot want to do that.' unless subitem_xml_options[:xml_repeated_attribute].nil?
+    return xmlsubnodes[aindex-1]
   end
 
   # @!group inserting new subnodes TODO: refactor out repeatable connected code
   def insert_new_empty_subnode_before(aindex)
     axmlnode = xmlnode
     options = subitem_xml_options
-    node,index_range = find_subnode_with_range(axmlnode, aindex)
+    node,index_range = find_subnode_with_range(aindex)
     
     if !node.nil? # found the node, now do the insert
       [index_range.begin..aindex-1,aindex..index_range.end].reject {|range| range.size<1}.each do |range| # split  original node by cloning
@@ -167,6 +139,15 @@ module XMLTiedArray
     return my_subnode(aindex)
   end
  
+  # @!supergroup internal procedures dealing solely with xml structure ==========
+  
+  # @!group finding and accessing subnodes
+  # array containing subnodes of xmlnode which represent subitems
+  def xmlsubnodes
+    return [] if xmlnode.nil?
+    xmlnode.elements.select{|node| node.name == subitem_xml_options[:xml_items_node_name]}
+  end
+  
 end
 
 end 

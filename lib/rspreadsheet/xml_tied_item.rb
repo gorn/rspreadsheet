@@ -80,7 +80,7 @@ class XMLTiedItem < XMLTied
     set_index(index + diff)
   end
   def range
-    parent.my_subnode_range(index,xml_options)
+    parent.my_subnode_range(index)
   end
   def invalid_reference?; false end
   # destroys the object so it can not be used, this is necessarry to prevent

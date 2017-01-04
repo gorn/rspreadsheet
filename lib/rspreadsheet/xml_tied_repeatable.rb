@@ -17,22 +17,21 @@ using ClassExtensions if RUBY_VERSION > '2.1'
 module XMLTiedArray_WithRepeatableItems
   include XMLTiedArray
 
-  def my_subnode_range(aindex, options)
-    raise 'xxxx' if options != subitem_xml_options
-    node, range = find_subnode_with_range(xmlnode, aindex)
+  def my_subnode_range(aindex)
+    node, range = find_subnode_with_range(aindex)
     return range
   end
   
   # vrátí xmlnode na souřadnici aindex
   def my_subnode(aindex)
-    result1, result2 = find_subnode_with_range(xmlnode, aindex)
+    result1, result2 = find_subnode_with_range(aindex)
     return result1
   end
 
-  def find_subnode_with_range(axmlnode, aindex)
+  def find_subnode_with_range(aindex)
     options = subitem_xml_options
     rightindex = 0
-    axmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
+    xmlsubnodes.each do |node|
       repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
       leftindex = rightindex + 1 
       rightindex = rightindex+repeated
@@ -41,6 +40,31 @@ module XMLTiedArray_WithRepeatableItems
       end
     end
     return nil, rightindex+1..Float::INFINITY
+  end
+  
+  # @!group inserting new subnodes
+  
+  def insert_new_empty_subnode_before(aindex)
+    insert_new_empty_subnode_before_respect_repeatable(aindex)
+  end
+  
+  def insert_new_empty_subnode_before_respect_repeatable(aindex)
+    axmlnode = xmlnode
+    options = subitem_xml_options
+    node,index_range = find_subnode_with_range(aindex)
+    
+    if !node.nil? # found the node, now do the insert
+      [index_range.begin..aindex-1,aindex..index_range.end].reject {|range| range.size<1}.each do |range| # split  original node by cloning
+        clone_before_and_set_repeated_attribute(node,range.size,options)
+      end
+      node.prev.prev =  prepare_repeated_subnode(1, options) # insert new node
+      node.remove!                                                         # remove the original node
+    else # insert outbound xmlnode
+      [index+1..aindex-1,aindex..aindex].reject {|range| range.size<1}.each do |range|
+        axmlnode << XMLTiedArray_WithRepeatableItems.prepare_repeated_subnode(range.size, options)
+      end  
+    end
+    return my_subnode(aindex)
   end
   
   def prepare_repeated_subnode(times_repeated,options)
@@ -59,7 +83,7 @@ module XMLTiedArray_WithRepeatableItems
   def detach_my_subnode_respect_repeated(aindex)
     axmlnode = xmlnode
     options = subitem_xml_options
-    node,index_range = find_subnode_with_range(axmlnode, aindex)
+    node,index_range = find_subnode_with_range(aindex)
     if index_range.size > 1 # pokud potřebuje vůbec detachovat
       if !node.nil? # detach subnode
         [index_range.begin..aindex-1,aindex..aindex,aindex+1..index_range.end].reject {|range| range.size<1}.each do |range| # create new structure by cloning

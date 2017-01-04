@@ -55,11 +55,16 @@ class Worksheet
     used_rows_range.collect{ |rowi| rows(rowi).nonemptycells }.flatten
   end
   
+  #@!group images
   def images_object
     @images ||= Images.new(self)
   end
   def images(*params)
     images_object.subitems(*params) 
+  end
+  
+  def insert_image(filename)
+    images_object.insert_image(filename)
   end
   
   #@!group XMLTiedArray_WithRepeatableItems connected methods
