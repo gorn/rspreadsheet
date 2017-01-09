@@ -62,6 +62,10 @@ module XMLTiedArray
     end
   end
   
+  def last
+    subitem(size)
+  end
+  
   # Returns an array of subitems (when called without parameter) or an item on paricular index (when called with parameter). 
   def subitems(*params)
     case params.length 

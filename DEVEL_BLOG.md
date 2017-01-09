@@ -22,6 +22,7 @@ After you have cloned the source run `bundle` command in gem directory to instal
   * longterm plan - go through other used libraries and try to find out whose syntax could be adopted, so this library is drop in replacement (possibly with some config options) for them
   * iterative generation like this
   * Currently the way you insert cells and rows is that you insert empty one and than copy values. It would be interesting to add "duplicate" method as well as other "copy pasting" stuff, which would be more forward compatible.
+  * Optionally allow negative coordinates count from end
  
  ```ruby
 RSpreadsheet.generate('pricelist.ods') do 

@@ -103,6 +103,8 @@ describe Rspreadsheet do
   end
   it 'examples from advanced syntax GUIDE are working' do
     def p(*par); end # supress p in the example
+    tmp_filename = '/tmp/testfile.ods'        # first delete temp files
+    File.delete(tmp_filename) if File.exists?(tmp_filename) # delete tmp file
     expect do 
       book = Rspreadsheet::Workbook.new
       sheet = book.create_worksheet 'Top icecreams'
@@ -143,12 +145,12 @@ describe Rspreadsheet do
 #       sheet.cells[2,1..5] = ['Vanilla', 'Pistacia', 'Chocolate', 'Annanas', 'Strawbery']
 #       sheet.columns(1).cells(1).format.color = :red
       
-      book.save('testfile.ods')
+      book.save('/tmp/testfile.ods')
     end.not_to raise_error
   end
   it 'can save file to io stream and the content is the same as when saving to file', :skip do
     tmp_filename = '/tmp/testfile.ods'        # first delete temp files
-    File.delete(tmp_filename) if File.exists?(tmp_filename1)
+    File.delete(tmp_filename) if File.exists?(tmp_filename)
     
     book = Rspreadsheet.new($test_filename)    # than open test file
     
