@@ -18,6 +18,7 @@ class Workbook
     register_worksheet(sheet)
     return sheet
   end
+  alias :add_worksheet :create_worksheet 
   # @return [Integer] number of sheets in the workbook
   def worksheets_count; @worksheets.length end
   # @return [String] names of sheets in the workbook
@@ -79,9 +80,21 @@ class Workbook
         @filename = @par
       end
       Zip::File.open(@filename) do |zip|
-        # it is easy, because @xmlnode in in sync with contents all the time
+        # main content is easy, because @xmlnode in in sync with contents all the time
         zip.get_output_stream('content.xml') do |f|
           f.write @content_xml.to_s(:indent => false)
+        end
+        # save all pictures
+        # iterate through sheets and pictures and check if they are saved and if not, save them
+        @worksheets.each do |sheet|
+          sheet.images.each do |image|
+            # check if it is saved
+            if zip.find_entry(image.internal_filename).nil?
+              zip.get_output_stream(image.internal_filename) do |f|
+                f.write File.read(image.original_filename)
+              end
+            end
+          end
         end
       end
     end

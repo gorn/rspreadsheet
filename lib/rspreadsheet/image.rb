@@ -1,40 +1,90 @@
 module Rspreadsheet
   
-# Represents an image included in the spreadsheet.
-
-class Images
+# Represents images embeded in a Worksheet
+class WorksheetImages
   include XMLTiedArray
   def initialize(parent_worksheet)
     initialize_xml_tied_array
     @worksheet = parent_worksheet
   end
-    
+  
   def insert_image(filename)
+    if xmlnode.nil? #TODO: this needs to be solved more generally maybe on XMLTiedArray level
+      @worksheet.xmlnode
+    end
     push_new
     last.initialize_from_file(filename)
   end
   
   # @!group XMLTiedArray_WithRepeatableItems related methods    
-  def subitem_xml_options; {:xml_items_node_name => 'frame'} end
+  def subitem_xml_options; {:xml_items_node_name => 'frame', :xml_items_node_namespace => 'draw'} end
   def prepare_subitem(index); Image.new(self,index) end
   def xmlnode; @worksheet.xmlnode.find('./table:shapes').first end
+  def prepare_empty_xmlnode
+    Tools.insert_as_first_node_child(
+      @worksheet.xmlnode, 
+      Tools.prepare_ns_node('table', 'shapes')
+    )
+  end
+  def prepare_empty_subnode
+    node = super # prepares <draw:frame/> node but it is entirely empty
+    node << Tools.prepare_ns_node('draw', 'image')
+    node
+  end
+
 end
 
+# Represents an image included in the spreadsheet. The Image can NOT exist
+# "detached" from an spreadsheet
 class Image < XMLTiedItem
-  def name
-    Tools.get_ns_attribute_value(xmlnode, 'draw', 'name', nil)
+  
+  def initialize(worksheet,index)
+    super(worksheet,index)
+    @original_filename = nil
   end
   
   def initialize_from_file(filename)
     # ověřit, zda soubor na disku existuje TODO: tady by to chtělo zobecnit na IO
-    file = File.new(filename)
-    # generate unique image name
-    Image.get_unused_filename(file.extname)
-    # copy picture to Pictures/ folder (within zip) under this name
-    # change xml
+    raise 'File does not exist or it is not accessible' unless File.exists?(filename)
+    @original_filename = filename
+    # generate unique image name + write it to xml
+    internal_filename = Image.get_unused_filename(File.extname(filename))        
+    Tools.set_ns_attribute(xml_image_subnode,'xlink','href', internal_filename ) 
+    self
   end
+  def xml_image_subnode
+    xmlnode.find('./draw:image').first
+  end
+  
+  def move_to(ax,ay)
+    self.x = ax
+    self.y = ay
+  end
+  
+  def original_filename; @original_filename end
+  
+  def copy_to(ax,ay,worksheet)
+    img = worksheet.insert_image_to(ax,ay,@original_filename)
+    img.height = height
+    img.width = width
+  end
+  
+  # TODO: put some sanity check for values into these
+  def x=(value); Tools.set_ns_attribute(xmlnode,'svg','x',value) end
+  def y=(value); Tools.set_ns_attribute(xmlnode,'svg','y',value) end
+  def width=(value);  Tools.set_ns_attribute(xmlnode,'svg','width',value) end
+  def height=(value); Tools.set_ns_attribute(xmlnode,'svg','height',value) end
+  def name=(value);   Tools.set_ns_attribute(xmlnode, 'draw', 'name', value)
+  end
+  def x;         Tools.get_ns_attribute_value(xmlnode,'svg','x') end
+  def y;         Tools.get_ns_attribute_value(xmlnode,'svg','y') end
+  def width;     Tools.get_ns_attribute_value(xmlnode,'svg','width') end
+  def height;    Tools.get_ns_attribute_value(xmlnode,'svg','height') end
+  def name;      Tools.get_ns_attribute_value(xmlnode, 'draw', 'name', nil) end
+  def internal_filename; Tools.get_ns_attribute_value(xml_image_subnode,'xlink','href')  end
 
   def self.get_unused_filename(extension)
+    'Pictures/11111'+extension
 #     path = 'Pictures/'
 #     filename_base = '11111111'
 #     
@@ -52,7 +102,6 @@ class Image < XMLTiedItem
 #     end
 #     return filename_base + iterator.to_s + extension
   end
-
   
   # @!group XMLTiedItem related methods
   def xml_options; {:xml_items_node_name => 'frame'} end

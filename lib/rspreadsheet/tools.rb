@@ -147,6 +147,7 @@ module Tools
     end
   end
   def self.get_ns_attribute(node,ns_prefix,key,default=:undefined_default)
+#     raise 'Nil does not have any attributes' if node.nil?
     if default==:undefined_default
       node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key)
     else
@@ -167,6 +168,14 @@ module Tools
   def self.prepare_ns_node(ns_prefix,nodename,value=nil)
     LibXML::XML::Node.new(nodename,value, Tools.get_namespace(ns_prefix))
   end
+  def self.insert_as_first_node_child(node,subnode)
+    if node.first?
+      node.first.prev = subnode
+    else
+      node << subnode
+    end
+  end
+  
 end
  
 end

@@ -56,15 +56,22 @@ class Worksheet
   end
   
   #@!group images
-  def images_object
-    @images ||= Images.new(self)
+  def worksheet_images
+    @worksheet_images ||= WorksheetImages.new(self)
+  end
+  def images_count
+    worksheet_images.size
   end
   def images(*params)
-    images_object.subitems(*params) 
-  end
-  
+    worksheet_images.subitems(*params) 
+  end  
   def insert_image(filename)
-    images_object.insert_image(filename)
+    worksheet_images.insert_image(filename)
+  end
+  def insert_image_to(x,y,filename)
+    img = insert_image(filename)
+    img.move_to(x,y)
+    img
   end
   
   #@!group XMLTiedArray_WithRepeatableItems connected methods
