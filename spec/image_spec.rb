@@ -2,10 +2,13 @@ require 'spec_helper'
  
 describe Rspreadsheet::Image do
   before do
-    @testbook_images_filename = './spec/testfile2-images.ods'
-    @testimage_basename = 'test-image-blue.png'
-    @testimage_filename = "./spec/#{@testimage_basename}"
-    @workbook = Rspreadsheet.new(@testbook_images_filename)
+    @testfile_filename = './spec/testfile2-images.ods'
+    @tmp_testfile_filename = '/tmp/testfile2.ods'
+    File.delete(@tmp_testfile_filename) if File.exists?(@tmp_testfile_filename) # delete temp file
+
+    @testimage_filename  = './spec/test-image-blue.png'
+    @testimage2_filename = './spec/test-image.png'
+    @workbook = Rspreadsheet.new(@testfile_filename)
     @sheet  = @workbook.worksheets(1)
     @sheet2 = @workbook.worksheets(2)
   end
@@ -57,40 +60,51 @@ describe Rspreadsheet::Image do
     @sheet2.images_count.should == 1
   end
   
-  it 'has internal_filename set once it is inserted' do
-    @image = @sheet.insert_image(@testimage_filename)
-    @image.internal_filename.should_not be_nil
-  end
-  
-  it 'can be inserted into file and is saved correctly to it' do
-    tmp_filename = '/tmp/testfile1.ods'        # first delete temp file
-    test_image = './spec/test-image.png'
+  it 'can be inserted into file and is saved correctly to it', :pending do
     tmp_test_image = '/tmp/test-image.png'
-    File.delete(tmp_filename) if File.exists?(tmp_filename)
     
     # create new file, insert image into it and save it
     book = Rspreadsheet.new
     @sheet = book.add_worksheet
     @sheet.images_count.should == 0
-    book.worksheets(1).insert_image_to('10mm','10mm',test_image)
+    book.worksheets(1).insert_image_to('10mm','10mm',@testimage2_filename)
     @sheet.images_count.should == 1
-    book.save(tmp_filename)
+    book.save(@tmp_testfile_filename)
 
     # reopen it and check the contents
-    book2 = Rspreadsheet.new(tmp_filename)
+    book2 = Rspreadsheet.new(@tmp_testfile_filename)
     @sheet2 = book2.worksheets(1)
     @sheet2.images_count.should == 1
     @image = @sheet2.images(1)
     
     File.delete(tmp_test_image) if File.exists?(tmp_test_image)
-    Zip::File.open(tmp_filename) do |zip|  ## TODO: this is UGLY - it should not be extracting contents here
+    Zip::File.open(@tmp_testfile_filename) do |zip|  ## TODO: this is UGLY - it should not be extracting contents here
       zip.extract(@image.internal_filename,tmp_test_image)
     end
-    File.binread(tmp_test_image).unpack("H*").should == File.binread(test_image).unpack("H*")
+    File.binread(tmp_test_image).unpack("H*").should == File.binread(@testimage2_filename).unpack("H*")
+  end
 
+  it 'xxx' do
+    i3 = @sheet.insert_image(@testimage2_filename)
+    i3.move_to('40.12mm','40.12mm')
+    @workbook.save(@tmp_testfile_filename)
   end
   
-  it 'has dimensions defaulting to size of the image once it is imserted' do
+  it 'generates internal_filename on save randomly and they are different', :pending do
+    i1 = @sheet.insert_image(@testimage_filename)
+    i2 = @sheet.insert_image(@testimage2_filename)
+    i3 = @sheet.insert_image(@testimage2_filename)
+    i1.move_to('40mm','40mm')
+    i2.move_to('40mm','40mm')
+    i3.move_to('40mm','40mm')
+    @workbook.save(@tmp_testfile_filename)
+    
+    i1.internal_filename.should_not == i2.internal_filename
+    i1.internal_filename.should_not == i3.internal_filename
+    i2.internal_filename.should_not == i3.internal_filename
   end
+  
+#   it 'has dimensions defaulting to size of the image once it is inserted' do
+#   end
   
 end

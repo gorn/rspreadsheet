@@ -27,9 +27,33 @@ class WorksheetImages
     )
   end
   def prepare_empty_subnode
-    node = super # prepares <draw:frame/> node but it is entirely empty
-    node << Tools.prepare_ns_node('draw', 'image')
-    node
+    main_node = super # prepares <draw:frame/> node but it is entirely empty
+    [
+      'draw:z-index:1', 
+      'draw:name:test',
+      'draw:style-name:gr1',
+      'draw:text-style-name:P1',
+      'svg:width:11.63mm',
+      'svg:height:10.83mm'
+    ].each do |k|
+      l = k.split(/:/)
+      Tools.set_ns_attribute(main_node,l[0],l[1],l[2])
+    end
+    
+    sub_node = Tools.prepare_ns_node('draw', 'image')
+    [
+      'xlink:href:nic',
+      'xlink:type:simple',
+      'xlink:show:embed',
+      'xlink:actuate:onLoad'
+    ].each do |k|
+      l = k.split(/:/)
+      Tools.set_ns_attribute(sub_node,l[0],l[1],l[2])
+    end
+    
+    sub_node << Tools.prepare_ns_node('text','p')
+    main_node << sub_node
+    main_node
   end
 
 end
@@ -47,9 +71,6 @@ class Image < XMLTiedItem
     # ověřit, zda soubor na disku existuje TODO: tady by to chtělo zobecnit na IO
     raise 'File does not exist or it is not accessible' unless File.exists?(filename)
     @original_filename = filename
-    # generate unique image name + write it to xml
-    internal_filename = Image.get_unused_filename(File.extname(filename))        
-    Tools.set_ns_attribute(xml_image_subnode,'xlink','href', internal_filename ) 
     self
   end
   def xml_image_subnode
@@ -66,43 +87,25 @@ class Image < XMLTiedItem
   def copy_to(ax,ay,worksheet)
     img = worksheet.insert_image_to(ax,ay,@original_filename)
     img.height = height
-    img.width = width
+    img.width  = width
   end
   
   # TODO: put some sanity check for values into these
-  def x=(value); Tools.set_ns_attribute(xmlnode,'svg','x',value) end
-  def y=(value); Tools.set_ns_attribute(xmlnode,'svg','y',value) end
-  def width=(value);  Tools.set_ns_attribute(xmlnode,'svg','width',value) end
+  def x=(value);      Tools.set_ns_attribute(xmlnode,'svg','x',     value) end
+  def y=(value);      Tools.set_ns_attribute(xmlnode,'svg','y',     value) end
+  def width=(value);  Tools.set_ns_attribute(xmlnode,'svg','width', value) end
   def height=(value); Tools.set_ns_attribute(xmlnode,'svg','height',value) end
-  def name=(value);   Tools.set_ns_attribute(xmlnode, 'draw', 'name', value)
-  end
-  def x;         Tools.get_ns_attribute_value(xmlnode,'svg','x') end
-  def y;         Tools.get_ns_attribute_value(xmlnode,'svg','y') end
-  def width;     Tools.get_ns_attribute_value(xmlnode,'svg','width') end
-  def height;    Tools.get_ns_attribute_value(xmlnode,'svg','height') end
-  def name;      Tools.get_ns_attribute_value(xmlnode, 'draw', 'name', nil) end
+  def name=(value);   Tools.set_ns_attribute(xmlnode,'draw','name', value) end
+  def x;      Tools.get_ns_attribute_value(xmlnode,'svg','x') end
+  def y;      Tools.get_ns_attribute_value(xmlnode,'svg','y') end
+  def width;  Tools.get_ns_attribute_value(xmlnode,'svg','width') end
+  def height; Tools.get_ns_attribute_value(xmlnode,'svg','height') end
+  def name;   Tools.get_ns_attribute_value(xmlnode, 'draw', 'name', nil) end
   def internal_filename; Tools.get_ns_attribute_value(xml_image_subnode,'xlink','href')  end
-
-  def self.get_unused_filename(extension)
-    'Pictures/11111'+extension
-#     path = 'Pictures/'
-#     filename_base = '11111111'
-#     
-#     puts zf.dir.entries('dir1').inspect
-# 
-#     
-#     
-#     iterator = ''
-#     while  File.exist?(upload_path + filename_base + iterator.to_s + extension) or (!Document.find_by_filename(filename_base + iterator.to_s + extension).nil?)
-#       if (iterator == '' )
-#         iterator = 0
-#         filename_base += '_'
-#       end
-#       iterator = iterator + 1
-#     end
-#     return filename_base + iterator.to_s + extension
-  end
-  
+  def internal_filename=(value)
+    Tools.set_ns_attribute(xml_image_subnode,'xlink','href', value ) 
+  end    
+    
   # @!group XMLTiedItem related methods
   def xml_options; {:xml_items_node_name => 'frame'} end
 

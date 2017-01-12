@@ -9,12 +9,12 @@ class Workbook
   
   #@!group Worskheets methods
   def create_worksheet_from_node(source_node)
-    sheet = Worksheet.new(source_node)
+    sheet = Worksheet.new(source_node,self)
     register_worksheet(sheet)
     return sheet
   end
   def create_worksheet(name = "Sheet#{worksheets_count+1}")
-    sheet = Worksheet.new(name)
+    sheet = Worksheet.new(name,self)
     register_worksheet(sheet)
     return sheet
   end
@@ -79,22 +79,34 @@ class Workbook
         FileUtils.cp(@filename || File.dirname(__FILE__)+'/empty_file_template.ods', @par)
         @filename = @par
       end
+      
+
       Zip::File.open(@filename) do |zip|
-        # main content is easy, because @xmlnode in in sync with contents all the time
-        zip.get_output_stream('content.xml') do |f|
-          f.write @content_xml.to_s(:indent => false)
-        end
-        # save all pictures
-        # iterate through sheets and pictures and check if they are saved and if not, save them
+        # open manifest
+        @manifest_xml = LibXML::XML::Document.io zip.get_input_stream('META-INF/manifest.xml')
+
+        # save all pictures - iterate through sheets and pictures and check if they are saved and if not, save them
         @worksheets.each do |sheet|
           sheet.images.each do |image|
             # check if it is saved
-            if zip.find_entry(image.internal_filename).nil?
-              zip.get_output_stream(image.internal_filename) do |f|
-                f.write File.read(image.original_filename)
+            if image.internal_filename.nil? or image.internal_filename=='nic' or zip.find_entry(image.internal_filename).nil?
+              
+              if image.internal_filename.nil? or image.internal_filename=='nic' 
+                image.internal_filename = Rspreadsheet::Tools.get_unused_filename(zip,'Pictures/',File.extname(image.original_filename))
+              end
+              
+              @manifest_xml.find_first('//manifest:file-entry')
+#               <manifest:file-entry manifest:full-path="Pictures/100000000000002C0000002980D0CECCFF775979.png" manifest:media-type="image/png"/>
+              
+              zip.get_output_stream('content.xml') do |f|
+                f.write @content_xml.to_s(:indent => false)
               end
             end
           end
+        end
+        
+        zip.get_output_stream('META-INF/manifest.xml') do |f|
+          f.write @manifest_xml.to_s(:indent => false)
         end
       end
     end

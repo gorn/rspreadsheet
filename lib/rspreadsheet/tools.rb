@@ -176,6 +176,37 @@ module Tools
     end
   end
   
+  
+  def self.get_unused_filename(zip,prefix, extension)
+    return 'Pictures/100000000000000E000000080A6A37BB7D9095A0.png'
+    (1000..9999).each do |ndx|
+      ndx = '100000000000002C000000'
+      filename = prefix + ndx.to_s + ((Time.now.to_r*1000000000).to_i.to_s(16)) + extension
+      return filename
+    end
+    
+    Zip::File.open(@filename) do |zip|
+      if zip.find_entry(image.internal_filename).nil?
+        zip.get_output_stream(image.internal_filename) do |f|
+          f.write File.read(image.original_filename)
+        end
+      end
+    end
+    
+#
+#     puts zf.dir.entries('dir1').inspect
+#     
+#     iterator = ''
+#     while File.exist?(upload_path + filename_base + iterator.to_s + extension) or (!Document.find_by_filename(filename_base + iterator.to_s + extension).nil?)
+#       if (iterator == '' )
+#         iterator = 0
+#         filename_base += '_'
+#       end
+#       iterator = iterator + 1
+#     end
+#     return filename_base + iterator.to_s + extension
+  end
+  
 end
  
 end
