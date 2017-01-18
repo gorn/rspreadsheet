@@ -75,6 +75,7 @@ RSpreadsheet.generate('pricelist.ods') do
 ## Release notes
 
   2017-01
+  * basic image handling implemented (issue [#24](https://github.com/gorn/rspreadsheet/issues/24))
   * bug corrected: inserted row was not empty, but rather copy of the row below.
     
 ## Developing this gem
