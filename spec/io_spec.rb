@@ -2,13 +2,15 @@ require 'spec_helper'
 using ClassExtensions if RUBY_VERSION > '2.1'
 
 describe Rspreadsheet do
+  before do
+    @tmp_filename = '/tmp/testfile.ods'        
+    File.delete(@tmp_filename) if File.exists?(@tmp_filename)  # delete temp file
+  end
+  
+  
   it 'can open spreadsheet and save it to file, resulting file has same content as original' do
     spreadsheet = Rspreadsheet.new($test_filename)                 # open a file
-    
-    # save it to temp file
-    tmp_filename = '/tmp/testfile1.ods'        
-    File.delete(tmp_filename) if File.exists?(tmp_filename)  # first delete temp file
-    spreadsheet.save(tmp_filename)                                  # and save spreadsheet as temp file
+    spreadsheet.save(@tmp_filename)                                # and save spreadsheet as temp file
     
     # now compare content saved file to original
     contents_of_files_are_identical?($test_filename,tmp_filename).should == true
@@ -23,10 +25,7 @@ describe Rspreadsheet do
     stringio.size.should > 30000
     
     # save it to temp file
-    tmp_filename = '/tmp/testfile1.ods'        
-    File.delete(tmp_filename) if File.exists?(tmp_filename)         # first delete temp file
-    # and save stream as temp file
-    File.open(tmp_filename, "w") do |f|
+    File.open(@tmp_filename, "w") do |f|
       f.write stringio.read                                  
     end
      
