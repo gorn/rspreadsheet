@@ -29,26 +29,23 @@ class WorksheetImages
   def prepare_empty_subnode
     main_node = super # prepares <draw:frame/> node but it is entirely empty
     [
-      'draw:z-index:1', 
-      'draw:name:test',
-      'draw:style-name:gr1',
-      'draw:text-style-name:P1',
-      'svg:width:11.63mm',
-      'svg:height:10.83mm'
-    ].each do |k|
-      l = k.split(/:/)
-      Tools.set_ns_attribute(main_node,l[0],l[1],l[2])
+      ['draw', 'z-index', '1'], 
+      ['draw', 'name', 'test'],
+      ['draw', 'style-name', 'gr1'],
+      ['draw', 'text-style-name', 'P1'],
+      ['svg', 'width', '11.63mm'],
+      ['svg', 'height', '10.83mm']
+    ].each do |line|
+      Tools.set_ns_attribute(main_node,line[0],line[1],line[2])
     end
     
     sub_node = Tools.prepare_ns_node('draw', 'image')
     [
-      'xlink:href:nic',
-      'xlink:type:simple',
-      'xlink:show:embed',
-      'xlink:actuate:onLoad'
-    ].each do |k|
-      l = k.split(/:/)
-      Tools.set_ns_attribute(sub_node,l[0],l[1],l[2])
+      ['xlink', 'type', 'simple'],
+      ['xlink', 'show', 'embed'],
+      ['xlink', 'actuate', 'onLoad']
+    ].each do |line|
+      Tools.set_ns_attribute(sub_node,line[0],line[1],line[2])
     end
     
     sub_node << Tools.prepare_ns_node('text','p')

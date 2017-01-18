@@ -90,9 +90,9 @@ class Workbook
           sheet.images.each do |image|
             # check if it is saved
             @ifname = image.internal_filename
-            if @ifname.nil? or @ifname=='nic' or zip.find_entry(@ifname).nil?   
+            if @ifname.nil? or zip.find_entry(@ifname).nil?   
               # if it does not have name -> make up unused name 
-              if @ifname.nil? or @ifname=='nic' 
+              if @ifname.nil?
                 @ifname = image.internal_filename = Rspreadsheet::Tools.get_unused_filename(zip,'Pictures/',File.extname(image.original_filename))
               end
               raise 'Could not set up internal_filename correctly.' if @ifname.nil?
