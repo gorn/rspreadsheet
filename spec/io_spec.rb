@@ -20,9 +20,8 @@ describe Rspreadsheet do
     spreadsheet = Rspreadsheet.new($test_filename)                 # open a file
     
     stringio = StringIO.new
-    spreadsheet.save(stringio)
-    
-    stringio.size.should > 30000
+    spreadsheet.save_to_io(stringio)
+    stringio.size.should > 300000
     
     # save it to temp file
     File.open(@tmp_filename, "w") do |f|
