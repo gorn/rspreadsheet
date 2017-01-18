@@ -28,6 +28,11 @@ You can mix these two at will, for example like this
 @row[4] = 10
 ````
 
+### Working with images
+@sheet.insert_image_to('10.21mm','15mm','image.png')
+i = @sheet.images.first
+i.move_to('100mm','99.98mm')
+
 ## Examples
 
   * [basic functionality](https://gist.github.com/gorn/42e33d086d9b4fda10ec) 
