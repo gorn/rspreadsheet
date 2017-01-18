@@ -34,6 +34,9 @@ sheet.row(5).cells.sum{ |cell| cell.value.to_f }
 # or set formula to a cell
 sheet.cell('A1').formula='=SUM(A2:A9)'
 
+# insert company logo to the file
+sheet.insert_image_to('10mm','15mm','company_logo.png')
+
 # iterating over list of people and displaying the data
 total = 0
 sheet.rows.each do |row|
@@ -47,11 +50,8 @@ book.save
 book.save('different_filename.ods')
 ```
 
-This is also pubished as Gist **where you can leave you comments and suggestions**:
-
-  * [basic functionality](https://gist.github.com/gorn/42e33d086d9b4fda10ec) 
-  * [extended examples](https://gist.github.com/gorn/b432e6a69e82628349e6) of lots of alternative syntax
-  * [GUIDE.md](GUIDE.md) some other notes
+  * [More examples](https://gist.github.com/gorn/b432e6a69e82628349e6) of lots of alternative syntax **you can leave you comments and suggestions there**
+  * [Guide to using Rspreadsheet](GUIDE.md) some other notes
 
 ## Installation and Configuration
 
