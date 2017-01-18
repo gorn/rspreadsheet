@@ -77,32 +77,46 @@ describe Rspreadsheet do
     book.create_worksheet
   end
   it 'examples from README file are working' do
-    book = Rspreadsheet.open($test_filename)
-    sheet = book.worksheets(1)
-    sheet.B5 = 'cell value'
-    
-    sheet.B5.should eq 'cell value'
-    sheet[5,2].should eq 'cell value'
-    sheet.rows(5).cells(2).value.should eq 'cell value'
-    
-    expect {
+    Rspreadsheet.open($test_filename).save(@tmp_filename)
+    def puts(*par); end # supress puts in the example
+    expect do
+      book = Rspreadsheet.open(@tmp_filename)
+      sheet = book.worksheets(1)
+
+      # get value of a cell B5 (there are more ways to do this)
+      sheet.B5                       # => 'cell value'
+      sheet[5,2]                     # => 'cell value'
+      sheet.row(5).cell(2).value   # => 'cell value'
+
+      # set value of a cell B5
       sheet.F5 = 'text'
       sheet[5,2] = 7
-      sheet.cells(5,2).value = 1.78
-      
-      sheet.cells(5,2).format.bold = true
-      sheet.cells(5,2).format.background_color = '#FF0000'
-    }.not_to raise_error
+      sheet.cell(5,2).value = 1.78
 
-    sheet.rows(4).cellvalues.sum.should eq 4+7*4
-    sheet.rows(4).cells.sum{ |cell| cell.value.to_f }.should eq 4+7*4
+      # working with cell format
+      sheet.cell(5,2).format.bold = true
+      sheet.cell(5,2).format.background_color = '#FF0000'
 
-    total = 0
-    sheet.rows[0..9].each do |row|
-      expect {"Adding number #{row[1]} to the result" }.not_to raise_error
-      total += row[1].to_f
-    end
-    total.should eq 55
+      # calculate sum of cells in row
+      sheet.row(5).cellvalues.sum
+      sheet.row(5).cells.sum{ |cell| cell.value.to_f }
+
+      # or set formula to a cell
+      sheet.cell('A1').formula='=SUM(A2:A9)'
+
+      # iterating over list of people and displaying the data
+      total = 0
+      sheet.rows.each do |row|
+        puts "Sponsor #{row[1]} with email #{row[2]} has donated #{row[3]} USD."
+        total += row[3].to_f
+      end
+      puts "Totally fundraised #{total} USD"
+
+      # saving file
+      book.save
+      book.save('/tmp/different_filename.ods')
+    end.not_to raise_error
+    File.delete('/tmp/different_filename.ods') if File.exists?('/tmp/different_filename.ods') # delete after tests
   end
   it 'examples from advanced syntax GUIDE are working' do
     def p(*par); end # supress p in the example
