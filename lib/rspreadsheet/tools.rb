@@ -148,8 +148,8 @@ module Tools
     end
   end
   def self.get_ns_attribute(node,ns_prefix,key,default=:undefined_default)
-#     raise 'Nil does not have any attributes' if node.nil?
     if default==:undefined_default
+      raise 'Nil does not have any attributes' if node.nil?
       node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key)
     else
       node.nil? ? default : node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key) || default
@@ -181,29 +181,9 @@ module Tools
   def self.get_unused_filename(zip,prefix, extension)
     (1000..9999).each do |ndx|
       filename = prefix + ndx.to_s + ((Time.now.to_r*1000000000).to_i.to_s(16)) + extension
-      return filename
+      return filename if zip.find_entry(filename).nil?
     end
-    
-    Zip::File.open(@filename) do |zip|
-      if zip.find_entry(image.internal_filename).nil?
-        zip.get_output_stream(image.internal_filename) do |f|
-          f.write File.read(image.original_filename)
-        end
-      end
-    end
-    
-#
-#     puts zf.dir.entries('dir1').inspect
-#     
-#     iterator = ''
-#     while File.exist?(upload_path + filename_base + iterator.to_s + extension) or (!Document.find_by_filename(filename_base + iterator.to_s + extension).nil?)
-#       if (iterator == '' )
-#         iterator = 0
-#         filename_base += '_'
-#       end
-#       iterator = iterator + 1
-#     end
-#     return filename_base + iterator.to_s + extension
+    raise 'Could not get unused filename within sane times of iterations'
   end
   
 end
