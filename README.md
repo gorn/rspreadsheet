@@ -34,6 +34,9 @@ sheet.row(5).cells.sum{ |cell| cell.value.to_f }
 # or set formula to a cell
 sheet.cell('A1').formula='=SUM(A2:A9)'
 
+# insert company logo to the file
+sheet.insert_image_to('10mm','15mm','company_logo.png')
+
 # iterating over list of people and displaying the data
 total = 0
 sheet.rows.each do |row|
