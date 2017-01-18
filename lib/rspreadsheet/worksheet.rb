@@ -65,11 +65,11 @@ class Worksheet
   def images(*params)
     worksheet_images.subitems(*params) 
   end  
-  def insert_image(filename)
-    worksheet_images.insert_image(filename)
+  def insert_image(filename,mime='image/png')
+    worksheet_images.insert_image(filename,mime)
   end
-  def insert_image_to(x,y,filename)
-    img = insert_image(filename)
+  def insert_image_to(x,y,filename,mime='image/png')
+    img = insert_image(filename,mime)
     img.move_to(x,y)
     img
   end

@@ -83,12 +83,6 @@ describe Rspreadsheet::Image do
     end
     File.binread(tmp_test_image).unpack("H*").should == File.binread(@testimage2_filename).unpack("H*")
   end
-
-  it 'xxx' do
-    i3 = @sheet.insert_image(@testimage2_filename)
-    i3.move_to('40.12mm','40.12mm')
-    @workbook.save(@tmp_testfile_filename)
-  end
   
   it 'generates internal_filename on save randomly and they are different', :pending do
     i1 = @sheet.insert_image(@testimage_filename)

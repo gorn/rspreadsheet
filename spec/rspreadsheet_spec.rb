@@ -2,6 +2,14 @@ require 'spec_helper'
 using ClassExtensions if RUBY_VERSION > '2.1'
 
 describe Rspreadsheet do
+  before do
+    @tmp_filename = '/tmp/testfile.ods'        # delete temp file before tests
+    File.delete(@tmp_filename) if File.exists?(@tmp_filename)
+  end
+  after do
+    File.delete(@tmp_filename) if File.exists?(@tmp_filename) # delete temp file after tests
+  end
+  
   it 'can open ods testfile and reads its content correctly' do
     book = Rspreadsheet.new($test_filename)
     s = book.worksheets(1)
@@ -12,13 +20,12 @@ describe Rspreadsheet do
     s[2,2].should === Date.new(2014,1,1)
   end
   it 'can open and save file, and saved file has same cells as original' do
-    tmp_filename = '/tmp/testfile1.ods'        # first delete temp file
-    File.delete(tmp_filename) if File.exists?(tmp_filename)
-    book = Rspreadsheet.new($test_filename)    # than open test file
-    book.save(tmp_filename)                    # and save it as temp file
+    
+    book = Rspreadsheet.new($test_filename)     # open test file
+    book.save(@tmp_filename)                    # and save it as temp file
     
     book1 = Rspreadsheet.new($test_filename)   # now open both again
-    book2 = Rspreadsheet.new(tmp_filename)
+    book2 = Rspreadsheet.new(@tmp_filename)
     @sheet1 = book1.worksheets(1)
     @sheet2 = book2.worksheets(1)
     
@@ -28,16 +35,14 @@ describe Rspreadsheet do
   end
 
   it 'can open and save file, and saved file is exactly same as original' do
-    tmp_filename = '/tmp/testfile1.ods'        # first delete temp file
-    File.delete(tmp_filename) if File.exists?(tmp_filename)
-    book = Rspreadsheet.new($test_filename)    # than open test file
-    book.save(tmp_filename)                    # and save it as temp file
+    book = Rspreadsheet.new($test_filename)    # open test file
+    book.save(@tmp_filename)                    # and save it as temp file
     
     # now compare them
     @content_xml1 = Zip::File.open($test_filename) do |zip|
       LibXML::XML::Document.io zip.get_input_stream('content.xml')
     end
-    @content_xml2 = Zip::File.open(tmp_filename) do |zip|
+    @content_xml2 = Zip::File.open(@tmp_filename) do |zip|
       LibXML::XML::Document.io zip.get_input_stream('content.xml')
     end
     
@@ -48,20 +53,18 @@ describe Rspreadsheet do
   end
 
   it 'when open and save file modified, than the file is different' do
-    tmp_filename = '/tmp/testfile1.ods'        # first delete temp file
-    File.delete(tmp_filename) if File.exists?(tmp_filename)
-    book = Rspreadsheet.new($test_filename)    # than open test file
+    book = Rspreadsheet.new($test_filename)    # open test file
     book.worksheets(1).rows(1).cells(1).value.should_not == 'xyzxyz'
     book.worksheets(1).rows(1).cells(1).value ='xyzxyz'
     book.worksheets(1).rows(1).cells(1).value.should == 'xyzxyz'
     
-    book.save(tmp_filename)                    # and save it as temp file
+    book.save(@tmp_filename)                    # and save it as temp file
     
     # now compare them
     @content_doc1 = Zip::File.open($test_filename) do |zip|
       LibXML::XML::Document.io zip.get_input_stream('content.xml')
     end
-    @content_doc2 = Zip::File.open(tmp_filename) do |zip|
+    @content_doc2 = Zip::File.open(@tmp_filename) do |zip|
       LibXML::XML::Document.io zip.get_input_stream('content.xml')
     end
     @content_doc1.eql?(@content_doc2).should == false
@@ -103,8 +106,6 @@ describe Rspreadsheet do
   end
   it 'examples from advanced syntax GUIDE are working' do
     def p(*par); end # supress p in the example
-    tmp_filename = '/tmp/testfile.ods'        # first delete temp files
-    File.delete(tmp_filename) if File.exists?(tmp_filename) # delete tmp file
     expect do 
       book = Rspreadsheet::Workbook.new
       sheet = book.create_worksheet 'Top icecreams'
@@ -149,17 +150,14 @@ describe Rspreadsheet do
     end.not_to raise_error
   end
   it 'can save file to io stream and the content is the same as when saving to file', :skip do
-    tmp_filename = '/tmp/testfile.ods'        # first delete temp files
-    File.delete(tmp_filename) if File.exists?(tmp_filename)
+    book = Rspreadsheet.new($test_filename)    # open test file
     
-    book = Rspreadsheet.new($test_filename)    # than open test file
-    
-    file = File.open(tmp_filename, 'w')        # and save the stream to tmp_filename
+    file = File.open(@tmp_filename, 'w')        # and save the stream to @tmp_filename
     file.write(book.save_to_io)
     file.close
     
     book1 = Rspreadsheet.new($test_filename)   # now open both again
-    book2 = Rspreadsheet.new(tmp_filename)
+    book2 = Rspreadsheet.new(@tmp_filename)
     @sheet1 = book1.worksheets(1)
     @sheet2 = book2.worksheets(1)
     

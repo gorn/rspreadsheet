@@ -8,12 +8,12 @@ class WorksheetImages
     @worksheet = parent_worksheet
   end
   
-  def insert_image(filename)
+  def insert_image(filename,mime='image/png')
     if xmlnode.nil? #TODO: this needs to be solved more generally maybe on XMLTiedArray level
       @worksheet.xmlnode
     end
     push_new
-    last.initialize_from_file(filename)
+    last.initialize_from_file(filename,mime)
   end
   
   # @!group XMLTiedArray_WithRepeatableItems related methods    
@@ -61,16 +61,18 @@ end
 # Represents an image included in the spreadsheet. The Image can NOT exist
 # "detached" from an spreadsheet
 class Image < XMLTiedItem
+  attr_reader :mime
   
   def initialize(worksheet,index)
     super(worksheet,index)
     @original_filename = nil
   end
   
-  def initialize_from_file(filename)
+  def initialize_from_file(filename,mime)
     # ověřit, zda soubor na disku existuje TODO: tady by to chtělo zobecnit na IO
     raise 'File does not exist or it is not accessible' unless File.exists?(filename)
     @original_filename = filename
+    @mime = mime
     self
   end
   def xml_image_subnode

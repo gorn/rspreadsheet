@@ -89,24 +89,34 @@ class Workbook
         @worksheets.each do |sheet|
           sheet.images.each do |image|
             # check if it is saved
-            if image.internal_filename.nil? or image.internal_filename=='nic' or zip.find_entry(image.internal_filename).nil?
-              
-              if image.internal_filename.nil? or image.internal_filename=='nic' 
-                image.internal_filename = Rspreadsheet::Tools.get_unused_filename(zip,'Pictures/',File.extname(image.original_filename))
+            @ifname = image.internal_filename
+            if @ifname.nil? or @ifname=='nic' or zip.find_entry(@ifname).nil?   
+              # if it does not have name -> make up unused name 
+              if @ifname.nil? or @ifname=='nic' 
+                @ifname = image.internal_filename = Rspreadsheet::Tools.get_unused_filename(zip,'Pictures/',File.extname(image.original_filename))
               end
+              raise 'Could not set up internal_filename correctly.' if @ifname.nil?
               
-              @manifest_xml.find_first('//manifest:file-entry')
-#               <manifest:file-entry manifest:full-path="Pictures/100000000000002C0000002980D0CECCFF775979.png" manifest:media-type="image/png"/>
+              # save it to zip file
+              zip.add(@ifname, image.original_filename)
               
-              zip.get_output_stream('content.xml') do |f|
-                f.write @content_xml.to_s(:indent => false)
-              end
+              # make sure it is in manifest
+              if @manifest_xml.find("//manifest:file-entry[@manifest:full-path='#{@ifname}']").empty?
+                node = Tools.prepare_ns_node('manifest','file-entry')
+                Tools.set_ns_attribute(node,'manifest','full-path',@ifname)
+                Tools.set_ns_attribute(node,'manifest','media-type',image.mime)
+                @manifest_xml.find_first("//manifest:manifest") << node
+              end  
             end
           end
         end
+
+        zip.get_output_stream('content.xml') do |f|
+          f.write @content_xml.to_s(:indent => false)
+        end
         
         zip.get_output_stream('META-INF/manifest.xml') do |f|
-          f.write @manifest_xml.to_s(:indent => false)
+          f.write @manifest_xml.to_s
         end
       end
     end

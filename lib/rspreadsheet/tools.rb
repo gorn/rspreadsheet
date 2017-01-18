@@ -117,7 +117,8 @@ module Tools
       'loext'=>"urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0",
       'field'=>"urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0",
       'formx'=>"urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0",
-      'css3t'=>"http://www.w3.org/TR/css3-text/"
+      'css3t'=>"http://www.w3.org/TR/css3-text/",
+      'manifest'=>"urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
     }
     if @pomnode.nil?
       @pomnode = LibXML::XML::Node.new('xxx')
@@ -178,9 +179,7 @@ module Tools
   
   
   def self.get_unused_filename(zip,prefix, extension)
-    return 'Pictures/100000000000000E000000080A6A37BB7D9095A0.png'
     (1000..9999).each do |ndx|
-      ndx = '100000000000002C000000'
       filename = prefix + ndx.to_s + ((Time.now.to_r*1000000000).to_i.to_s(16)) + extension
       return filename
     end
