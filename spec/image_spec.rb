@@ -40,7 +40,7 @@ describe Rspreadsheet::Image do
     @sheet2.insert_image_to('10mm','10mm',@testimage_filename)
   end
   
-  it 'can be inserted to a sheet and moved around' , :xpending do
+  it 'can be inserted to a sheet and moved around' do
     x,y = '15mm', '17mm'
     @image = @sheet.insert_image_to(x,y,@testimage_filename)
     # moving image
@@ -60,7 +60,7 @@ describe Rspreadsheet::Image do
     @sheet2.images_count.should == 1
   end
   
-  it 'can be inserted into file and is saved correctly to it', :pending do
+  it 'can be inserted into file and is saved correctly to it' do
     tmp_test_image = '/tmp/test-image.png'
     
     # create new file, insert image into it and save it
@@ -84,7 +84,7 @@ describe Rspreadsheet::Image do
     File.binread(tmp_test_image).unpack("H*").should == File.binread(@testimage2_filename).unpack("H*")
   end
   
-  it 'generates internal_filename on save randomly and they are different', :pending do
+  it 'generates internal_filename on save randomly and they are different' do
     i1 = @sheet.insert_image(@testimage_filename)
     i2 = @sheet.insert_image(@testimage2_filename)
     i3 = @sheet.insert_image(@testimage2_filename)

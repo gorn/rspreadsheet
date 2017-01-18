@@ -13,7 +13,7 @@ describe Rspreadsheet do
     spreadsheet.save(@tmp_filename)                                # and save spreadsheet as temp file
     
     # now compare content saved file to original
-    contents_of_files_are_identical?($test_filename,tmp_filename).should == true
+    contents_of_files_are_identical?($test_filename,@tmp_filename).should == true
   end
   
   it 'can open spreadsheet and store it to IO object', :pending => 'Under development' do
@@ -29,7 +29,7 @@ describe Rspreadsheet do
       f.write stringio.read                                  
     end
      
-    contents_of_files_are_identical?($test_filename,tmp_filename).should == true
+    contents_of_files_are_identical?($test_filename,@tmp_filename).should == true
   end
 end
 
