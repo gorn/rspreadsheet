@@ -169,7 +169,7 @@ module XMLTiedArray
     return [] if xmlnode.nil?
     ele = xmlnode.elements
     ele.select do |node| 
-      node.name == subitem_xml_options[:xml_items_node_name]
+      node.andand.name == subitem_xml_options[:xml_items_node_name]
     end
   end
     

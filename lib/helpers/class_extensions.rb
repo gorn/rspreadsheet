@@ -36,8 +36,9 @@ if  RUBY_VERSION > '2.1'
         return "#{where}> elements have different number of subelements #{elems1.length} !=  #{elems2.length}" if (elems1.length != elems2.length)
         
         elems1.each_index do |i|
+          raise "Nil for i=#{i}" if elems1[i].nil?
           if (elems1[i].node_type_name == 'text') 
-            if (elems1[i].to_s) != (elems2[i].to_s)
+            if elems2[i].nil? || (elems1[i].to_s) != (elems2[i].to_s)
               return  "#{where}> #{i+1}th text subelements are different: #{elems1[i].to_s} != #{elems2[i].to_s}"
             end
           elsif (elems1[i].node_type_name == 'element') 

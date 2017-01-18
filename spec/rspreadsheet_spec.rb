@@ -78,6 +78,7 @@ describe Rspreadsheet do
   end
   it 'examples from README file are working' do
     Rspreadsheet.open($test_filename).save(@tmp_filename)
+    @testimage_filename  = './spec/test-image-blue.png'
     def puts(*par); end # supress puts in the example
     expect do
       book = Rspreadsheet.open(@tmp_filename)
@@ -104,6 +105,9 @@ describe Rspreadsheet do
       # or set formula to a cell
       sheet.cell('A1').formula='=SUM(A2:A9)'
 
+      # insert company logo to the file
+      sheet.insert_image_to('10mm','15mm',@testimage_filename)
+      
       # iterating over list of people and displaying the data
       total = 0
       sheet.rows.each do |row|
