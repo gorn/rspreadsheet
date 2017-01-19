@@ -2,8 +2,8 @@ require 'spec_helper'
  
 describe Rspreadsheet::Image do
   before do
-    @testfile_filename = './spec/testfile2-images.ods'
-    @tmp_testfile_filename = '/tmp/testfile2.ods'
+    @testfile_filename = $test_filename_images
+    @tmp_testfile_filename = '/tmp/testfile2-image.ods'
     File.delete(@tmp_testfile_filename) if File.exists?(@tmp_testfile_filename) # delete temp file
 
     @testimage_filename  = './spec/test-image-blue.png'
@@ -11,6 +11,9 @@ describe Rspreadsheet::Image do
     @workbook = Rspreadsheet.new(@testfile_filename)
     @sheet  = @workbook.worksheets(1)
     @sheet2 = @workbook.worksheets(2)
+  end
+  after do
+    File.delete(@tmp_testfile_filename) if File.exists?(@tmp_testfile_filename) # delete temp file
   end
   it 'is accesible when included in spreadsheet', :xpending do
     @sheet.images_count.should == 1

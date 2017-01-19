@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", '~> 1.5'
   spec.add_development_dependency "rake", '~>0.9'
   # testig - see http://bit.ly/1n5yM51
-  spec.add_development_dependency "rspec", '~>2.99.0'       # running tests
+  spec.add_development_dependency "rspec", '~>2.0'       # running tests
   spec.add_development_dependency 'pry-nav', '~>0.0'     # enables pry 'next', 'step' commands
   spec.add_development_dependency "coveralls", '~>0.7' # inspecting coverage of tests
 
