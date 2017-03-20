@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   def self.package_installed?(pkgname)
-    system("dpkg-query -l #{pkgname} | grep -q '^i'")
+    Gem::Specification.find_all_by_name(pkgname).length > 0
   end
   
   # runtime dependencies
