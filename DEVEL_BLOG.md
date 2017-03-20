@@ -4,9 +4,8 @@ See [GUIDE.md](GUIDE.md#conventions) for syntax conventions.
 
 After you have cloned the source run `bundle` command in gem directory to install needed tools. If there are any errors try to
 
-  1. Make sure that necessary tools are installed. In debian based distros you may try this  `apt-get install make gcc`. In other distros, use their native way to install tools. 
-  2. If you have installed `ruby-libxml` than you may want to comment out the line containing libxml-ruby dependency in rspreadseet.gemspec file before running bundle.
-  3. Comment out `guard` and `guard-rspec` lines from gemfile if you use ruby version less than 2.2.1.
+  1. Make sure that necessary tools are installed. In debian based distros you may try this  `apt-get install make gcc`. In other distros, use their native way to install tool.
+  2. Comment out `guard` and `guard-rspec` lines from gemfile if you use ruby version less than 2.2.1.
 
 ## Ideas/wishlist
 
