@@ -149,7 +149,7 @@ class Workbook
 
     # write manifest if it was modified
     save_entry_to_zip(output_zip, MANIFEST_FILE_NAME, 
-                      @manifest_xml.to_s.rstrip) if modified
+                      @manifest_xml.to_s) if modified
   end
   
   def copy_internally_without_content_and_manifest(input_zip,output_zip)
