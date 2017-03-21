@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
     # if the shell fails, the system command returns nil. In that case we assume that the package is NOT installed. It might be overkill, because I am supresing the stderr as well
     (system("dpkg-query -l #{pkgname} 2>/dev/null | grep -q '^i'")==true) or  # debian based
     (system("rpm -qa 2>/dev/null | grep -q '#{pkgname}' ")==true) or          # rpm based 
-    (system("pkg_info -q -e #{pkgname} >/dev/null 2>&1")==true)               # openbsd and alike
+    (system("pkg_info -q -e '#{pkgname}-*' >/dev/null 2>&1")==true)           # openbsd and alike
   end
   
   # runtime dependencies
