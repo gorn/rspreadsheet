@@ -167,9 +167,11 @@ module XMLTiedArray
   # array containing subnodes of xmlnode which represent subitems
   def xmlsubnodes
     return [] if xmlnode.nil?
+    ele = xmlnode.elements
+    return [] if ele.empty?
     so = subitem_xml_options[:xml_items_node_name]
     
-    xmlnode.elements.select do |node| 
+    ele.select do |node| 
       node.andand.name == so
     end
   end
