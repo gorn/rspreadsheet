@@ -118,7 +118,7 @@ class Workbook
   def update_manifest_xml(input_zip,output_zip)
     # read manifest
     @manifest_xml = LibXML::XML::Document.io input_zip.get_input_stream(MANIFEST_FILE_NAME)
-
+    modified = false
     # save all pictures - iterate through sheets and pictures and check if they are saved and if not, save them
     @worksheets.each do |sheet|
       sheet.images.each do |image|
@@ -141,13 +141,15 @@ class Workbook
             Tools.set_ns_attribute(node,'manifest','full-path',@ifname)
             Tools.set_ns_attribute(node,'manifest','media-type',image.mime)
             @manifest_xml.find_first("//manifest:manifest") << node
+            modified = true
           end  
         end
       end
     end
 
-    # write manifest
-    save_entry_to_zip(output_zip, MANIFEST_FILE_NAME, @manifest_xml.to_s)
+    # write manifest if it was modified
+    save_entry_to_zip(output_zip, MANIFEST_FILE_NAME, 
+                      @manifest_xml.to_s.rstrip) if modified
   end
   
   def copy_internally_without_content_and_manifest(input_zip,output_zip)
