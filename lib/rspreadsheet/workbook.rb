@@ -73,7 +73,7 @@ class Workbook
       when @filename.nil? && (io.kind_of?(String) || io.kind_of?(File) || io.kind_of?(IO) || io.kind_of?(StringIO))
         Zip::File.open(TEMPLATE_FILE_NAME) do |empty_template_zip|                       # open empty_template file
           write_zip_to(io) do |output_zip|                                               # open output stream of file
-            copy_internally_without_content_and_manifest(empty_template_zip,output_zip)  # copy empty_template internals
+            copy_internally_without_content(empty_template_zip,output_zip)  # copy empty_template internals
             update_manifest_and_content_xml(empty_template_zip,output_zip)               # update xmls + pictures
           end
         end
@@ -91,7 +91,7 @@ class Workbook
       when @filename.kind_of?(String) && (io.kind_of?(IO) || io.kind_of?(StringIO))
         Zip::File.open(@filename) do | old_zip |                                    # open old file
           write_zip_to(io) do |output_zip_stream|                                   # open output stream
-            copy_internally_without_content_and_manifest(old_zip,output_zip_stream) # copy the old internals
+            copy_internally_without_content(old_zip,output_zip_stream) # copy the old internals
             update_manifest_and_content_xml(old_zip,output_zip_stream)              # update xmls + pictures
           end
         end
@@ -118,7 +118,7 @@ class Workbook
   def update_manifest_xml(input_zip,output_zip)
     # read manifest
     @manifest_xml = LibXML::XML::Document.io input_zip.get_input_stream(MANIFEST_FILE_NAME)
-
+    modified = false
     # save all pictures - iterate through sheets and pictures and check if they are saved and if not, save them
     @worksheets.each do |sheet|
       sheet.images.each do |image|
@@ -141,19 +141,21 @@ class Workbook
             Tools.set_ns_attribute(node,'manifest','full-path',@ifname)
             Tools.set_ns_attribute(node,'manifest','media-type',image.mime)
             @manifest_xml.find_first("//manifest:manifest") << node
+            modified = true
           end  
         end
       end
     end
 
-    # write manifest
-    save_entry_to_zip(output_zip, MANIFEST_FILE_NAME, @manifest_xml.to_s)
+    # write manifest if it was modified
+    save_entry_to_zip(output_zip, MANIFEST_FILE_NAME, 
+                      @manifest_xml.to_s) if modified
   end
   
-  def copy_internally_without_content_and_manifest(input_zip,output_zip)
+  def copy_internally_without_content(input_zip,output_zip)
     input_zip.each do |entry|
       next unless entry.file? 
-      next if entry.name == CONTENT_FILE_NAME || entry.name == MANIFEST_FILE_NAME
+      next if entry.name == CONTENT_FILE_NAME 
       save_entry_to_zip(output_zip, entry.name, entry.get_input_stream.read)
     end
   end
