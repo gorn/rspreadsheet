@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
     (system("rpm -qa 2>/dev/null | grep -q '#{pkgname}' ")==true) or          # rpm based 
     (system("pkg_info -q -e #{pkgname} >/dev/null 2>&1")==true)               # openbsd and alike
   end
-  
+
   # runtime dependencies
   unless package_natively_installed?('ruby-libxml')
     spec.add_runtime_dependency 'libxml-ruby', '~>2.7'   # parsing XML files
@@ -45,7 +45,7 @@ Gem::Specification.new do |spec|
     spec.add_development_dependency "guard", '~>2.13'
     spec.add_development_dependency "guard-rspec", '~>4.6'
   end
-  
+
 #   spec.add_development_dependency 'equivalent-xml'     # implementing xml diff
 
 end
