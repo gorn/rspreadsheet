@@ -1,3 +1,3 @@
 module Rspreadsheet
-  VERSION = "0.2.17"
+  VERSION = "0.4.2"
 end

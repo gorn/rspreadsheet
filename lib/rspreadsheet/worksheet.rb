@@ -1,5 +1,6 @@
 require 'rspreadsheet/row'
 require 'rspreadsheet/column'
+require 'rspreadsheet/image'
 require 'rspreadsheet/tools'
 require 'helpers/class_extensions'
 # require 'forwardable'
@@ -7,12 +8,12 @@ require 'helpers/class_extensions'
 module Rspreadsheet 
 
 class Worksheet
-  include XMLTiedArray
+  include XMLTiedArray_WithRepeatableItems
   attr_accessor :xmlnode
   def subitem_xml_options; {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'} end
 
-  def initialize(xmlnode_or_sheet_name)
-    @itemcache = Hash.new  #TODO: move to module XMLTiedArray
+  def initialize(xmlnode_or_sheet_name,workbook) # workbook is here ONLY because of inserting images - to find unique name - it would be much better if it should bot be there
+    initialize_xml_tied_array
     # set up the @xmlnode according to parameter
     case xmlnode_or_sheet_name
       when LibXML::XML::Node
@@ -30,31 +31,50 @@ class Worksheet
   def name=(value); Tools.set_ns_attribute(@xmlnode,'table','name', value) end
   
   def rowxmlnode(rowi)
-    find_my_subnode_respect_repeated(rowi, {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
+    my_subnode(rowi)
   end
     
   def first_unused_row_index
-    find_first_unused_index_respect_repeated({:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
+    first_unused_subitem_index
   end
   
   def add_row_above(arowi)
-    add_empty_subitem_before(arowi)
+    insert_new_empty_subitem_before(arowi)
   end
   
-  def insert_cell_before(arowi,acoli)
+  def insert_cell_before(arowi,acoli)        # TODO: maybe move this to row level
     detach_row_in_xml(arowi)
-    rows(arowi).add_empty_subitem_before(acoli)
+    rows(arowi).insert_new_item(acoli)  
   end
   
   def detach_row_in_xml(rowi)
-    return detach_my_subnode_respect_repeated(rowi, {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'})
+    return detach_my_subnode_respect_repeated(rowi)
   end
   
   def nonemptycells
     used_rows_range.collect{ |rowi| rows(rowi).nonemptycells }.flatten
   end
   
-  #@!group XMLTiedArray connected methods
+  #@!group images
+  def worksheet_images
+    @worksheet_images ||= WorksheetImages.new(self)
+  end
+  def images_count
+    worksheet_images.size
+  end
+  def images(*params)
+    worksheet_images.subitems(*params) 
+  end  
+  def insert_image(filename,mime='image/png')
+    worksheet_images.insert_image(filename,mime)
+  end
+  def insert_image_to(x,y,filename,mime='image/png')
+    img = insert_image(filename,mime)
+    img.move_to(x,y)
+    img
+  end
+  
+  #@!group XMLTiedArray_WithRepeatableItems connected methods
   def rows(*params); subitems(*params) end
   alias :row :rows
   def prepare_subitem(rowi); Row.new(self,rowi) end

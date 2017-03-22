@@ -2,6 +2,14 @@ require 'spec_helper'
 using ClassExtensions if RUBY_VERSION > '2.1'
 
 describe Rspreadsheet do
+  before do
+    @tmp_filename = '/tmp/testfile.ods'        # delete temp file before tests
+    File.delete(@tmp_filename) if File.exists?(@tmp_filename)
+  end
+  after do
+    File.delete(@tmp_filename) if File.exists?(@tmp_filename) # delete temp file after tests
+  end
+  
   it 'can open ods testfile and reads its content correctly' do
     book = Rspreadsheet.new($test_filename)
     s = book.worksheets(1)
@@ -12,13 +20,12 @@ describe Rspreadsheet do
     s[2,2].should === Date.new(2014,1,1)
   end
   it 'can open and save file, and saved file has same cells as original' do
-    tmp_filename = '/tmp/testfile1.ods'        # first delete temp file
-    File.delete(tmp_filename) if File.exists?(tmp_filename)
-    book = Rspreadsheet.new($test_filename)    # than open test file
-    book.save(tmp_filename)                    # and save it as temp file
+    
+    book = Rspreadsheet.new($test_filename)     # open test file
+    book.save(@tmp_filename)                    # and save it as temp file
     
     book1 = Rspreadsheet.new($test_filename)   # now open both again
-    book2 = Rspreadsheet.new(tmp_filename)
+    book2 = Rspreadsheet.new(@tmp_filename)
     @sheet1 = book1.worksheets(1)
     @sheet2 = book2.worksheets(1)
     
@@ -28,16 +35,14 @@ describe Rspreadsheet do
   end
 
   it 'can open and save file, and saved file is exactly same as original' do
-    tmp_filename = '/tmp/testfile1.ods'        # first delete temp file
-    File.delete(tmp_filename) if File.exists?(tmp_filename)
-    book = Rspreadsheet.new($test_filename)    # than open test file
-    book.save(tmp_filename)                    # and save it as temp file
+    book = Rspreadsheet.new($test_filename)    # open test file
+    book.save(@tmp_filename)                    # and save it as temp file
     
     # now compare them
     @content_xml1 = Zip::File.open($test_filename) do |zip|
       LibXML::XML::Document.io zip.get_input_stream('content.xml')
     end
-    @content_xml2 = Zip::File.open(tmp_filename) do |zip|
+    @content_xml2 = Zip::File.open(@tmp_filename) do |zip|
       LibXML::XML::Document.io zip.get_input_stream('content.xml')
     end
     
@@ -48,20 +53,18 @@ describe Rspreadsheet do
   end
 
   it 'when open and save file modified, than the file is different' do
-    tmp_filename = '/tmp/testfile1.ods'        # first delete temp file
-    File.delete(tmp_filename) if File.exists?(tmp_filename)
-    book = Rspreadsheet.new($test_filename)    # than open test file
+    book = Rspreadsheet.new($test_filename)    # open test file
     book.worksheets(1).rows(1).cells(1).value.should_not == 'xyzxyz'
     book.worksheets(1).rows(1).cells(1).value ='xyzxyz'
     book.worksheets(1).rows(1).cells(1).value.should == 'xyzxyz'
     
-    book.save(tmp_filename)                    # and save it as temp file
+    book.save(@tmp_filename)                    # and save it as temp file
     
     # now compare them
     @content_doc1 = Zip::File.open($test_filename) do |zip|
       LibXML::XML::Document.io zip.get_input_stream('content.xml')
     end
-    @content_doc2 = Zip::File.open(tmp_filename) do |zip|
+    @content_doc2 = Zip::File.open(@tmp_filename) do |zip|
       LibXML::XML::Document.io zip.get_input_stream('content.xml')
     end
     @content_doc1.eql?(@content_doc2).should == false
@@ -74,32 +77,50 @@ describe Rspreadsheet do
     book.create_worksheet
   end
   it 'examples from README file are working' do
-    book = Rspreadsheet.open($test_filename)
-    sheet = book.worksheets(1)
-    sheet.B5 = 'cell value'
-    
-    sheet.B5.should eq 'cell value'
-    sheet[5,2].should eq 'cell value'
-    sheet.rows(5).cells(2).value.should eq 'cell value'
-    
-    expect {
+    Rspreadsheet.open($test_filename).save(@tmp_filename)
+    @testimage_filename  = './spec/test-image-blue.png'
+    def puts(*par); end # supress puts in the example
+    expect do
+      book = Rspreadsheet.open(@tmp_filename)
+      sheet = book.worksheets(1)
+
+      # get value of a cell B5 (there are more ways to do this)
+      sheet.B5                       # => 'cell value'
+      sheet[5,2]                     # => 'cell value'
+      sheet.row(5).cell(2).value   # => 'cell value'
+
+      # set value of a cell B5
       sheet.F5 = 'text'
       sheet[5,2] = 7
-      sheet.cells(5,2).value = 1.78
+      sheet.cell(5,2).value = 1.78
+
+      # working with cell format
+      sheet.cell(5,2).format.bold = true
+      sheet.cell(5,2).format.background_color = '#FF0000'
+
+      # calculate sum of cells in row
+      sheet.row(5).cellvalues.sum
+      sheet.row(5).cells.sum{ |cell| cell.value.to_f }
+
+      # or set formula to a cell
+      sheet.cell('A1').formula='=SUM(A2:A9)'
+
+      # insert company logo to the file
+      sheet.insert_image_to('10mm','15mm',@testimage_filename)
       
-      sheet.cells(5,2).format.bold = true
-      sheet.cells(5,2).format.background_color = '#FF0000'
-    }.not_to raise_error
+      # iterating over list of people and displaying the data
+      total = 0
+      sheet.rows.each do |row|
+        puts "Sponsor #{row[1]} with email #{row[2]} has donated #{row[3]} USD."
+        total += row[3].to_f
+      end
+      puts "Totally fundraised #{total} USD"
 
-    sheet.rows(4).cellvalues.sum.should eq 4+7*4
-    sheet.rows(4).cells.sum{ |cell| cell.value.to_f }.should eq 4+7*4
-
-    total = 0
-    sheet.rows[0..9].each do |row|
-      expect {"Adding number #{row[1]} to the result" }.not_to raise_error
-      total += row[1].to_f
-    end
-    total.should eq 55
+      # saving file
+      book.save
+      book.save('/tmp/different_filename.ods')
+    end.not_to raise_error
+    File.delete('/tmp/different_filename.ods') if File.exists?('/tmp/different_filename.ods') # delete after tests
   end
   it 'examples from advanced syntax GUIDE are working' do
     def p(*par); end # supress p in the example
@@ -143,21 +164,18 @@ describe Rspreadsheet do
 #       sheet.cells[2,1..5] = ['Vanilla', 'Pistacia', 'Chocolate', 'Annanas', 'Strawbery']
 #       sheet.columns(1).cells(1).format.color = :red
       
-      book.save('testfile.ods')
+      book.save('/tmp/testfile.ods')
     end.not_to raise_error
   end
   it 'can save file to io stream and the content is the same as when saving to file', :skip do
-    tmp_filename = '/tmp/testfile.ods'        # first delete temp files
-    File.delete(tmp_filename) if File.exists?(tmp_filename1)
+    book = Rspreadsheet.new($test_filename)    # open test file
     
-    book = Rspreadsheet.new($test_filename)    # than open test file
-    
-    file = File.open(tmp_filename, 'w')        # and save the stream to tmp_filename
+    file = File.open(@tmp_filename, 'w')        # and save the stream to @tmp_filename
     file.write(book.save_to_io)
     file.close
     
     book1 = Rspreadsheet.new($test_filename)   # now open both again
-    book2 = Rspreadsheet.new(tmp_filename)
+    book2 = Rspreadsheet.new(@tmp_filename)
     @sheet1 = book1.worksheets(1)
     @sheet2 = book2.worksheets(1)
     

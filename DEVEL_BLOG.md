@@ -4,9 +4,8 @@ See [GUIDE.md](GUIDE.md#conventions) for syntax conventions.
 
 After you have cloned the source run `bundle` command in gem directory to install needed tools. If there are any errors try to
 
-  1. Make sure that necessary tools are installed. In debian based distros you may try this  `apt-get install make gcc`. In other distros, use their native way to install tools. 
-  2. If you have installed `ruby-libxml` than you may want to comment out the line containing libxml-ruby dependency in rspreadseet.gemspec file before running bundle.
-  3. Comment out `guard` and `guard-rspec` lines from gemfile if you use ruby version less than 2.2.1.
+  1. Make sure that necessary tools are installed. In debian based distros you may try this  `apt-get install make gcc`. In other distros, use their native way to install tool.
+  2. Comment out `guard` and `guard-rspec` lines from gemfile if you use ruby version less than 2.2.1.
 
 ## Ideas/wishlist
 
@@ -21,6 +20,8 @@ After you have cloned the source run `bundle` command in gem directory to instal
   * implement to_csv
   * longterm plan - go through other used libraries and try to find out whose syntax could be adopted, so this library is drop in replacement (possibly with some config options) for them
   * iterative generation like this
+  * Currently the way you insert cells and rows is that you insert empty one and than copy values. It would be interesting to add "duplicate" method as well as other "copy pasting" stuff, which would be more forward compatible.
+  * Optionally allow negative coordinates count from end
  
  ```ruby
 RSpreadsheet.generate('pricelist.ods') do 
@@ -61,7 +62,7 @@ RSpreadsheet.generate('pricelist.ods') do
 * array returned by rows of cells can have predefined dummy object as defaults for out of range indexes
 
 
-##Guiding ideas
+## Guiding ideas
   * xml document is always synchronized with the data. So the save is trivial.
   * no duplication of data. Objects like RowArray should containg minimum information. This one exists solely to speed up cell search. Taken to extream it is questionable, whether we need such objects at all, it might be possible to always work with xml directly.
   * all cells and rows only server as proxy. they hold index and worksheet pointer and everytime read or write is done, the xml is newly searched. until there is a xmlnode caching we have no problem
@@ -69,6 +70,13 @@ RSpreadsheet.generate('pricelist.ods') do
     
 ## Known Issues
   * currently there is a confusing syntax @worksheet.rows(1).cells[5] which returns a cell object in SIXT column, which is not intended. It is side effecto of Row#cells returning an array
+    
+## Release notes
+
+  2017-01
+  - file can be saced to any IO now, making it suitable for creating files on fly.
+  - basic image handling implemented (issue [#24](https://github.com/gorn/rspreadsheet/issues/24))
+  - bug corrected: inserted row was not empty, but rather copy of the row below.
     
 ## Developing this gem
 
@@ -92,7 +100,7 @@ RSpreadsheet.generate('pricelist.ods') do
 5. When happy, increment the version number and `git add .; git commit -am'commit message'; git push`
 6. ``rake release`` - creates a version tag in git and pushes the code to github + Rubygems. After this is succesfull the new version appears as release in Github and RubyGems.
 
-gem alternativa to points 3-6
+gem alternative to points 3-6
 
     gem build rspreadsheet.gemspec              -\   These two lines together are in install.sh
     sudo gem install rspreadsheet-x.y.z.gem     -/   which should be invoked from parent directory

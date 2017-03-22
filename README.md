@@ -1,8 +1,8 @@
-[![Build Status](https://api.travis-ci.org/gorn/rspreadsheet.svg?branch=master)](https://travis-ci.org/gorn/rspreadsheet) [![Coverage Status](https://coveralls.io/repos/gorn/rspreadsheet/badge.svg?branch=master&service=github)](https://coveralls.io/r/gorn/rspreadsheet) [![User opinion wanted](https://badge.waffle.io/gorn/rspreadsheet.png?label=user opinion wanted&title=User opinion wanted)](https://waffle.io/gorn/rspreadsheet)
+[![Build Status](https://api.travis-ci.org/gorn/rspreadsheet.svg?branch=master)](https://travis-ci.org/gorn/rspreadsheet) [![Coverage Status](https://coveralls.io/repos/gorn/rspreadsheet/badge.svg?branch=master&service=github)](https://coveralls.io/r/gorn/rspreadsheet) [![User opinion wanted](https://img.shields.io/badge/user%20opinion%20wanted-yes-blue.svg)](https://github.com/gorn/rspreadsheet/projects/1)
 
 # rspreadsheet
  
-Manipulating spreadsheets with Ruby. Read, **modify**, write or create new OpenDocument Spreadsheet files from ruby code. 
+Manipulating spreadsheets with Ruby. Read, **modify**, write or create new OpenDocument Spreadsheet files from ruby code.
 
 The gem allows you to acces your file and modify any cell of it, **without** touching the rest of the file, which makes it compatible with all advanced features of ODS files (both existing and future ones). You do not have to worry if it supports feature XY, if it does not, it won't touch it. This itself makes it distinct from most of [similar gems](#why-another-opendocument-spreadsheet-gem). Alhought this gem is still in beta stage I use in everyday and it works fine.
 
@@ -34,6 +34,9 @@ sheet.row(5).cells.sum{ |cell| cell.value.to_f }
 # or set formula to a cell
 sheet.cell('A1').formula='=SUM(A2:A9)'
 
+# insert company logo to the file
+sheet.insert_image_to('10mm','15mm','company_logo.png')
+
 # iterating over list of people and displaying the data
 total = 0
 sheet.rows.each do |row|
@@ -47,11 +50,8 @@ book.save
 book.save('different_filename.ods')
 ```
 
-This is also pubished as Gist **where you can leave you comments and suggestions**:
-
-  * [basic functionality](https://gist.github.com/gorn/42e33d086d9b4fda10ec) 
-  * [extended examples](https://gist.github.com/gorn/b432e6a69e82628349e6) of lots of alternative syntax
-  * [GUIDE.md](GUIDE.md) some other notes
+  * [More examples](https://gist.github.com/gorn/b432e6a69e82628349e6) of lots of alternative syntax **you can leave you comments and suggestions there**
+  * [Guide to using Rspreadsheet](GUIDE.md) some other notes
 
 ## Installation and Configuration
 

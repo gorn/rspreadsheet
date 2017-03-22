@@ -1,7 +1,7 @@
 ## Guide to basic functionality
 ### Opening the file
 
-You can open ODS file like this
+You can open ODS file (OpenDocument Spreadsheet) like this
 ````ruby
 @workbook = Rspreadsheet.open('./test.ods')
 ````
@@ -26,6 +26,19 @@ You can mix these two at will, for example like this
 ````ruby
 @row = @sheet.row(5)
 @row[4] = 10
+````
+
+### Working with images
+@sheet.insert_image_to('10.21mm','15mm','image.png')
+i = @sheet.images.first
+i.move_to('100mm','99.98mm')
+
+### Saving 
+The file needs to be saved after doing changes. 
+````ruby
+@workbook.save
+@workbook.save('new_filename.ods')   # changes filename and saves
+@workbook.save(any_io_object)        # file can be saved to any IO like object as well
 ````
 
 ## Examples

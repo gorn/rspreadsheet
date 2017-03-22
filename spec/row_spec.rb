@@ -3,7 +3,8 @@ require 'spec_helper'
 describe Rspreadsheet::Row do
   before do 
     @sheet1 = Rspreadsheet.new.create_worksheet
-    @sheet2 = Rspreadsheet.new($test_filename).worksheets(1)
+    @book2 = Rspreadsheet.new($test_filename)
+    @sheet2 = @book2.worksheets(1)
   end
   it 'allows access to cells in a row' do
     @row = @sheet2.rows(1)
@@ -199,6 +200,16 @@ describe Rspreadsheet::Row do
     @sheet2.add_row_above(1)
     @sheet2.rows(1).should be_kind_of(Rspreadsheet::Row)
   end
+  it 'inserted is empty even is surrounded by nonempty rows' do
+    @sheet2.row(4).cells.size.should > 1
+    @sheet2.row(5).cells.size.should > 1
+    @row5 = @sheet2.row(5)
+    @sheet2.add_row_above(5)
+    @sheet2.row(4).cells.size.should > 1
+    @sheet2.row(5).cells.size.should == 0
+    @sheet2.row(6).should == @row5
+  end
+  
   it 'can be deleted' do
     @sheet1[15,4]='data'
     @row = @sheet1.rows(15)
@@ -254,6 +265,10 @@ describe Rspreadsheet::Row do
     @row.size.should == 3
     @row.truncate
     @row.size.should == 0
+  end
+  it 'remembers its parent correctly' do
+    @row = @sheet1.rows(5)
+    @row.worksheet.should == @sheet1
   end
 end
 

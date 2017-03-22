@@ -1,5 +1,5 @@
 require 'rspreadsheet/cell'
-require 'rspreadsheet/xml_tied'
+require 'rspreadsheet/xml_tied_repeatable'
 
 module Rspreadsheet
 
@@ -24,22 +24,19 @@ module Rspreadsheet
 # and shifts all other rows down/up appropriatelly.
 
 class Row < XMLTiedItem
-  include XMLTiedArray
+  include XMLTiedArray_WithRepeatableItems
   ## @return [Worksheet] worksheet which contains the row
   # @!attribute [r] worksheet
-  attr_reader :worksheet
+  def worksheet; parent end
   ## @return [Integer] row index of the row
   # @!attribute [r] rowi
-  attr_reader :rowi 
-    
+  def rowi; index end
+  
   def initialize(aworksheet,arowi)
-    @worksheet = aworksheet
-    @rowi = arowi
-    @itemcache = Hash.new  #TODO: move to module XMLTiedArray
+    initialize_xml_tied_array
+    initialize_xml_tied_item(aworksheet,arowi)
   end
   
-  def xmlnode; parent.find_my_subnode_respect_repeated(index, xml_options)  end
-    
  # @!group Syntactic sugar
   def cells(*params); subitems(*params) end
   alias :cell :cells
@@ -90,7 +87,7 @@ class Row < XMLTiedItem
     if myxmlnode.nil?
       []
     else
-      @worksheet.find_nonempty_subnode_indexes(myxmlnode, {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'})
+      worksheet.find_nonempty_subnode_indexes(myxmlnode, subitem_xml_options)
     end
   end
   alias :used_range :range
@@ -102,21 +99,19 @@ class Row < XMLTiedItem
  # @!group Private methods, which should not be called directly
   # @private
   # shifts internal represetation of row by diff. This should not be called directly
-  # by user, it is only used by XMLTiedArray as hook when shifting around rows
+  # by user, it is only used by XMLTiedArray_WithRepeatableItems as hook when shifting around rows
   def _shift_by(diff)
     super
-    @itemcache.each_value{ |cell| cell.set_rowi(@rowi) }
+    @itemcache.each_value{ |cell| cell.set_rowi(rowi) }
   end
   
  private
-  # @!group XMLTiedArray related methods
+  # @!group XMLTiedArray_WithRepeatableItems related methods
   def subitem_xml_options; {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'} end
-  def prepare_subitem(coli); Cell.new(@worksheet,@rowi,coli) end
+  def prepare_subitem(coli); Cell.new(worksheet,rowi,coli) end
   # @!group XMLTiedItem related methods and extensions
   def xml_options; {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'} end
-  def parent; @worksheet end                
-  def index; @rowi end                       
-  def set_index(value); @rowi=value end      
+
 end
 
 end

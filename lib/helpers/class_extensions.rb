@@ -33,12 +33,18 @@ if  RUBY_VERSION > '2.1'
 
         elems1 = self.elements
         elems2 = node2.elements
-    #     return "#{where}> elements have different number of subelements #{elems1.length} !=  #{elems2.length}" if (elems1.length != elems2.length) 
-        (0..elems1.length-1).each do |i|
-          if (elems1[i].node_type_name == 'text') && ((elems1[i].to_s) != (elems2[i].to_s))
-            return  "#{where}> #{i+1}th text subelements are different: #{elems1[i].to_s} != #{elems2[i].to_s}"
-          elsif (elems1[i].node_type_name == 'element') && (!elems1[i].simplification_of?(elems2[i]))
-            return "#{where}/[#{i+1}]#{elems1[i].first_diff(elems2[i])}"
+        return "#{where}> elements have different number of subelements #{elems1.length} !=  #{elems2.length}" if (elems1.length != elems2.length)
+        
+        elems1.each_index do |i|
+          raise "Nil for i=#{i}" if elems1[i].nil?
+          if (elems1[i].node_type_name == 'text') 
+            if elems2[i].nil? || (elems1[i].to_s) != (elems2[i].to_s)
+              return  "#{where}> #{i+1}th text subelements are different: #{elems1[i].to_s} != #{elems2[i].to_s}"
+            end
+          elsif (elems1[i].node_type_name == 'element') 
+            unless elems1[i].simplification_of?(elems2[i])
+              return "#{where}/[#{i+1}]#{elems1[i].first_diff(elems2[i])}"
+            end
           end
         end
           

@@ -117,7 +117,8 @@ module Tools
       'loext'=>"urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0",
       'field'=>"urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0",
       'formx'=>"urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0",
-      'css3t'=>"http://www.w3.org/TR/css3-text/"
+      'css3t'=>"http://www.w3.org/TR/css3-text/",
+      'manifest'=>"urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
     }
     if @pomnode.nil?
       @pomnode = LibXML::XML::Node.new('xxx')
@@ -148,6 +149,7 @@ module Tools
   end
   def self.get_ns_attribute(node,ns_prefix,key,default=:undefined_default)
     if default==:undefined_default
+      raise 'Nil does not have any attributes' if node.nil?
       node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key)
     else
       node.nil? ? default : node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key) || default
@@ -167,6 +169,23 @@ module Tools
   def self.prepare_ns_node(ns_prefix,nodename,value=nil)
     LibXML::XML::Node.new(nodename,value, Tools.get_namespace(ns_prefix))
   end
+  def self.insert_as_first_node_child(node,subnode)
+    if node.first?
+      node.first.prev = subnode
+    else
+      node << subnode
+    end
+  end
+  
+  
+  def self.get_unused_filename(zip,prefix, extension)
+    (1000..9999).each do |ndx|
+      filename = prefix + ndx.to_s + ((Time.now.to_r*1000000000).to_i.to_s(16)) + extension
+      return filename if zip.find_entry(filename).nil?
+    end
+    raise 'Could not get unused filename within sane times of iterations'
+  end
+  
 end
  
 end

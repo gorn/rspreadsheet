@@ -14,6 +14,7 @@ Coveralls.wear!
 
 # some variables used everywhere
 $test_filename = './spec/testfile1.ods'
+$test_filename_images = './spec/testfile2-images.ods'
 
 # require my gem
 require 'rspreadsheet'
