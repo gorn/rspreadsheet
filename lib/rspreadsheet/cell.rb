@@ -5,7 +5,7 @@
 require 'andand'
 require 'rspreadsheet/xml_tied_item'
 require 'date'
-require 'time'
+require 'time'            # extended functions for time like Time.strptime
 require 'bigdecimal'
 require 'bigdecimal/util' # for to_d method
 require 'helpers/class_extensions'
@@ -75,6 +75,7 @@ class Cell < XMLTiedItem
       raise "Unknown cell mode #{self.mode}"
     end
   end
+  
   ## according to http://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-part1.html#__RefHeading__1417674_253892949
   ## the value od time-value is in a "duration" format defined here https://www.w3.org/TR/xmlschema-2/#duration
   ## this method converts the time-value to Time object. Note that it does not check if the cell is in time-value
@@ -84,7 +85,7 @@ class Cell < XMLTiedItem
   end
   def self.parse_time_value(svalue)
     begin
-      Time.strptime(svalue, 'PT%HH%MM%SS') # first iteration which does fail - see issue #23
+      Time.strptime(svalue, InternalTimeFormat) # first iteration which does fail - see issue #23
     rescue
       begin
         Time.parse(svalue) # maybe add defaults for year-mont-day
@@ -98,20 +99,20 @@ class Cell < XMLTiedItem
         days = m[:days].to_i
         months = m[:months].to_i
         years = m[:years].to_i
-        
-        if seconds >= 61 
-          divisor = (seconds / 60).floor
-          minutes,  = minutes + divisor
-          seconds  = seconds - divisor * 60
-        end
-        
-        if minutes >= 60
-          divisor = (seconds / 60).floor
-          minutes,  = minutes + divisor
-          seconds  = seconds - divisor * 60
-        end
-        
-        raise m[:years].inspect if m
+
+        # if years and/or months are NOT specified, than probably the time is specified as duration after 1899-12-30 00:00:00
+        base =
+          if m[:years].nil? and m[:months].nil?
+            Time.new(1899,12,30,0,0,0,0)
+          else # year or month was specified, so it should be taken as base for the date
+            if months > 12
+              divisor = (months / 12).floor
+              years   = years + divisor
+              months  = months - divisor * 12
+            end
+            Time.new(years,months,0,0,0,0,0)
+          end
+        return (base + days*24*60*60 + hours*60*60 + minutes*60 + seconds)
       end  
     end
   end
@@ -376,6 +377,7 @@ class CellFormat
   def inspect
     "#<Rspreadsheet::CellFormat bold:#{bold?.inspect}, borders:#{top.get_value_string.inspect} #{right.get_value_string.inspect} #{bottom.get_value_string.inspect} #{left.get_value_string.inspect}>"
   end
+  private
   
 end
 

@@ -1,5 +1,5 @@
 require 'spec_helper'
- 
+
 describe Rspreadsheet::Cell do
   before do 
     book1 = Rspreadsheet.new
@@ -276,6 +276,12 @@ describe Rspreadsheet::Cell do
     @cell.value.min.should eq 42
     @cell.value.sec.should eq 0
   end
+  it 'parse_time_value converts correcty different time values' do
+    dyear = 1899; dmonth = 12; dday = 30
+    
+#     Rspreadsheet::Cell.parse_time_value('PT923451H33M00S').should == Time.new(2005,5,5,3,33,00,0)
+    Rspreadsheet::Cell.parse_time_value('PT1H33M00S').should == Time.new(dyear,dmonth,dday,1,33,00,0)
+  end
   it 'can read various types of times'   do # :pending => 'see issue #23'
 #     raise @sheet2.cell('D23').xml.inspect
     expect {@cell = @sheet2.cell('D22'); @cell.value }.not_to raise_error
@@ -286,14 +292,6 @@ describe Rspreadsheet::Cell do
     
     @cell.value.should == Time.new(2005,5,5,3,33,00)
   end
-  it 'parse_time_value converts correcty different time values' do
-    dyear = 1899; dmonth = 12; dday = 30
-    
-    Cell.parse_time_value('PT923451H33M00S').should == Time.new(2015,5,5,3,33,00)
-    Cell.parse_time_value('PT1H33M00S').should == Time.new(dyear,dmonth,dday,1,33,00)
-    
-  end
-  
   it 'can be addressed by even more ways and all are identical' do
     @cell = @sheet1.cell(2,2)
     @sheet1.cell('B2').value = 'zaseste'
