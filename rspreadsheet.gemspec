@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   
   # runtime dependencies
   unless package_natively_installed?('ruby-libxml')
-    spec.add_runtime_dependency 'libxml-ruby', '~>2.7'   # parsing XML files
+    spec.add_runtime_dependency 'libxml-ruby', '2.8'   # parsing XML files
   end
   spec.add_runtime_dependency 'rubyzip', '~>1.1'       # opening zip files
   spec.add_runtime_dependency 'andand', '~>1.3'
