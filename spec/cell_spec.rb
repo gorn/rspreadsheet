@@ -276,7 +276,7 @@ describe Rspreadsheet::Cell do
     @cell.value.min.should eq 42
     @cell.value.sec.should eq 0
   end
-  it 'can read various types of times', :xpending => 'see is' do
+  it 'can read various types of times', :pending => 'this is tested in feature-datetimebranch' do
 #     raise @sheet2.cell('D23').xml.inspect
     expect {@cell = @sheet2.cell('D22'); @cell.value }.not_to raise_error
     expect {@cell = @sheet2.cell('D23'); @cell.value }.not_to raise_error
