@@ -293,7 +293,7 @@ describe Rspreadsheet::Cell do
 #     Rspreadsheet::Cell.parse_time_value('PT923451H33M00S').should == Time.new(2005,5,5,3,33,00,0)
     Rspreadsheet::Cell.parse_time_value('PT1H33M00S').should == Time.new(dyear,dmonth,dday,1,33,00,0)
   end
-  it 'can read various types of times'   do # :pending => 'see issue #23'
+  it 'can read various types of times', :pending => 'this is tested in feature-datetimebranch' do
 #     raise @sheet2.cell('D23').xml.inspect
     expect {@cell = @sheet2.cell('D22'); @cell.value }.not_to raise_error
     
