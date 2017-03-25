@@ -96,7 +96,7 @@ describe Rspreadsheet::Cell do
   end
   it 'returns correct type for the cell' do
     @sheet2.cell(1,2).type.should eq :string
-    @sheet2.cell(2,2).type.should eq :date
+    @sheet2.cell(2,2).type.should eq :datetime
     @sheet2.cell(3,1).type.should eq :float
     @sheet2.cell(3,2).type.should eq :percentage
     @sheet2.cell(4,2).type.should eq :string
@@ -106,7 +106,7 @@ describe Rspreadsheet::Cell do
   end
   it 'returns value of correct type' do
     @sheet2[1,2].should be_kind_of(String)
-    @sheet2[2,2].should be_kind_of(Date)
+    @sheet2[2,2].should be_kind_of(DateTime)  # maybe date
     @sheet2[3,1].should be_kind_of(Float)
     @sheet2[3,2].should be_kind_of(Float)
     @sheet2.cell(3,2).type.should eq :percentage
@@ -271,15 +271,6 @@ describe Rspreadsheet::Cell do
     @cell.value.month.should eq 1
     @cell.value.day.should eq 2
   end
-  it 'handles time of day correctly on assignement' do
-    @sheet1.A11 = Rspreadsheet::Tools.new_time_value(2,13,27)
-#     raise @sheet1.cell('A11').time_value.class.inspect
-#     raise @sheet1.cell('A11').value.inspect
-    @sheet1.A12 = @sheet1.A11
-#     raise a + ' // ' + @sheet1.A11.inspect
-    @sheet1.A12.should == @sheet1.A11
-    @sheet1.cell('A12').type.should == :time
-  end
   it 'stores time correctly' do
     @cell = @sheet1.cell(1,1)
     @cell.value= Time.parse('2:42 pm')
@@ -289,19 +280,36 @@ describe Rspreadsheet::Cell do
   end
   it 'parse_time_value converts correcty different time values' do
     dyear = 1899; dmonth = 12; dday = 30
-    
-#     Rspreadsheet::Cell.parse_time_value('PT923451H33M00S').should == Time.new(2005,5,5,3,33,00,0)
+    Rspreadsheet::Cell.parse_time_value('PT923451H33M00S').should == Time.new(2005,5,5,3,33,00,0)
     Rspreadsheet::Cell.parse_time_value('PT1H33M00S').should == Time.new(dyear,dmonth,dday,1,33,00,0)
   end
-  it 'can read various types of times', :pending => 'this is tested in feature-datetimebranch' do
-#     raise @sheet2.cell('D23').xml.inspect
+  it 'handles time of day correctly on assignement' do
+    @sheet1.A11 = Rspreadsheet::Tools.new_time_value(2,13,27)
+    @sheet1.A12 = @sheet1.A11
+    @sheet1.A12.should == @sheet1.A11
+    @sheet1.cell('A12').type.should == :time
+  end
+  it 'can read various types of times' do
     expect {@cell = @sheet2.cell('D22'); @cell.value }.not_to raise_error
-    
-    @sheet2.cell('D23').value
+    @cell.value.hour.should == 2
+    @cell.value.min.should == 22
     expect {@cell = @sheet2.cell('D23'); @cell.value }.not_to raise_error
     @cell.value.should == Time.new(2005,5,5,3,33,0,0)
   end
-  
+  it 'handles dates and datetimes correctly on assignement' do
+    @sheet1.A11 = DateTime.new(2011,1,1,2,13,27,0)
+    @sheet1.A12 = @sheet1.A11
+    @sheet1.A12.should == @sheet1.A11
+    @sheet1.cell('A12').type.should == :datetime
+    @sheet1.A11 = Date.new(2012,2,2)
+    @sheet1.A12 = @sheet1.A11
+    @sheet1.A12.should == @sheet1.A11
+    @sheet1.cell('A12').type.should == :datetime
+  end
+  it 'can read various types of dates' do
+    expect {@cell = @sheet2.cell('F22'); @cell.value }.not_to raise_error
+    @cell.value.should == DateTime.new(2006,6,6,3,44,21,0)
+  end
   it 'can be addressed by even more ways and all are identical' do
     @cell = @sheet1.cell(2,2)
     @sheet1.cell('B2').value = 'zaseste'
@@ -425,5 +433,9 @@ describe Rspreadsheet::Cell do
     @cell.format.top.should_not_be_nil
     @cell.format.top.style = 'none'
     @cell.border_top.should_not be_nil ## ?????
+  end
+  
+  it 'automatically creates new style, if a style is automatic, some of its attributes changes and there are several cells pointing to it', :penting=>'' do
+  
   end
 end
