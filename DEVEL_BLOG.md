@@ -9,6 +9,7 @@ After you have cloned the source run `bundle` command in gem directory to instal
 
 ## Ideas/wishlist
 
+  * make it configurable whether Time or DateTime will be used.
   * In future inntroduce syntax like `sheet.range('C3:E4')` for mass operations.
   * Trying to make row Enumerable - perhaps skipping empty or undefined cells.
   * Maybe insted two syntaxes for accessing cell, we make both of them do the same and return Proxy object which would act either as value or cell.

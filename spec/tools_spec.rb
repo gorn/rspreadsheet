@@ -1,6 +1,6 @@
 require 'spec_helper'
  
-describe Rspreadsheet::Tools, :focus do
+describe Rspreadsheet::Tools do
   before do
     @tools = Rspreadsheet::Tools
   end

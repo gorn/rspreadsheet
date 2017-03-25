@@ -185,9 +185,13 @@ module Tools
     end
     raise 'Could not get unused filename within sane times of iterations'
   end
-  
-end
  
+  def self.new_time_value(h,m,s)
+    Time.new(StartOfEpoch.year,StartOfEpoch.month,StartOfEpoch.day,h,m,s)
+  end
+ 
+end
+  
 end
 
 # @private

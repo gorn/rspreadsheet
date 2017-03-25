@@ -40,6 +40,9 @@ The file needs to be saved after doing changes.
 @workbook.save('new_filename.ods')   # changes filename and saves
 @workbook.save(any_io_object)        # file can be saved to any IO like object as well
 ````
+### Date and Time
+OpenDocument and ruby have different models of date, time and datetime. Ruby containg three different objects. Time and DateTime cover all cases, Date covers dates only. OpenDocument distinguishes two groups - time of a day (time) and everything else (date). To simplify things a little we return cell values containg time of day as Time object and cell values containg datetime of date as DateTime. I am aware that this is very arbitrary choice, but it is very practical. This way and to some extend the types of values from OpenDocument are preserved when read from files, beeing acted upon and written back to spreadshhet.
+
 
 ## Examples
 
@@ -47,7 +50,7 @@ The file needs to be saved after doing changes.
   * [extended examples](https://gist.github.com/gorn/b432e6a69e82628349e6) of lots of alternative syntax
 
 ## Conventions
-  * **all indexes are 1-based**. This applies to rows, cells cordinates, and all array like structures like list od  worksheets etc. Spreadsheet world is 1-based, ruby is 0-based do I had to make a decision. I intend to make an global option for this, but in early stage I need to keep things simple. 
+  * **all indexes are 1-based**. This applies to rows, cells cordinates, and all array like structures like list od  worksheets etc. Spreadsheet world is 1-based, ruby is 0-based so I had to make a decision. I intend to make an global option for this, but in early stage I need to keep things simple.
   * with numeric coordinates row always comes before col as in  (row,col)
   * with alphanumerical col always comes before row as in F12
   * Shorter syntax worksheet[x,y] returns value, longer syntax worksheet.cell(x,y) return cell objects. This allows to work conviniently with values using short syntax and access the cell object if needed (to access formatting for example).

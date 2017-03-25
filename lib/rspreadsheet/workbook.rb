@@ -124,8 +124,8 @@ class Workbook
       sheet.images.each do |image|
         # check if it is saved
         @ifname = image.internal_filename
-        if @ifname.nil? or input_zip.find_entry(@ifname).nil?   
-          # if it does not have name -> make up unused name 
+        if @ifname.nil? or input_zip.find_entry(@ifname).nil?
+          # if it does not have name -> make up unused name
           if @ifname.nil?
             @ifname = image.internal_filename = Rspreadsheet::Tools.get_unused_filename(input_zip,'Pictures/',File.extname(image.original_filename))
           end
@@ -163,7 +163,7 @@ class Workbook
   def save_entry_to_zip(zip,internal_filename,contents)
     if zip.kind_of? Zip::File
 #       raise [internal_filename,contents].inspect  unless File.exists?(internal_filename)
-      zip.get_output_stream(internal_filename) do  |f| 
+      zip.get_output_stream(internal_filename) do  |f|
         f.write contents
       end
     else
