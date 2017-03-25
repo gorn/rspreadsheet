@@ -15,12 +15,6 @@ using ClassExtensions if RUBY_VERSION > '2.1'
 
 StartOfEpoch = Time.new(1899,12,30,0,0,0,0)
 
-# represents moment in day
-class TimeOfDay < Time
-  delegate 
-  def initialize(h=0,m=0,s=0); super(StartOfEpoch.year,StartOfEpoch.month,StartOfEpoch.day,h,m,s) end
-end
-
 ###
 # Represents a cell in spreadsheet which has coordinates, contains value, formula and can be formated.
 # You can get this object like this (suppose that @worksheet contains {Rspreadsheet::Worksheet} object)
@@ -100,13 +94,13 @@ class Cell < XMLTiedItem
   def self.parse_time_value(svalue)
     if (m = /^PT((?<hours>[0-9]+)H)?((?<minutes>[0-9]+)M)?((?<seconds>[0-9]+(\.[0-9]+)?)S)$/.match(svalue.delete(' ')))
       # time was parsed manually
-      (TimeOfDay.new(0,0,0) + m[:hours].to_i*60*60 + m[:minutes].to_i*60 + m[:seconds].to_f.round(5))
+      (StartOfEpoch + m[:hours].to_i*60*60 + m[:minutes].to_i*60 + m[:seconds].to_f.round(5))
       #BASTL: Rounding is here because LibreOffice adds some fractions of seconds randomly
     else
       begin
-        TimeOfDay.strptime(svalue, InternalTimeFormat)
+        Time.strptime(svalue, InternalTimeFormat)
       rescue
-        TimeOfDay.parse(svalue) # maybe add defaults for year-mont-day
+        Time.parse(svalue) # maybe add defaults for year-mont-day
       end
     end
   end
@@ -183,8 +177,8 @@ class Cell < XMLTiedItem
     # try guessing by value
     valueguess = case avalue
       when Numeric then Float
-      when Rspreadsheet::TimeOfDay then :time
-      when Time, Date, DateTime then :date
+      when Time then :time
+      when Date, DateTime then :date
       when String,nil then nil
       else nil
     end
@@ -431,7 +425,6 @@ class Border
 end
 
 end # module
-
 
 
 

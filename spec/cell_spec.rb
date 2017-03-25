@@ -272,17 +272,17 @@ describe Rspreadsheet::Cell do
     @cell.value.day.should eq 2
   end
   it 'handles time of day correctly on assignement' do
-    @sheet1.A11 = Rspreadsheet::TimeOfDay.new(2,13,27)
-    raise @sheet1.cell('A11').time_value.class.inspect
-    raise @sheet1.cell('A11').value.inspect
+    @sheet1.A11 = Rspreadsheet::Tools.new_time_value(2,13,27)
+#     raise @sheet1.cell('A11').time_value.class.inspect
+#     raise @sheet1.cell('A11').value.inspect
     @sheet1.A12 = @sheet1.A11
 #     raise a + ' // ' + @sheet1.A11.inspect
     @sheet1.A12.should == @sheet1.A11
-    @sheet1.A12.type.should == :time
+    @sheet1.cell('A12').type.should == :time
   end
   it 'stores time correctly' do
     @cell = @sheet1.cell(1,1)
-    @cell.value= Rspreadsheet::TimeOfDay.parse('2:42 pm')
+    @cell.value= Time.parse('2:42 pm')
     @cell.value.hour.should eq 14
     @cell.value.min.should eq 42
     @cell.value.sec.should eq 0
