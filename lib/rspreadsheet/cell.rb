@@ -13,6 +13,14 @@ require 'helpers/class_extensions'
 module Rspreadsheet
 using ClassExtensions if RUBY_VERSION > '2.1'
 
+StartOfEpoch = Time.new(1899,12,30,0,0,0,0)
+
+# represents moment in day
+class TimeOfDay < Time
+  delegate 
+  def initialize(h=0,m=0,s=0); super(StartOfEpoch.year,StartOfEpoch.month,StartOfEpoch.day,h,m,s) end
+end
+
 ###
 # Represents a cell in spreadsheet which has coordinates, contains value, formula and can be formated.
 # You can get this object like this (suppose that @worksheet contains {Rspreadsheet::Worksheet} object)
@@ -28,7 +36,6 @@ class Cell < XMLTiedItem
   attr_reader :rowi
   InternalDateFormat = '%Y-%m-%d'
   InternalTimeFormat = 'PT%HH%MM%SS'
-#   InternalTimeFormat = 'PT%HH%MM%SS,%LS'
   
   # @!group XMLTiedItem related methods and extensions  
   def xml_options; {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'} end
@@ -64,8 +71,8 @@ class Cell < XMLTiedItem
         when gt == nil then nil
         when gt == Float then xmlnode.attributes['value'].to_f
         when gt == String then xmlnode.elements.first.andand.content.to_s
-        when gt == Date then Date.strptime(xmlnode.attributes['date-value'].to_s, InternalDateFormat)
-        when gt == Time then self.time_value
+        when gt == :date then Date.strptime(xmlnode.attributes['date-value'].to_s, InternalDateFormat)
+        when gt == :time then self.time_value
         when gt == :percentage then xmlnode.attributes['value'].to_f
         when gt == :currency then xmlnode.attributes['value'].to_d
       end
@@ -79,41 +86,28 @@ class Cell < XMLTiedItem
   ## according to http://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-part1.html#__RefHeading__1417674_253892949
   ## the value od time-value is in a "duration" format defined here https://www.w3.org/TR/xmlschema-2/#duration
   ## this method converts the time-value to Time object. Note that it does not check if the cell is in time-value
-  ## or not, this is the responibility of caller
+  ## or not, this is the responibility of caller. However beware that specification does not specify how the time 
+  ## should be interpreted. By observing LibreOffice behaviour, I have found these options
+  ##   1. "Time only cell" has time is stored as PT16H22M35S (16:22:35) where the duration is duration from midnight.  
+  ##      Because ruby does NOT have TimeOfDay type we need to represent that as DateTime. I have chosen 1899-12-30 00:00:00 as 
+  ##      StartOfEpoch time, because it plays well with case 2.
+  ##   2. "DateTime converted to Time only cell" has time stored as PT923451H33M00.000000168S (15:33:00 with date part 2005-05-05 
+  ##      before conversion to time only). It is strange format which seems to have hours meaning number of hours after 1899-12-30 00:00:00
+
   def time_value
     Cell.parse_time_value(xmlnode.attributes['time-value'].to_s)
   end
   def self.parse_time_value(svalue)
-    begin
-      Time.strptime(svalue, InternalTimeFormat) # first iteration which does fail - see issue #23
-    rescue
+    if (m = /^PT((?<hours>[0-9]+)H)?((?<minutes>[0-9]+)M)?((?<seconds>[0-9]+(\.[0-9]+)?)S)$/.match(svalue.delete(' ')))
+      # time was parsed manually
+      (TimeOfDay.new(0,0,0) + m[:hours].to_i*60*60 + m[:minutes].to_i*60 + m[:seconds].to_f.round(5))
+      #BASTL: Rounding is here because LibreOffice adds some fractions of seconds randomly
+    else
       begin
-        Time.parse(svalue) # maybe add defaults for year-mont-day
-      rescue  
-        # ultimate manual parse
-        m = /^P((?<years>[0-9]+)Y)?((?<months>[0-9]+)M)?((?<days>[0-9]+)D)?T((?<hours>[0-9]+)H)?((?<minutes>[0-9]+)M)?((?<seconds>[0-9]+(\.[0-9]+)?)S)$/ .match(svalue.delete(' '))
-        
-        seconds = m[:seconds].to_f
-        minutes = m[:minutes].to_i
-        hours = m[:hours].to_i
-        days = m[:days].to_i
-        months = m[:months].to_i
-        years = m[:years].to_i
-
-        # if years and/or months are NOT specified, than probably the time is specified as duration after 1899-12-30 00:00:00
-        base =
-          if m[:years].nil? and m[:months].nil?
-            Time.new(1899,12,30,0,0,0,0)
-          else # year or month was specified, so it should be taken as base for the date
-            if months > 12
-              divisor = (months / 12).floor
-              years   = years + divisor
-              months  = months - divisor * 12
-            end
-            Time.new(years,months,0,0,0,0,0)
-          end
-        return (base + days*24*60*60 + hours*60*60 + minutes*60 + seconds)
-      end  
+        TimeOfDay.strptime(svalue, InternalTimeFormat)
+      rescue
+        TimeOfDay.parse(svalue) # maybe add defaults for year-mont-day
+      end
     end
   end
   
@@ -132,13 +126,13 @@ class Cell < XMLTiedItem
           remove_all_value_attributes_and_content(xmlnode)
           set_type_attribute('string')
           xmlnode << Tools.prepare_ns_node('text','p', avalue.to_s)
-        when gt == Date then 
+        when gt == :date then 
           remove_all_value_attributes_and_content(xmlnode)
           set_type_attribute('date')
           avalue = avalue.strftime(InternalDateFormat)
           Tools.set_ns_attribute(xmlnode,'office','date-value', avalue)
           xmlnode << Tools.prepare_ns_node('text','p', avalue)
-        when gt == Time then
+        when gt == :time then
           remove_all_value_attributes_and_content(xmlnode)
           set_type_attribute('time')
           Tools.set_ns_attribute(xmlnode,'office','time-value', avalue.strftime(InternalTimeFormat))
@@ -175,8 +169,8 @@ class Cell < XMLTiedItem
     case 
       when gct == Float  then :float
       when gct == String then :string
-      when gct == Date   then :date
-      when gct == Time   then :time
+      when gct == :date  then :date
+      when gct == :time  then :time
       when gct == :percentage then :percentage
       when gct == :unassigned then :unassigned
       when gct == :currency then :currency
@@ -189,8 +183,8 @@ class Cell < XMLTiedItem
     # try guessing by value
     valueguess = case avalue
       when Numeric then Float
-      when Time then Time
-      when Date then Date
+      when Rspreadsheet::TimeOfDay then :time
+      when Time, Date, DateTime then :date
       when String,nil then nil
       else nil
     end
@@ -202,8 +196,8 @@ class Cell < XMLTiedItem
         when nil then nil
         when 'float' then Float
         when 'string' then String
-        when 'time' then Time
-        when 'date' then Date
+        when 'time' then :time
+        when 'date' then :date
         when 'percentage' then :percentage
         when 'N/A' then :unassigned
         when 'currency' then :currency

@@ -89,10 +89,10 @@ class Workbook
         save_to_io(nil)                                                              # continue modyfying file on spot
         
       when @filename.kind_of?(String) && (io.kind_of?(IO) || io.kind_of?(StringIO))
-        Zip::File.open(@filename) do | old_zip |                                    # open old file
-          write_zip_to(io) do |output_zip_stream|                                   # open output stream
-            copy_internally_without_content_and_manifest(old_zip,output_zip_stream) # copy the old internals
-            update_manifest_and_content_xml(old_zip,output_zip_stream)              # update xmls + pictures
+        Zip::File.open(@filename) do | old_zip |                                     # open old file
+          write_zip_to(io) do |output_zip_stream|                                    # open output stream
+            copy_internally_without_content_and_manifest(old_zip,output_zip_stream)  # copy the old internals
+            update_manifest_and_content_xml(old_zip,output_zip_stream)               # update xmls + pictures
           end
         end
         # rewind result
@@ -124,8 +124,8 @@ class Workbook
       sheet.images.each do |image|
         # check if it is saved
         @ifname = image.internal_filename
-        if @ifname.nil? or input_zip.find_entry(@ifname).nil?   
-          # if it does not have name -> make up unused name 
+        if @ifname.nil? or input_zip.find_entry(@ifname).nil?
+          # if it does not have name -> make up unused name
           if @ifname.nil?
             @ifname = image.internal_filename = Rspreadsheet::Tools.get_unused_filename(input_zip,'Pictures/',File.extname(image.original_filename))
           end
@@ -161,7 +161,7 @@ class Workbook
   def save_entry_to_zip(zip,internal_filename,contents)
     if zip.kind_of? Zip::File
 #       raise [internal_filename,contents].inspect  unless File.exists?(internal_filename)
-      zip.get_output_stream(internal_filename) do  |f| 
+      zip.get_output_stream(internal_filename) do  |f|
         f.write contents
       end
     else
