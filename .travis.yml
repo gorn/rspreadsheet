@@ -9,6 +9,7 @@ rvm:
 script: 'bundle exec rake'
 before_install:
   - gem uninstall libxml-ruby
+  - apt install libxml2
   - gem update bundler
 notifications:
   email:
