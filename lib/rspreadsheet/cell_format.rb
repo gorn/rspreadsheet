@@ -2,18 +2,16 @@
 # @author Jakub Tesinsky
 # @title rspreadsheet Cell
 
-require 'andand'
-require 'rspreadsheet/xml_tied_item'
-require 'date'
-require 'time'            # extended functions for time like Time.strptime
-require 'bigdecimal'
-require 'bigdecimal/util' # for to_d method
-require 'helpers/class_extensions'
+# require 'andand'
+# require 'rspreadsheet/xml_tied_item'
+# require 'date'
+# require 'time'            # extended functions for time like Time.strptime
+# require 'bigdecimal'
+# require 'bigdecimal/util' # for to_d method
+# require 'helpers/class_extensions'
 
 module Rspreadsheet
 using ClassExtensions if RUBY_VERSION > '2.1'
-
-StartOfEpoch = Time.new(1899,12,30,0,0,0,0)
 
 ###
 # Represents a format of a cell. This object is returned by `@cell.format` method and allows syntax like
