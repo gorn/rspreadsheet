@@ -122,33 +122,39 @@ class Cell < XMLTiedItem
     detach_if_needed
     if self.mode == :regular
       gt = guess_cell_type(avalue)
+#       raise 'here'+gt.to_s if avalue == 666.66
       case
         when gt == nil then raise 'This value type is not storable to cell'
         when gt == Float then
-          remove_all_value_attributes_and_content(xmlnode)
+          remove_all_value_attributes_and_content
           set_type_attribute('float')
           Tools.set_ns_attribute(xmlnode,'office','value', avalue.to_s) 
           xmlnode << Tools.prepare_ns_node('text','p', avalue.to_f.to_s)
         when gt == String then
-          remove_all_value_attributes_and_content(xmlnode)
+          remove_all_value_attributes_and_content
           set_type_attribute('string')
           xmlnode << Tools.prepare_ns_node('text','p', avalue.to_s)
         when gt == :datetime then 
-          remove_all_value_attributes_and_content(xmlnode)
+          remove_all_value_attributes_and_content
           set_type_attribute('date')
           avalue = avalue.strftime(InternalDateTimeFormat)
           Tools.set_ns_attribute(xmlnode,'office','date-value', avalue)
           xmlnode << Tools.prepare_ns_node('text','p', avalue)
         when gt == :time then
-          remove_all_value_attributes_and_content(xmlnode)
+          remove_all_value_attributes_and_content
           set_type_attribute('time')
           Tools.set_ns_attribute(xmlnode,'office','time-value', avalue.strftime(InternalTimeFormat))
           xmlnode << Tools.prepare_ns_node('text','p', avalue.strftime('%H:%M'))
         when gt == :percentage then
-          remove_all_value_attributes_and_content(xmlnode)
+          remove_all_value_attributes_and_content
           set_type_attribute('percentage')
           Tools.set_ns_attribute(xmlnode,'office','value', '%0.2d%' % avalue.to_f) 
           xmlnode << Tools.prepare_ns_node('text','p', (avalue.to_f*100).round.to_s+'%')
+        when gt == :currency then
+          remove_all_value_attributes_and_content
+          set_type_attribute('currency')
+          Tools.set_ns_attribute(xmlnode,'office','value', '%f' % avalue.to_d)
+          xmlnode << Tools.prepare_ns_node('text','p', avalue.to_d.to_s+' '+self.format.currency)
       end
     else
       raise "Unknown cell mode #{self.mode}"
@@ -158,6 +164,7 @@ class Cell < XMLTiedItem
     Tools.set_ns_attribute(xmlnode,'office','value-type',typestring)
     Tools.set_ns_attribute(xmlnode,'calcext','value-type',typestring)
   end
+  ## TODO: using this is NOT in line with the general intent of forward compatibility
   def remove_all_value_attributes_and_content(node=xmlnode)
     if att = Tools.get_ns_attribute(node, 'office','value') then att.remove! end
     if att = Tools.get_ns_attribute(node, 'office','date-value') then att.remove! end
@@ -197,7 +204,7 @@ class Cell < XMLTiedItem
     end
     result = valueguess
 
-    if valueguess.nil? # valueguess is most important if not succesfull then try guessing by type from node xml
+    if valueguess.nil?  # valueguess is most important if not succesfull then try guessing by type from node xml
       typ = xmlnode.nil? ? 'N/A' : xmlnode.attributes['value-type']
       typeguess = case typ
         when nil then nil
@@ -229,7 +236,7 @@ class Cell < XMLTiedItem
         else             # without value we just beleive typeguess
           typeguess
         end
-      else # it not have a typeguess
+      else  # it not have a typeguess
         if (avalue.nil?) # if nil then nil
           NilClass
         elsif (String(avalue) rescue false) # convertible to String
@@ -238,8 +245,11 @@ class Cell < XMLTiedItem
           nil
         end
       end
-    elsif valueguess == Float and xmlnode.andand.attributes['value-type'] == 'percentage'
-      result = :percentage
+    elsif valueguess == Float 
+      case xmlnode.andand.attributes['value-type'] 
+        when 'percentage' then result = :percentage
+        when 'currency' then result = :currency
+      end
     end
     result
   end

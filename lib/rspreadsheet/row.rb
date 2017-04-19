@@ -96,6 +96,13 @@ class Row < XMLTiedItem
     parent.add_row_above(rowi)
   end
   
+  def next_row; relative(+1) end
+  alias :next :next_row
+  
+  def relative(rowi_offset)
+    worksheet.row(self.rowi+rowi_offset)
+  end
+  
  # @!group Private methods, which should not be called directly
   # @private
   # shifts internal represetation of row by diff. This should not be called directly

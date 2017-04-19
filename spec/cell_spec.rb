@@ -371,6 +371,20 @@ describe Rspreadsheet::Cell do
     @czkcell = @sheet2.cell('B23')
     @czkcell.value.should == 344.to_d
     @czkcell.format.currency.should == 'CZK'
+    
+    @czkcell.value = 200.to_d
+    @czkcell.value.should == 200.to_d
+    @czkcell.format.currency.should == 'CZK'
+  end
+  it 'preserves currency format when float is assingned to it' do
+    @cell = @sheet2.cell('B23')
+    @cell.type.should eq :currency
+    @cell.format.currency.should == 'CZK'
+    
+    @cell.value = 666.66.to_d
+    @cell.value.should == 666.66.to_d
+    @cell.type.should eq :currency
+    @cell.format.currency.should == 'CZK'
   end
   it 'is possible to manipulate borders of cells' do
     @cell = @sheet1.cell(1,1)

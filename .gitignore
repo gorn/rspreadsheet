@@ -26,6 +26,7 @@ build/
 .*kate-swp
 .*kate-swp.bak
 .directory
+.rake-tasks~
 
 ## Environment normalisation:
 /.bundle/
