@@ -10,7 +10,7 @@ describe Rspreadsheet::Row do
     @row = @sheet2.rows(1)
     @c = @row.cells(1)
     @c.value = 3
-    @c.value.should == 3 
+    @c.value.should == 3
   end
   it 'allows access to cells using different syntax' do
     @row = @sheet1.rows(1)
