@@ -137,14 +137,18 @@ class Cell < XMLTiedItem
         when gt == :datetime then 
           remove_all_value_attributes_and_content
           set_type_attribute('date')
-          avalue = avalue.strftime(InternalDateTimeFormat)
-          Tools.set_ns_attribute(xmlnode,'office','date-value', avalue)
-          xmlnode << Tools.prepare_ns_node('text','p', avalue)
+          if avalue.kind_of?(DateTime) or avalue.kind_of?(Date) or avalue.kind_of?(Time)
+            avalue = avalue.strftime(InternalDateTimeFormat)
+            Tools.set_ns_attribute(xmlnode,'office','date-value', avalue)
+            xmlnode << Tools.prepare_ns_node('text','p', avalue)
+          end
         when gt == :time then
           remove_all_value_attributes_and_content
           set_type_attribute('time')
-          Tools.set_ns_attribute(xmlnode,'office','time-value', avalue.strftime(InternalTimeFormat))
-          xmlnode << Tools.prepare_ns_node('text','p', avalue.strftime('%H:%M'))
+          if avalue.kind_of?(DateTime) or avalue.kind_of?(Date) or avalue.kind_of?(Time)
+            Tools.set_ns_attribute(xmlnode,'office','time-value', avalue.strftime(InternalTimeFormat))
+            xmlnode << Tools.prepare_ns_node('text','p', avalue.strftime('%H:%M'))
+          end
         when gt == :percentage then
           remove_all_value_attributes_and_content
           set_type_attribute('percentage')
@@ -153,8 +157,10 @@ class Cell < XMLTiedItem
         when gt == :currency then
           remove_all_value_attributes_and_content
           set_type_attribute('currency')
-          Tools.set_ns_attribute(xmlnode,'office','value', '%f' % avalue.to_d)
-          xmlnode << Tools.prepare_ns_node('text','p', avalue.to_d.to_s+' '+self.format.currency)
+          unless avalue.nil?
+            Tools.set_ns_attribute(xmlnode,'office','value', '%f' % avalue.to_d)
+            xmlnode << Tools.prepare_ns_node('text','p', avalue.to_d.to_s+' '+self.format.currency)
+          end
       end
     else
       raise "Unknown cell mode #{self.mode}"
@@ -203,7 +209,7 @@ class Cell < XMLTiedItem
       else nil
     end
     result = valueguess
-
+    
     if valueguess.nil?  # valueguess is most important if not succesfull then try guessing by type from node xml
       typ = xmlnode.nil? ? 'N/A' : xmlnode.attributes['value-type']
       typeguess = case typ

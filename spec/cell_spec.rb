@@ -452,4 +452,15 @@ describe Rspreadsheet::Cell do
   it 'automatically creates new style, if a style is automatic, some of its attributes changes and there are several cells pointing to it', :penting=>'' do
   
   end
+  
+  it 'gracedully accepts nil in assignement' do
+    expect {
+      @sheet2.cell('B1').value = nil
+      @sheet2.cell('B2').value = nil
+      @sheet2.cell('B3').value = nil
+      @sheet2.cell('B22').value = nil
+      @sheet2.cell('D22').value = nil
+      @sheet2.cell('F22').value = nil    
+    }.not_to raise_error
+  end
 end
