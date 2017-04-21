@@ -128,8 +128,9 @@ class Worksheet
       super
     end
   end
+  alias :rowcount :size
   def used_rows_range
-    1..self.first_unused_row_index-1
+    1..self.rowcount
   end
 end
 
