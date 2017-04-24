@@ -10,7 +10,7 @@ script: 'bundle exec rake'
 matrix:
   include:
   - rvm: 2.4.0
-    before_install:
+    xx_before_install:
       - gem uninstall libxml-ruby
       - sudo apt-get install ruby-libxml
       - sudo apt-get install libxml2
