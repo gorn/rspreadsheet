@@ -463,4 +463,14 @@ describe Rspreadsheet::Cell do
       @sheet2.cell('F22').value = nil    
     }.not_to raise_error
   end
+  it 'can be inserted before existing cell and this one is shifted right' do
+    @sheet1.B2 = 'test'
+    @sheet1.B2.should == 'test'
+    inscell = @sheet1.insert_cell_before(2,2)
+    inscell.value = 'new'
+    @sheet1.B2.should == 'new'
+    @sheet1.C2.should == 'test'
+    inscell = @sheet1.insert_cell_before(2,4) # should not move cells with data
+    @sheet1.C2.should == 'test' 
+  end
 end

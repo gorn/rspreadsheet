@@ -8,6 +8,7 @@ describe Rspreadsheet::Worksheet do
     end
     it 'contains nonempty xml in rows for testfile' do
       @sheet.rows(1).xmlnode.elements.size.should be >1
+      @sheet.rows(1).xml.index '<text:p>text</text:p>'
     end
     it 'uses detach_my_subnode_respect_repeated well' do
       @sheet.cell(50,12).mode.should_not == :regular

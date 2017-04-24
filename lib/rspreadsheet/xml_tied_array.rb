@@ -74,7 +74,7 @@ module XMLTiedArray
     case params.length 
       when 0 then subitems_array
       when 1 then subitem(params[0]) 
-      else raise Exception.new('Wrong number of arguments.')
+      else raise ArgumentError.new('Wrong number of arguments.')
     end
   end
 
@@ -162,7 +162,7 @@ module XMLTiedArray
   def prepare_empty_xmlnode
     raise 'xmlnode is empty and I do not know how to create empty xmlnode. Please provide prepare_empty_xmlnode method in your object.'
   end
-  
+    
   # @!group finding and accessing subnodes
   # array containing subnodes of xmlnode which represent subitems
   def xmlsubnodes

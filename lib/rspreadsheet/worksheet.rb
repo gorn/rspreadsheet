@@ -106,7 +106,7 @@ class Worksheet
       when 1..2
         r,c = Rspreadsheet::Tools.a2c(*params)
         row(r).andand.cell(c)
-      else raise Exception.new('Wrong number of arguments.')
+      else raise ArgumentError.new('Wrong number of arguments.')
     end
   end
   alias :cell :cells

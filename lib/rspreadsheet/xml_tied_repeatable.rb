@@ -61,7 +61,7 @@ module XMLTiedArray_WithRepeatableItems
       node.remove!                                             # remove the original node
     else # insert outbound xmlnode
       [index+1..aindex-1,aindex..aindex].reject {|range| range.size<1}.each do |range|
-        axmlnode << XMLTiedArray_WithRepeatableItems.prepare_repeated_subnode(range.size, options)
+        axmlnode << prepare_repeated_subnode(range.size, options)
       end  
     end #TODO: Out of bounds indexes handling
     return my_subnode(aindex)
