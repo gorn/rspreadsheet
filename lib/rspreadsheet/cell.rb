@@ -46,6 +46,10 @@ class Cell < XMLTiedItem
   end
   def row; @worksheet.rows(rowi) end
   def coordinates; [rowi,coli] end
+  def address
+    Tools.convert_cell_coordinates_to_address(coordinates)
+  end
+
   def to_s; value.to_s end
   def valuexml; self.valuexmlnode.andand.inner_xml end
   def valuexmlnode; self.xmlnode.elements.first end
@@ -261,9 +265,6 @@ class Cell < XMLTiedItem
   end
   def format
     @format ||= CellFormat.new(self)
-  end
-  def address
-    Tools.convert_cell_coordinates_to_address(coordinates)
   end
   
   def formula

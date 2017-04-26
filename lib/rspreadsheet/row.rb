@@ -38,11 +38,31 @@ class Row < XMLTiedItem
   end
   
  # @!group Syntactic sugar
+  
+  
+  def cells(*params)
+    case params.length 
+      when 0 then raise 'Not implemented yet' #TODO: return list of all cells
+      when 1..2
+        r,c = Rspreadsheet::Tools.a2c(*params)
+        row(r).andand.cell(c)
+      else raise ArgumentError.new('Wrong number of arguments.')
+    end
+  end
+
+    case params.length 
+      when 0 then subitems_array
+      when 1 then subitem(params[0]) 
+      else raise ArgumentError.new('Wrong number of arguments.')
+    end
+
+  
+  
   def cells(*params); subitems(*params) end
   alias :cell :cells
   
   ## @return [String or Float or Date] value of the cell
-  # @param coli [Integer] colum index of the cell 
+  # @param coli [Integer ot String] colum index of the cell of colum letter
   # returns value of the cell at column `coli`. 
   #  
   #     @row = @worksheet.rows(5)     # with cells containing names of months
