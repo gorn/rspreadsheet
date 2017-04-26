@@ -132,8 +132,9 @@ class Cell < XMLTiedItem
         when gt == Float then
           remove_all_value_attributes_and_content
           set_type_attribute('float')
-          Tools.set_ns_attribute(xmlnode,'office','value', avalue.to_s) 
-          xmlnode << Tools.prepare_ns_node('text','p', avalue.to_f.to_s)
+          sav=avalue.to_f.to_s # to_f handles case when avalue is decimal number
+          Tools.set_ns_attribute(xmlnode,'office','value', sav) 
+          xmlnode << Tools.prepare_ns_node('text','p', sav)
         when gt == String then
           remove_all_value_attributes_and_content
           set_type_attribute('string')

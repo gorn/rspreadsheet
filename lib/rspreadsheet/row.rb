@@ -49,16 +49,14 @@ class Row < XMLTiedItem
       else raise ArgumentError.new('Wrong number of arguments.')
     end
   end
-
-    case params.length 
-      when 0 then subitems_array
-      when 1 then subitem(params[0]) 
-      else raise ArgumentError.new('Wrong number of arguments.')
+  
+  def cells(*params)
+    if params.length == 1
+      subitems(Tools.convert_column_name_to_index(params[0]))
+    else
+      subitems(*params)
     end
-
-  
-  
-  def cells(*params); subitems(*params) end
+  end
   alias :cell :cells
   
   ## @return [String or Float or Date] value of the cell
