@@ -53,7 +53,7 @@ module Tools
     
     ## third possibility how to implement it (second one little shortened)
     s=colname.size
-    return (colname.upcase.to_i(36)-(36**s-1).div(3.5)).to_s(36).to_i(26)+(26**s-1)/25
+    return (colname.to_s.upcase.to_i(36)-(36**s-1).div(3.5)).to_s(36).to_i(26)+(26**s-1)/25
   end
   
   def self.convert_cell_coordinates_to_address(*coords)
