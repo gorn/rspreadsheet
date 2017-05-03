@@ -129,7 +129,6 @@ module XMLTiedArray
   # @!group inserting new subnodes TODO: refactor out repeatable connected code
   def insert_new_empty_subnode_before(aindex)
     node_after = my_subnode(aindex)
-    
     if !node_after.nil?
       node_after.prev = prepare_empty_subnode
       return node_after.prev

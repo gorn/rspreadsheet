@@ -37,19 +37,7 @@ class Row < XMLTiedItem
     initialize_xml_tied_item(aworksheet,arowi)
   end
   
- # @!group Syntactic sugar
-  
-  
-  def cells(*params)
-    case params.length 
-      when 0 then raise 'Not implemented yet' #TODO: return list of all cells
-      when 1..2
-        r,c = Rspreadsheet::Tools.a2c(*params)
-        row(r).andand.cell(c)
-      else raise ArgumentError.new('Wrong number of arguments.')
-    end
-  end
-  
+ # @!group Syntactic sugar  
   def cells(*params)
     if params.length == 1
       subitems(Tools.convert_column_name_to_index(params[0]))
