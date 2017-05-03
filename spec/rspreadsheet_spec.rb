@@ -48,8 +48,7 @@ describe Rspreadsheet do
     
     @content_xml2.root.first_diff(@content_xml1.root).should be_nil
     @content_xml1.root.first_diff(@content_xml2.root).should be_nil
-    
-    @content_xml1.root.should == @content_xml2.root
+    @content_xml1.root.to_s.should == @content_xml2.root.to_s
   end
 
   it 'when open and save file modified, than the file is different' do

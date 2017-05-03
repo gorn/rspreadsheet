@@ -71,6 +71,5 @@ end
 def xmls_should_be_identical(xml1,xml2) 
   xml2.root.first_diff(xml1.root).should be_nil
   xml1.root.first_diff(xml2.root).should be_nil
-  
-  xml1.root.should == xml2.root
+  xml1.root.to_s.should == xml2.root.to_s
 end
