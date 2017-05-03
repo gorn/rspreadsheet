@@ -1,4 +1,4 @@
-if  RUBY_VERSION > '2.1'
+if false # RUBY_VERSION > '2.1'
 
   module ClassExtensions
 
@@ -9,6 +9,9 @@ if  RUBY_VERSION > '2.1'
         else
           inject(0){ |sum, element| sum.to_f + element.to_f } || identity
         end
+      end
+      def self.marker
+        'yes'
       end
     end
     
@@ -68,6 +71,9 @@ else # Monkeypatching
       else
         inject(0){ |sum, element| sum.to_f + element.to_f } || identity
       end
+    end
+    def self.marker
+      'yes2'
     end
   end
 
