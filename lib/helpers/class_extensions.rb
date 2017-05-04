@@ -1,4 +1,4 @@
-if false # RUBY_VERSION > '2.1'
+if RUBY_VERSION > '2.1'
 
   module ClassExtensions
 
