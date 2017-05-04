@@ -74,10 +74,7 @@ RSpreadsheet.generate('pricelist.ods') do
     
 ## Release notes
 
-  2017-01
-  - file can be saced to any IO now, making it suitable for creating files on fly.
-  - basic image handling implemented (issue [#24](https://github.com/gorn/rspreadsheet/issues/24))
-  - bug corrected: inserted row was not empty, but rather copy of the row below.
+  Release notes are maintaned [on github](https://github.com/gorn/rspreadsheet/releases).
     
 ## Developing this gem
 
