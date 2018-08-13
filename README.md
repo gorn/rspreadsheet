@@ -61,10 +61,14 @@ Gem is on [Rubygems](https://rubygems.org/gems/rspreadsheet) so you can install 
 
 or add <code>gem 'rspreadsheet'</code> to your Gemfile and execute  <code>bundle</code>. 
 
-If you get this error
+If you get this error concering libxml, like
+
+    checking for libxml/xmlversion.h in /opt/include/libxml2,/opt/local/include/libxml2,/usr/local/include/libxml2,/usr/include/libxml2... no
+    *** extconf.rb failed ***
+or 
 
     mkmf.rb can't find header files for ruby at /usr/lib/ruby/include/ruby.h 
-    
+        
 then you might not have installed libxml for ruby. I.e. in debian something like <code>sudo aptitude install ruby-libxml</code> or using equivalent command in other package managers.
 
 ## Contibutions, ideas and wishes welcomed
