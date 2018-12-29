@@ -14,7 +14,8 @@ sheet = Rspreadsheet.open('./test.ods').worksheets(1)
 sheet.B5 = 'Cat'
 sheet.B5                    #=>  'Cat'
 sheet['B', 5]               #=>  'Cat'
-sheet.row(5).cell(2).value  #=>  'Cat'
+sheet['B', 5] = 'Mouse'
+sheet.row(5).cell(2).value  #=>  'Mouse'
 
 # working with cell format
 sheet.cell(5,2).format.bold = true
