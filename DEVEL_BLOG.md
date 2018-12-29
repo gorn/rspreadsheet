@@ -66,7 +66,7 @@ RSpreadsheet.generate('pricelist.ods') do
 ## Guiding ideas
   * xml document is always synchronized with the data. So the save is trivial.
   * no duplication of data. Objects like RowArray should containg minimum information. This one exists solely to speed up cell search. Taken to extream it is questionable, whether we need such objects at all, it might be possible to always work with xml directly.
-  * all cells and rows only server as proxy. they hold index and worksheet pointer and everytime read or write is done, the xml is newly searched. until there is a xmlnode caching we have no problem
+  * all cells and rows only serve as a proxy. They hold index and worksheet pointer and everytime read or write is done, the xml is newly searched. until there is a xmlnode caching we have no problem
   * all cells returned for particular coordinates are **always the same object**. This way we have no problem to synchronize changes.
     
 ## Known Issues
