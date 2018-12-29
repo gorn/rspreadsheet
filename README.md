@@ -9,19 +9,12 @@ The gem allows you to acces your file and modify any cell of it, **without** tou
 ## Examples of usage
 
 ```ruby
-require 'rspreadsheet'
-book = Rspreadsheet.open('./test.ods')
-sheet = book.worksheets(1)
+sheet = Rspreadsheet.open('./test.ods').worksheets(1)
 
-# get value of a cell B5 (there are more ways to do this)
-sheet.B5                       # => 'cell value'
-sheet[5,2]                     # => 'cell value'
-sheet.row(5).cell(2).value   # => 'cell value'
-
-# set value of a cell B5
-sheet.F5 = 'text'
-sheet[5,2] = 7
-sheet.cell(5,2).value = 1.78
+sheet.B5 = 'Cat'
+sheet.B5                    #=>  'Cat'
+sheet['B', 5]               #=>  'Cat'
+sheet.row(5).cell(2).value  #=>  'Cat'
 
 # working with cell format
 sheet.cell(5,2).format.bold = true
