@@ -157,7 +157,7 @@ class Cell < XMLTiedItem
         when gt == :percentage then
           remove_all_value_attributes_and_content
           set_type_attribute('percentage')
-          Tools.set_ns_attribute(xmlnode,'office','value', '%0.2d%' % avalue.to_f) 
+          Tools.set_ns_attribute(xmlnode,'office','value', '%0.2d%%' % avalue.to_f) 
           xmlnode << Tools.prepare_ns_node('text','p', (avalue.to_f*100).round.to_s+'%')
         when gt == :currency then
           remove_all_value_attributes_and_content
