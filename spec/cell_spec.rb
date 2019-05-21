@@ -449,11 +449,11 @@ describe Rspreadsheet::Cell do
     @cell.border_top.should_not be_nil ## ?????
   end
   
-  it 'automatically creates new style, if a style is automatic, some of its attributes changes and there are several cells pointing to it', :penting=>'' do
+  it 'automatically creates new style, if a style is automatic, some of its attributes changes and there are several cells pointing to it', :pending=>'' do
   
   end
   
-  it 'gracedully accepts nil in assignement' do
+  it 'gracefully accepts nil in assignement' do
     expect {
       @sheet2.cell('B1').value = nil
       @sheet2.cell('B2').value = nil
