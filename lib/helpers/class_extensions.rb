@@ -10,9 +10,6 @@ if RUBY_VERSION > '2.1'
           inject(0){ |sum, element| sum.to_f + element.to_f } || identity
         end
       end
-      def self.marker
-        'yes'
-      end
     end
     
     refine LibXML::XML::Node do
@@ -72,9 +69,6 @@ else # Monkeypatching
         inject(0){ |sum, element| sum.to_f + element.to_f } || identity
       end
     end
-    def self.marker
-      'yes2'
-    end
   end
 
   class LibXML::XML::Node
@@ -116,11 +110,3 @@ else # Monkeypatching
   end
 
 end
-
-# # @private
-# class Range
-#   def size
-#     res = self.end-self.begin+1
-#     res>0 ? res : 0
-#   end
-# end
