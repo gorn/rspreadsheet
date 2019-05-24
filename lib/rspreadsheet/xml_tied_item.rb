@@ -92,6 +92,7 @@ class XMLTiedItem < XMLTied
       self.singleton_class.send(:define_method, method, raise_destroyed_cell_error)
     end
     self.singleton_class.send(:define_method, :inspect, -> { "#<%s:0x%x destroyed cell>" % [self.class,object_id] })  # define descriptive inspect
+    self.singleton_class.remove_method :invalid_reference? if self.singleton_class.method_defined? :invalid_reference?
     self.singleton_class.send(:define_method, :invalid_reference?, -> { true }) # define invalid_reference? method
     # invalidate variables
     @xml_tied_parent=nil

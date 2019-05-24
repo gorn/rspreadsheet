@@ -21,7 +21,7 @@ if RUBY_VERSION > '2.1'
       @m2 = LibXML::XML::Node.new('a')
     end
     it 'can compare nodes' do
-      @n.to_s.should == @m.to_s
+      @n.to_s.should be == @m.to_s
       @n.to_s.should_not == @m2.to_s
     end
     it 'has correct elements' do

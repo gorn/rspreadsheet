@@ -25,6 +25,6 @@ describe Rspreadsheet::XMLTiedArray do
     
     tx = TestXMLTiedArray.new
     expect {tx.insert_new_empty_subnode_before(0)}.to raise_error IndexError
-    expect {tx.insert_new_empty_subnode_before(1)}.to raise_error /create empty xmlnode/
+    expect {tx.insert_new_empty_subnode_before(1)}.to raise_error(/create empty xmlnode/)
   end
 end

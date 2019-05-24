@@ -116,3 +116,11 @@ else # Monkeypatching
   end
 
 end
+
+# # @private
+# class Range
+#   def size
+#     res = self.end-self.begin+1
+#     res>0 ? res : 0
+#   end
+# end
