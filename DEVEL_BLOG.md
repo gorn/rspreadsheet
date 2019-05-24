@@ -81,7 +81,7 @@ RSpreadsheet.generate('pricelist.ods') do
 ### Automated testing
 
   * ``bundle exec guard`` will get tested any changes as soon as they are summitted
-  * ``rake spec`` runs all test manually
+  * ``bundle exec rake spec`` runs all test manually
 
 ### Automated utilities
  
