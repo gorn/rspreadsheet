@@ -119,10 +119,10 @@ module Tools
       'css3t'=>"http://www.w3.org/TR/css3-text/",
       'manifest'=>"urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
     }
-    if @pomnode.nil?
+    if !defined?(@pomnode) or @pomnode.nil?
       @pomnode = LibXML::XML::Node.new('xxx')
     end
-    if @ns.nil? then @ns={} end
+    if !defined?(@ns) or @ns.nil? then @ns={} end
     if @ns[prefix].nil?
       @ns[prefix] = LibXML::XML::Namespace.new(@pomnode, prefix, ns_array[prefix])
     end
@@ -191,12 +191,4 @@ module Tools
  
 end
   
-end
-
-# @private
-class Range
-  def size
-    res = self.end-self.begin+1
-    res>0 ? res : 0
-  end
 end

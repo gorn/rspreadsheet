@@ -67,7 +67,7 @@ class Image < XMLTiedItem
   
   def initialize_from_file(filename,mime)
     # ověřit, zda soubor na disku existuje TODO: tady by to chtělo zobecnit na IO
-    raise 'File does not exist or it is not accessible' unless File.exists?(filename)
+    raise 'File does not exist or it is not accessible' unless File.exist?(filename)
     @original_filename = filename
     @mime = mime
     self

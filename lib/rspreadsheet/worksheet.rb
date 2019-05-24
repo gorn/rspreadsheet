@@ -111,7 +111,7 @@ class Worksheet
   end
   alias :cell :cells
   def column(param)
-    r,coli = Rspreadsheet::Tools.a2c(1,param)
+    _,coli = Rspreadsheet::Tools.a2c(1,param)
     Column.new(self,coli)
   end
   # Allows syntax like sheet.F15. TO catch errors easier, allows only up to three uppercase letters in colum part, althought it won't be necessarry to restrict.

@@ -8,8 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Rspreadsheet::VERSION
   spec.authors       = ["Jakub A.Těšínský"]
   spec.email         = ["jAkub.cz (A is at)"]
-  spec.summary       = %q{Manipulating spreadsheets with Ruby (read / create / modify OpenDocument Spreadsheet).}
-  spec.description   = %q{Manipulating OpenDocument spreadsheets with Ruby. This gem can create new, read existing files abd modify them. When modyfying files, it tries to change as little as possible, making it as much forward compatifle as possible.}
+  spec.summary       = 'Manipulating LibreOffice Calc (OpenDocument Spreadsheet) files from Ruby (read / create / modify).'
+  spec.description   = 'Manipulating LibreOffice Calc (OpenDocument Spreadsheet) files with Ruby. This gem can create new, read existing files abd modify them. When modyfying files, it tries to change as little as possible, making it as much forward compatible as possible.'
+
   spec.homepage      = "https://github.com/gorn/rspreadsheet"
   spec.license       = "GPL"
 
@@ -33,12 +34,20 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'andand', '~>1.3'
 
   # development dependencies
-  spec.add_development_dependency "bundler", '~> 1.5'
-  spec.add_development_dependency "rake", '~>0.9'
+  if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.4.5')
+    # ruby 2.4.5 and up
+    spec.add_development_dependency "bundler", '>= 1.5', '<3'   # some 2.5 rubyies contain already bundler 2 included
+    spec.add_development_dependency "rake", '~>10.0'
+  else
+    # ruby up to 2.4.5
+    spec.add_development_dependency "bundler", '~> 1.5'
+    spec.add_development_dependency "rake", '~>0.9'
+  end
   # testig - see http://bit.ly/1n5yM51
   spec.add_development_dependency "rspec", '~>2.0.0'       # running tests
   spec.add_development_dependency 'pry-nav', '~>0.0'     # enables pry 'next', 'step' commands
   spec.add_development_dependency "coveralls", '~>0.7' # inspecting coverage of tests
+
 
   # optional and testing
   if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.2.5')

@@ -81,11 +81,11 @@ RSpreadsheet.generate('pricelist.ods') do
 ### Automated testing
 
   * ``bundle exec guard`` will get tested any changes as soon as they are summitted
-  * ``rake spec`` runs all test manually
+  * ``bundle exec rake spec`` runs all test manually
 
 ### Automated utilities
  
-  * [travis-ci](https://travis-ci.org/gorn/rspreadsheet) provides automated testing
+  * [travis-ci](https://travis-ci.org/gorn/rspreadsheet) provides automated testing - it tests every commit even in branches
   * [github](https://github.com/gorn/rspreadsheet) hosts the repository where you can get the code
   * [coverals](https://coveralls.io/r/gorn/rspreadsheet) checks how well source is covered by tests
 
@@ -94,13 +94,16 @@ RSpreadsheet.generate('pricelist.ods') do
 1. Make changes
 2. Test if all tests pass (run `bundle exec guard` to test automatically). If not go to 1.
 3. Build and install locally using script `./reinstall_local_gem.sh` (see [details](reinstall_local_gem.sh))
-4. Now can locally and manually use/test the gem. This should not be replacement for automated testing. If you make some changes, go to 1.
-5. When happy, increment the version number and `git add .; git commit -am'commit message'; git push`
-6. ``rake release`` - creates a version tag in git and pushes the code to github + Rubygems. After this is succesfull the new version appears as release in Github and RubyGems.
+4. Now can locally and manually use/test the gem. This should not be replacement for automated testing. If you make any changes, go to 1.
+5. If you want to test in travis before the release, you can `git push` the changes and let [travis](https://travis-ci.org/gorn/rspreadsheet) test them. 
+   If you want to be extra prudent you can do this in feature branch by `git checkout -b <feature-branch-name>; git push -u origin <feature-branch-name>`
+6. When happy, increment the version number and `git add .; git commit -am'commit message'; git push`
+7. ``rake release`` - creates a version tag in git and pushes the code to github + Rubygems. After this is succesfull the new version appears as release in Github and RubyGems.
+8. If you have used the feature branch, than delete it.
 
-gem alternative to points 3-6
+gem alternative to step 3 and 7
 
-    gem build rspreadsheet.gemspec              -\   These two lines together are in install.sh
+    gem build rspreadsheet.gemspec              -\   These two lines together are in reinstall_local_gem.sh
     sudo gem install rspreadsheet-x.y.z.gem     -/   which should be invoked from parent directory
     gem push rspreadsheet-x.y.z.gem             releases the gem, do not forgot to update version in rspreadsheet.gemspec before doing this
 

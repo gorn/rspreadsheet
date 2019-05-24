@@ -1,12 +1,19 @@
 language: ruby
 cache: bundler
 rvm:
-  - 2.0.0
-  - 2.1.10
-  - 2.2.6
-  - 2.3.3
-  - 2.4.0
+  - 2.0.0  # latest 2.0 by 2019-05 
+  - 2.1.10 # latest 2.1 by 2019-05
+  - 2.2.10 # latest 2.2 by 2019-05
+  - 2.3.8  # latest 2.3 by 2019-05
+  - 2.4.6  # latest 2.4 by 2019-05
+  - 2.5.5  # latest 2.5 by 2019-05
+  - 2.6.3  # latest 2.6 by 2019-05
+  - 2.1.5  #  ruby in debian 8 jessie
+  - 2.3.3  #  ruby in debian 9 stretch
+  - 2.5.5  # ruby in debian 10 buster
 
+
+# tesing versions with native libxml2 in debian
 script: 'bundle exec rake'
 matrix:
   include:
@@ -20,6 +27,6 @@ matrix:
 notifications:
   email:
     recipients:
-      - jatesins@ncsu.edu
+      - travis@kub.cz
     on_failure: change
     on_success: never

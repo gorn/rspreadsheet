@@ -4,7 +4,7 @@ using ClassExtensions if RUBY_VERSION > '2.1'
 describe Rspreadsheet do
   before do
     @tmp_filename = '/tmp/testfile.ods'
-    File.delete(@tmp_filename) if File.exists?(@tmp_filename)  # delete temp file
+    File.delete(@tmp_filename) if File.exist?(@tmp_filename)  # delete temp file
   end
   
   

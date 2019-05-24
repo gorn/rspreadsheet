@@ -4,7 +4,7 @@ describe Rspreadsheet::Image do
   before do
     @testfile_filename = $test_filename_images
     @tmp_testfile_filename = '/tmp/testfile2-image.ods'
-    File.delete(@tmp_testfile_filename) if File.exists?(@tmp_testfile_filename) # delete temp file
+    File.delete(@tmp_testfile_filename) if File.exist?(@tmp_testfile_filename) # delete temp file
 
     @testimage_filename  = './spec/test-image-blue.png'
     @testimage2_filename = './spec/test-image.png'
@@ -13,7 +13,7 @@ describe Rspreadsheet::Image do
     @sheet2 = @workbook.worksheets(2)
   end
   after do
-    File.delete(@tmp_testfile_filename) if File.exists?(@tmp_testfile_filename) # delete temp file
+    File.delete(@tmp_testfile_filename) if File.exist?(@tmp_testfile_filename) # delete temp file
   end
   it 'is accesible when included in spreadsheet', :xpending do
     @sheet.images_count.should == 1
@@ -80,7 +80,7 @@ describe Rspreadsheet::Image do
     @sheet2.images_count.should == 1
     @image = @sheet2.images(1)
     
-    File.delete(tmp_test_image) if File.exists?(tmp_test_image)
+    File.delete(tmp_test_image) if File.exist?(tmp_test_image)
     Zip::File.open(@tmp_testfile_filename) do |zip|  ## TODO: this is UGLY - it should not be extracting contents here
       zip.extract(@image.internal_filename,tmp_test_image)
     end

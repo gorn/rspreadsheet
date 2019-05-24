@@ -18,13 +18,13 @@ module XMLTiedArray_WithRepeatableItems
   include XMLTiedArray
 
   def my_subnode_range(aindex)
-    node, range = find_subnode_with_range(aindex)
+    _, range = find_subnode_with_range(aindex)
     return range
   end
   
   # vrátí xmlnode na souřadnici aindex
   def my_subnode(aindex)
-    result1, result2 = find_subnode_with_range(aindex)
+    result1, _ = find_subnode_with_range(aindex)
     return result1
   end
 
@@ -112,7 +112,7 @@ module XMLTiedArray_WithRepeatableItems
   # clean up item from xml (handle possible detachments) and itemcache. leave the object invalidation on the object
   # this should not be called from nowhere but XMLTiedItem.delete
   def delete_subitem(aindex)
-    options = subitem_xml_options
+#     options = subitem_xml_options
     delete_my_subnode_respect_repeated(aindex)  # vymaž node z xml
     @itemcache.delete(aindex)
     @itemcache.keys.sort.select{|i| i>=aindex+1 }.each do |i| 

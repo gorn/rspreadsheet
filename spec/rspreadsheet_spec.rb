@@ -4,10 +4,10 @@ using ClassExtensions if RUBY_VERSION > '2.1'
 describe Rspreadsheet do
   before do
     @tmp_filename = '/tmp/testfile.ods'        # delete temp file before tests
-    File.delete(@tmp_filename) if File.exists?(@tmp_filename)
+    File.delete(@tmp_filename) if File.exist?(@tmp_filename)
   end
   after do
-    File.delete(@tmp_filename) if File.exists?(@tmp_filename) # delete temp file after tests
+    File.delete(@tmp_filename) if File.exist?(@tmp_filename) # delete temp file after tests
   end
   
   it 'can open ods testfile and reads its content correctly' do
@@ -119,7 +119,7 @@ describe Rspreadsheet do
       book.save
       book.save('/tmp/different_filename.ods')
     end.not_to raise_error
-    File.delete('/tmp/different_filename.ods') if File.exists?('/tmp/different_filename.ods') # delete after tests
+    File.delete('/tmp/different_filename.ods') if File.exist?('/tmp/different_filename.ods') # delete after tests
   end
   it 'examples from advanced syntax GUIDE are working' do
     def p(*par); end # supress p in the example

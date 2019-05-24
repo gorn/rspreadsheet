@@ -2,7 +2,7 @@
 
 # rspreadsheet
  
-Manipulating LibreOffice Calc (OpenDocument Spreadsheet) files with Ruby. Read, **modify**, write or create new spreadsheets from ruby code.
+Manipulating spreadsheets with Ruby. Read, **modify**, write or create new OpenDocument Spreadsheet files from ruby code.
 
 The gem allows you to acces your file and modify any cell of it, **without** touching the rest of the file, which makes it compatible with all advanced features of ODS files (both existing and future ones). You do not have to worry if it supports feature XY, if it does not, it won't touch it. This itself makes it distinct from most of [similar gems](#why-another-opendocument-spreadsheet-gem). Alhought this gem is still in beta stage I use in everyday and it works fine.
 
