@@ -2,7 +2,7 @@
 
 # rspreadsheet
  
-Manipulating LibreOffice Calc (OpenDocument Spreadsheet) files with Ruby. Read, **modify**, write or create new spreadsheets from ruby code.
+Manipulating spreadsheets with Ruby. Read, **modify**, write or create new OpenDocument Spreadsheet files from ruby code.
 
 The gem allows you to acces your file and modify any cell of it, **without** touching the rest of the file, which makes it compatible with all advanced features of ODS files (both existing and future ones). You do not have to worry if it supports feature XY, if it does not, it won't touch it. This itself makes it distinct from most of [similar gems](#why-another-opendocument-spreadsheet-gem). Alhought this gem is still in beta stage I use in everyday and it works fine.
 
@@ -49,11 +49,19 @@ book.save('different_filename.ods')
 
 ## Installation and Configuration
 
-Gem is on [Rubygems](https://rubygems.org/gems/rspreadsheet) so you can install it by
+Add this line to your application's Gemfile:
+
+```ruby
+gem 'rspreadsheet'
+```
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
 
     $ gem install rspreadsheet
-
-or add <code>gem 'rspreadsheet'</code> to your Gemfile and execute  <code>bundle</code>. 
 
 If you get this error concering libxml, like
 
@@ -68,17 +76,14 @@ then you might not have installed libxml for ruby. I.e. in debian something like
 ## Contibutions, ideas and wishes welcomed
 
 ### Nonprogrammers
-If you need any help or find a bug please [submit an issue](https://github.com/gorn/rspreadsheet/issues) here. I appreciate any feedback and even if you can not help with code, it is interesting for me to hear from you. Different people have different needs and I want to hear about them. If you are a programmer and you have any ideas, wishes, etc you are welcomed to fork the repository and submit a pull request preferably including a failing test.
 
-Alhought this gem is still in beta stage I use in everyday and it works fine. Currently I am experimenting with syntax to get stabilized. **Any suggestions regarding the syntax is very welcomed**
+File a [bug report](https://github.com/gorn/rspreadsheet/issues). I appreciate any feedback and even if you can not help with code, it is interesting for me to hear from you. Different people have different needs and I want to hear about them. 
+
+Alhought this gem is still in beta stage I use in everyday and it works fine. Any suggestions regarding the syntax is very welcomed.
 
 ### Programmers
 
-1. [Fork it](http://github.com/gorn/rspreadsheet/fork) and clone it ([troubleshooting](https://github.com/gorn/rspreadsheet/blob/master/DEVEL_BLOG.md#installation-troubleshooting))
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+File a [bug report](https://github.com/gorn/rspreadsheet/issues) or [fork it](http://github.com/gorn/rspreadsheet/fork) and file a pull request. You do not have to contribute a code, failing tests are welcomed as well.
 
 ## Why another OpenDocument spreadsheet gem?
 
@@ -100,3 +105,7 @@ One of the main ideas is that the manipulation with OpenDOcument files should be
 * [Code documentation](http://www.rubydoc.info/github/gorn/rspreadsheet) is hosted on [rubydoc.info](http://www.rubydoc.info/)
 * [Changelog](CHANGELOG.md)
 * [Documentation for developers](DEVEL_BLOG.md) containing ideas for future development and documentation on testing tools
+
+## License
+
+The gem is available as open source under the terms of the [GPL licence](LICENCE.md).

@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Rspreadsheet::VERSION
   spec.authors       = ["Jakub A.Těšínský"]
   spec.email         = ["jAkub.cz (A is at)"]
-  spec.summary       = 'Manipulating spreadsheets with Ruby (read / create / modify OpenDocument Spreadsheet).'
-  spec.description   = 'Manipulating OpenDocument spreadsheets with Ruby. This gem can create new, read existing files abd modify them. When modyfying files, it tries to change as little as possible, making it as much forward compatifle as possible.'
+  spec.summary       = 'Manipulating LibreOffice Calc (OpenDocument Spreadsheet) files from Ruby (read / create / modify).'
+  spec.description   = 'Manipulating LibreOffice Calc (OpenDocument Spreadsheet) files with Ruby. This gem can create new, read existing files abd modify them. When modyfying files, it tries to change as little as possible, making it as much forward compatible as possible.'
 
   spec.homepage      = "https://github.com/gorn/rspreadsheet"
   spec.license       = "GPL"
