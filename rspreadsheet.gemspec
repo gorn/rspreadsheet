@@ -34,12 +34,12 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'andand', '~>1.3'
 
   # development dependencies
-  if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5')
-    # ruby 2.5 and up
-    spec.add_development_dependency "bundler", '>= 1.5', '<3'   # some 2.5 rubyies contain alreadz bundler 2
+  if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.4.5')
+    # ruby 2.4.5 and up
+    spec.add_development_dependency "bundler", '>= 1.5', '<3'   # some 2.5 rubyies contain already bundler 2 included
     spec.add_development_dependency "rake", '~>10.0'
   else
-    # ruby up to 2.4.*
+    # ruby up to 2.4.5
     spec.add_development_dependency "bundler", '~> 1.5'
     spec.add_development_dependency "rake", '~>0.9'
   end
