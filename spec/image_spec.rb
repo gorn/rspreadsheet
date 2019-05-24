@@ -15,7 +15,7 @@ describe Rspreadsheet::Image do
   after do
     File.delete(@tmp_testfile_filename) if File.exist?(@tmp_testfile_filename) # delete temp file
   end
-  it 'is accesible when included in spreadsheet', :xpending do
+  it 'is accesible when included in spreadsheet' do
     @sheet.images_count.should == 1
     @image = @sheet.images(1)
     

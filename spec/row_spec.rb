@@ -255,7 +255,7 @@ describe Rspreadsheet::Row do
     @row.cells(1).value.should == 1
     @row.cells(3).blank?.should be_truthy
   end
-  it 'can be mass assigned by sheet[]= method', :focus do
+  it 'can be mass assigned by sheet[]= method' do
     @sheet1[1] = ['foo','baz']
   end
   it 'cells can be wiped out by truncate method' do

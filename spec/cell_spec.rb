@@ -345,7 +345,7 @@ describe Rspreadsheet::Cell do
     @cell.formula='=1+5'
     @cell.formula.should eq '=1+5'
   end
-  it 'unsets cell type when formula set - we can not guess it correctly', :focus do
+  it 'unsets cell type when formula set - we can not guess it correctly' do
     @cell = @sheet1.cell(1,1)
     @cell.value = 'ahoj'
     @cell.type.should eq :string

@@ -51,8 +51,8 @@ Gem::Specification.new do |spec|
 
   # optional and testing
   if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.2.5')
-#    spec.add_development_dependency "guard", '~>2.13'
-#    spec.add_development_dependency "guard-rspec", '~>4.6'
+   spec.add_development_dependency "guard", '~>2.13'
+   spec.add_development_dependency "guard-rspec", '~>4.6'
   end
 
 #   spec.add_development_dependency 'equivalent-xml'     # implementing xml diff
