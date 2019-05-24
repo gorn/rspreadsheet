@@ -90,6 +90,8 @@ describe Rspreadsheet::Worksheet do
       @sheet[-2,-5].should be_nil
       
       Rspreadsheet.raise_on_negative_coordinates = pom  # reset the setting back
+  
+      Rspreadsheet.configuration { |config| config.raise_on_negative_coordinates.should be == pom }
     end
     it 'returns nil with negative index or raise if configured to do so' do
       pom = Rspreadsheet.raise_on_negative_coordinates
