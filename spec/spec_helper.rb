@@ -2,10 +2,11 @@
 require 'bundler/setup'
 Bundler.setup
 
-RSpec.configure do |c|
-  c.fail_fast = true
-#   c.warnings = true
-  c.treat_symbols_as_metadata_keys_with_true_values = true # so i can run individual test just by appending :focus to them
+RSpec.configure do |config|
+  config.fail_fast = true
+#   config.warnings = true
+  config.treat_symbols_as_metadata_keys_with_true_values = true # so i can run individual test just by appending :focus to them
+  
 end
 
 # this enables Coveralls
