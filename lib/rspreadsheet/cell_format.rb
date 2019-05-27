@@ -120,7 +120,7 @@ class CellFormat
   alias :border_left :left
   
   def inspect
-    "#<Rspreadsheet::CellFormat bold:#{bold?.inspect}, borders:#{top.get_value_string.inspect} #{right.get_value_string.inspect} #{bottom.get_value_string.inspect} #{left.get_value_string.inspect}>"
+    "#<Rspreadsheet::CellFormat bold:#{bold?.inspect}, borders: #{top.get_border_string || 'none'}, #{right.get_border_string || 'none'}, #{bottom.get_border_string || 'none'}, #{left.get_border_string || 'none'}>"
   end
   # experimental. Allows to assign a style to cell.
   def style_name=(value)
@@ -152,7 +152,7 @@ class Border
     
   ## internals  
    
-  # set parth-th part of string which represents the border. String looks like "0.06pt solid #00ee00"
+  # set part-th part of string which represents the border. String looks like "0.06pt solid #00ee00"
   # part is 1 for width, 2 for style or 3 for color
   def set_border_string_part(part,value)
     current_value = @cellformat.get_cell_style_node_attribute(attribute_name)
@@ -167,19 +167,19 @@ class Border
     @cellformat.set_cell_style_node_attribute(attribute_name, value_array.join(' '))
   end
   
-  def get_border_string_part(part)
-    current_value = @cellformat.get_cell_style_node_attribute(attribute_name) || @cellformat.get_cell_style_node_attribute('border')
-    if current_value.nil? or (current_value=='none')
-      return nil
-    else
-      value_array = current_value.split(' ')  
-      raise 'Strange border attribute value. Does not have 3 parts' unless value_array.length == 3
-      return value_array[part-1]
-    end
+  def get_border_string
+    result = @cellformat.get_cell_style_node_attribute(attribute_name) || @cellformat.get_cell_style_node_attribute('border')
+    result = nil if result=='none'
+    result
   end
   
-  def get_value_string
-    @cellformat.get_cell_style_node_attribute(attribute_name)
+  def get_border_string_part(part)
+    border_string = get_border_string
+    return nil if border_string.nil?
+      
+    value_array = border_string.split(' ')  
+    raise 'Strange border attribute value. Does not have 3 parts' unless value_array.length == 3
+    return value_array[part-1]
   end
   
 end
