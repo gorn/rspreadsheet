@@ -111,11 +111,7 @@ class CellFormat
     automatic_styles_node << anode
     raise 'Style node was not correctly initialized' if style_node.nil?
   end
-  # duplicated style_node and gives it new unused style_name
-  def duplicate_style_node
-    
-  end
-    
+  
   # @!group other style node related routines
   def unused_cell_style_name
     last = (cellnode.nil? ? [] : cellnode.doc.root.find('./office:automatic-styles/style:style')).
@@ -173,8 +169,7 @@ class Border
   def delete
     @cellformat.set_cell_style_node_attribute(attribute_name, 'none')
   end
-    
-    
+  
   ## internals  
    
   # set part-th part of string which represents the border. String looks like "0.06pt solid #00ee00"
