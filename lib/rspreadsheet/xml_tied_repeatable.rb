@@ -7,7 +7,7 @@ using ClassExtensions if RUBY_VERSION > '2.1'
 
 
 # Abstract class similar to XMLTiedArray but with support to "repeatable" items. This is notion specific
-# to OpenDocument files - whnewer a row repeats more times (or a cell), one can either make many identical
+# to OpenDocument files - whenewer a row repeats more times (or a cell), one can either make many identical
 # copies of the same xml or only make one xml representing one item and add attribute xml_repeated.
 #
 # This class is made to be included, not subclassed - the reason is in delete method which calls super.

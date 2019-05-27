@@ -2,14 +2,6 @@
 # @author Jakub Tesinsky
 # @title rspreadsheet Cell
 
-# require 'andand'
-# require 'rspreadsheet/xml_tied_item'
-# require 'date'
-# require 'time'            # extended functions for time like Time.strptime
-# require 'bigdecimal'
-# require 'bigdecimal/util' # for to_d method
-# require 'helpers/class_extensions'
-
 module Rspreadsheet
 using ClassExtensions if RUBY_VERSION > '2.1'
 
@@ -28,43 +20,73 @@ class CellFormat
   end
   def cellnode; @cell.xmlnode end
   
-  # text style attribute readers
+  # @!group text style attribute readers
   def bold;      get_text_style_node_attribute('font-weight') == 'bold' end
   alias :bold? :bold 
   def italic;    get_text_style_node_attribute('font-style') == 'italic' end
   def color;     get_text_style_node_attribute('color') end
   def font_size; get_text_style_node_attribute('font-size') end
-  def get_text_style_node_attribute(attribute_name)
-    text_style_node.nil? ? nil : Tools.get_ns_attribute_value(text_style_node,'fo',attribute_name)
-  end
   def background_color; get_cell_style_node_attribute('background-color') end
-  def get_cell_style_node_attribute(attribute_name)
-    cell_style_node.nil? ? nil : Tools.get_ns_attribute_value(cell_style_node,'fo',attribute_name)
+  def currency
+    Tools.get_ns_attribute_value(cellnode,'office','currency',nil) 
   end
   
-  # text style attribute writers
+  # @!group text style attribute writers
   def bold=(value);     set_text_style_node_attribute('font-weight', value ? 'bold' : 'normal') end
   def italic=(value);   set_text_style_node_attribute('font-style',  value ? 'italic' : 'normal') end
   def color=(value);    set_text_style_node_attribute('color',  value) end
   def font_size=(value);set_text_style_node_attribute('font-size',  value) end
+  def background_color=(value); set_cell_style_node_attribute('background-color',  value) end
+    
+  
+  # @!group border related
+  def top;    @top    ||= Border.new(self,:top)  end
+  def bottom; @bottom ||= Border.new(self,:bottom) end
+  def left;   @left   ||= Border.new(self,:left) end
+  def right;  @right  ||= Border.new(self,:right) end
+  alias :border_top :top
+  alias :border_right :right
+  alias :border_bottom :bottom
+  alias :border_left :left
+      
+  # @!group manipulation of style related nodes
+  def get_text_style_node_attribute(attribute_name)
+    text_style_node.nil? ? nil : Tools.get_ns_attribute_value(text_style_node,'fo',attribute_name)
+  end
+  def get_cell_style_node_attribute(attribute_name)
+    cell_style_node.nil? ? nil : Tools.get_ns_attribute_value(cell_style_node,'fo',attribute_name)
+  end
   def set_text_style_node_attribute(attribute_name,value)
-    @cell.detach if @cell.mode != :regular
+    make_sure_styles_are_not_shared
     if text_style_node.nil?
       self.create_text_style_node
-      raise 'Style node was not correctly initialized' if text_style_node.nil?
+      raise 'Text style node was not correctly initialized' if text_style_node.nil?
     end
     Tools.set_ns_attribute(text_style_node,'fo',attribute_name,value)
   end
-  def background_color=(value); set_cell_style_node_attribute('background-color',  value) end
   def set_cell_style_node_attribute(attribute_name,value)
-    @cell.detach if @cell.mode != :regular
+    make_sure_styles_are_not_shared
     if cell_style_node.nil?
       self.create_cell_style_node
-      raise 'Style node was not correctly initialized' if cell_style_node.nil?
+      raise 'Cell style node was not correctly initialized' if cell_style_node.nil?
     end
     Tools.set_ns_attribute(cell_style_node,'fo',attribute_name,value)
   end
-  
+  def make_sure_styles_are_not_shared  # with another cell (prevent issue #40)
+    # if cell is reapeated, we must detach it first
+    @cell.detach if @cell.mode != :regular   
+    # if style node is shared, we must create our own first
+    if style_shared?
+      new_style_name = unused_cell_style_name
+      
+      new_style_node = style_node.copy(true)
+      Tools.set_ns_attribute(new_style_node,'style','name',new_style_name)
+      style_node.next = new_style_node
+      self.style_name = new_style_name
+      raise 'Unsucessfull unsharing of styles' if style_shared?
+    end
+  end
+
  # @!group initialization of style related nodes, if they do not exist
   def create_text_style_node
     create_style_node if style_name.nil? or style_node.nil?
@@ -83,13 +105,18 @@ class CellFormat
       raise 'Style name was not correctly initialized' if style_name!=proposed_style_name
     end
     anode =  Tools.prepare_ns_node('style','style')
-    Tools.set_ns_attribute(anode, 'style', 'name', proposed_style_name)
+    Tools.set_ns_attribute(anode, 'style', 'name', style_name)
     Tools.set_ns_attribute(anode, 'style', 'family', 'table-cell')
     Tools.set_ns_attribute(anode, 'style', 'parent-style-name', 'Default')
     automatic_styles_node << anode
     raise 'Style node was not correctly initialized' if style_node.nil?
   end
-  
+  # duplicated style_node and gives it new unused style_name
+  def duplicate_style_node
+    
+  end
+    
+  # @!group other style node related routines
   def unused_cell_style_name
     last = (cellnode.nil? ? [] : cellnode.doc.root.find('./office:automatic-styles/style:style')).
       collect {|node| node['name']}.
@@ -106,27 +133,25 @@ class CellFormat
     return nil if cellnode.nil?
     cellnode.doc.root.find("./office:automatic-styles#{xpath}").first 
   end
-  def currency
-    Tools.get_ns_attribute_value(cellnode,'office','currency',nil) 
-  end
-  #returns object representing top border of the cell
-  def top;    @top    ||= Border.new(self,:top)  end
-  def bottom; @bottom ||= Border.new(self,:bottom) end
-  def left;   @left   ||= Border.new(self,:left) end
-  def right;  @right  ||= Border.new(self,:right) end
-  alias :border_top :top
-  alias :border_right :right
-  alias :border_bottom :bottom
-  alias :border_left :left
   
+  # how many cells are using this style. repeated cells are counted only once
+  def style_shared_count
+    cellnode.doc.root.find("//table:table-cell[@table:style-name=\"#{style_name}\"]").size
+  end
+  def style_shared?
+    style_shared_count>1
+  end
+  
+  # @!group other routines
   def inspect
     "#<Rspreadsheet::CellFormat bold:#{bold?.inspect}, borders: #{top.get_border_string || 'none'}, #{right.get_border_string || 'none'}, #{bottom.get_border_string || 'none'}, #{left.get_border_string || 'none'}>"
   end
-  # experimental. Allows to assign a style to cell.
-  def style_name=(value)
-    Tools.set_ns_attribute_value(cellnode,'table','style-name',value)
-  end
   
+  # experimental. Allows to assign a style to cell. Currenty used only for automatic styles.
+  def style_name=(value)
+    Tools.set_ns_attribute(cellnode,'table','style-name',value)
+  end
+
 end
 
 # represents one of the borders of a cell

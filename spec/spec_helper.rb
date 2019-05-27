@@ -3,7 +3,7 @@ require 'bundler/setup'
 Bundler.setup
 
 RSpec.configure do |config|
-  config.fail_fast = true
+#   config.fail_fast = 4
 #   config.warnings = true
   
   # so i can run individual test just by appending :focus to them

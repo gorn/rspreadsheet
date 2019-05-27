@@ -129,14 +129,29 @@ describe Rspreadsheet::Cell do
   
   it 'does not have issue 40 - coloring other cells, when they have similar borders' do
     sheet = Rspreadsheet.open('./spec/testfile-issue-40.ods').worksheet(1)
+    sheet[1,1] = 'ahoj'
     sheet.cell(1,1).format.background_color = '#FF0000'
 
     sheet.cell(1,1).format.background_color.should == '#FF0000'
     sheet.cell('B3').format.background_color.should_not == '#FF0000'
   end
   
-  it 'automatically creates new style, if a style is automatic, some of its attributes changes and there are several cells pointing to it', :pending=>'' do
+  it 'automatically creates new style, if a style is automatic, some of its attributes changes and there are several cells pointing to it', :focus do
+    sheet = Rspreadsheet.open('./spec/testfile-issue-40.ods').worksheet(1)
+    cell1 = sheet.cell(1,1)
+    cell2 = sheet.cell('B3')
+    
+    cell1.xmlnode.attributes['style-name'].should == cell2.xmlnode.attributes['style-name']
+    cell1.format.background_color = '#FF0000'
+    
+    cell1.xmlnode.attributes['style-name'].should_not == cell2.xmlnode.attributes['style-name']
+  end
   
+  it 'recognizes correctly that style is shared with other cell' do
+    sheet = Rspreadsheet.open('./spec/testfile-issue-40.ods').worksheet(1)
+    
+    sheet.cell(1,1).format.style_shared_count.should == 2
+    sheet.cell(1,1).format.style_shared?.should == true
   end
   
 end

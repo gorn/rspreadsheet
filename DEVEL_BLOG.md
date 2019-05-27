@@ -9,6 +9,8 @@ After you have cloned the source run `bundle` command in gem directory to instal
 
 ## Ideas/wishlist
 
+  * refactor Style and AutomaticStyle objects from CellFormat.
+  * introduce "speedup" option, which can for example skip all "safetest" (or it can be named $prudent = true/false)
   * make it configurable whether Time or DateTime will be used.
   * In future inntroduce syntax like `sheet.range('C3:E4')` for mass operations.
   * Trying to make row Enumerable - perhaps skipping empty or undefined cells.
