@@ -43,6 +43,9 @@ workbook.save(any_io_object)        # file can be saved to any IO like object as
 ### Date and Time
 OpenDocument and ruby have different models of date, time and datetime. Ruby containg three different objects. Time and DateTime cover all cases, Date covers dates only. OpenDocument distinguishes two groups - time of a day (time) and everything else (date). To simplify things a little we return cell values containg time of day as Time object and cell values containg datetime of date as DateTime. I am aware that this is very arbitrary choice, but it is very practical. This way and to some extend the types of values from OpenDocument are preserved when read from files, beeing acted upon and written back to spreadshhet.
 
+### Merged cells 
+Even when a cell spans more rows and collumns, you must access by coordinates of its topleft corner. In fact, the "hidden" cells under are still there and their content is usually preserved.
+
 
 ## Examples
 

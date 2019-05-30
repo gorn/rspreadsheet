@@ -351,4 +351,17 @@ describe Rspreadsheet::Cell do
     inscell = @sheet1.insert_cell_before(2,4) # should not move cells with data
     @sheet1.C2.should == 'test' 
   end
+  it 'Does not ignore rows repeated on every page = header rows (issue 43)' do
+    sheet = Rspreadsheet.new('testfile-issue-42-42.ods').sheet(1)
+    sheet.A1.should == 'Schedule'
+    sheet.B2.should == 'Course'
+    sheet.A3.should == 'Teacher'
+  end
+  it 'Does not ignore cells covered by other merged cells (issue 42)' do
+    sheet = Rspreadsheet.new('testfile-issue-42-42.ods').sheet(1)
+    sheet.C4.should == 'week2'
+    sheet.C5.should == 'week3'
+    sheet.C6.should == 'week4'
+    sheet.C9.should == 'week7'        
+  end
 end
