@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'pry'
 
 describe Rspreadsheet::Cell do
   before do 
@@ -240,6 +239,7 @@ describe Rspreadsheet::Cell do
     dyear = 1899; dmonth = 12; dday = 30
     Rspreadsheet::Cell.parse_time_value('PT923451H33M00S').should == Time.new(2005,5,5,3,33,00,0)
     Rspreadsheet::Cell.parse_time_value('PT1H33M00S').should == Time.new(dyear,dmonth,dday,1,33,00,0)
+    Rspreadsheet::Cell.parse_time_value('11:50').should == Time.parse('11:50')
   end
   it 'handles time of day correctly on assignement' do
     @sheet1.A11 = Rspreadsheet::Tools.new_time_value(2,13,27)
