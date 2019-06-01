@@ -1,4 +1,6 @@
 require 'spec_helper'
+using ClassExtensions
+
 
 if RUBY_VERSION > '2.1'
   # testing ClassExtensionsForSpec
@@ -19,13 +21,24 @@ if RUBY_VERSION > '2.1'
       @m << LibXML::XML::Node.new_text('textnode')
       
       @m2 = LibXML::XML::Node.new('a')
+
+      @m3 = LibXML::XML::Node.new('a')
+      @m3 << LibXML::XML::Node.new('i','italic')
+       c = LibXML::XML::Node.new('p','paragraph')
+       c << LibXML::XML::Node.new('b','boldtext-another')
+      @m3 << c
+      @m3 << LibXML::XML::Node.new_text('textnode-other')
     end
     it 'can compare nodes' do
       @n.to_s.should be == @m.to_s
       @n.to_s.should_not == @m2.to_s
+      @n.should be == @m
+      @n.should_not == @m2
     end
-    it 'has correct elements' do
-  #     raise @n.first_diff(@m).inspect
+    it 'has correct text' do
+      @n.first_diff(@m).should == nil
+      @n.first_diff(nil).inspect.should_not == nil
+      @n.first_diff(@m3).inspect.should include 'boldtext-another'
     end
   end
 

@@ -31,15 +31,15 @@ if RUBY_VERSION > '2.1'
           return "#{where}> Attribute #{attr} have diffent values: #{attr.value} != #{node2.attributes[attr.name]}" unless node2.attributes[attr.name] == attr.value
         end
 
-        elems1 = self.elements
-        elems2 = node2.elements
-        return "#{where}> elements have different number of subelements #{elems1.length} !=  #{elems2.length}" if (elems1.length != elems2.length)
+        elems1 = self.children
+        elems2 = node2.children
+        return "#{where}> elements have different number of children #{elems1.length} !=  #{elems2.length}" if (elems1.length != elems2.length)
         
         elems1.each_index do |i|
           raise "Nil for i=#{i}" if elems1[i].nil?
           if (elems1[i].node_type_name == 'text') 
             if elems2[i].nil? || (elems1[i].to_s) != (elems2[i].to_s)
-              return  "#{where}> #{i+1}th text subelements are different: #{elems1[i].to_s} != #{elems2[i].to_s}"
+              return  "#{where}> #{i+1}th text children are different: #{elems1[i].to_s} != #{elems2[i].to_s}"
             end
           elsif (elems1[i].node_type_name == 'element') 
             unless elems1[i].simplification_of?(elems2[i])
