@@ -37,7 +37,8 @@ end
 #     * subnode_options[:node_namespace] - namespace of relevant subitems (defaults to table)
 #     * subnode_options[:repeated_attribute] - attribute of elements which tell how many 
 #       times this is repeated (this is only used in XMLTiedArray_WithRepeatableItems)
-#     * subnode_options[:ignore_groupings] - soe su
+#     * subnode_options[:ignore_groupings] - some subnodes can rather be groups of subnodes, these
+#       groups need to be expanded and nodes put out of them 
 #   * intilize must call initialize_xml_tied_array
 #
 #== Notes for developers
@@ -175,12 +176,24 @@ module XMLTiedArray
   # @!group finding and accessing subnodes
   # array containing subnodes of xmlnode which represent subitems
   def xmlsubnodes
-    axmlnode = self.xmlnode    
+    axmlnode = self.xmlnode
     return [] if axmlnode.nil?
     node_name = subnode_options[:node_name]
     alt_node_names = subnode_options[:alt_node_names] || []
+    ignore_groupings = subnode_options[:ignore_groupings] || []
 
-    axmlnode.children.select do |node|
+    result = []
+    axmlnode.children.each do |node|
+      if ignore_groupings.include?(node.andand.name)
+        node.children.each do |subnode|
+          result << subnode
+        end
+      else
+        result << node
+      end
+    end
+
+    result.select do |node|
       node.element? &&                        # nejde o textový node 
       ( (node_name == node.andand.name) ||    # a jde o node s pořadovaným názvem
         alt_node_names.include?(node.andand.name) )  # nebo s alternativním přípustným názvem
@@ -190,3 +203,18 @@ module XMLTiedArray
 end
 
 end 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

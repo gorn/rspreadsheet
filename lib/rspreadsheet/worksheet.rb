@@ -10,7 +10,12 @@ module Rspreadsheet
 class Worksheet
   include XMLTiedArray_WithRepeatableItems
   attr_accessor :xmlnode
-  def subnode_options; {:node_name => 'table-row', :repeated_attribute => 'number-rows-repeated'} end
+  # @!group XMLTiedArray related methods
+  def subnode_options; {
+    :node_name => 'table-row', 
+    :ignore_groupings => ['table-header-rows'], 
+    :repeated_attribute => 'number-rows-repeated'
+  } end
 
   def initialize(xmlnode_or_sheet_name,workbook) # workbook is here ONLY because of inserting images - to find unique name - it would be much better if it should bot be there
     initialize_xml_tied_array

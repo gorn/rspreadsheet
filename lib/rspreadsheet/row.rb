@@ -25,6 +25,14 @@ module Rspreadsheet
 
 class Row < XMLTiedItem
   include XMLTiedArray_WithRepeatableItems
+  # @!group XMLTiedArray_WithRepeatableItems related methods
+  def subnode_options; {
+    :node_name => 'table-cell', 
+    :alt_node_names => ['covered-table-cell'], 
+    :repeated_attribute => 'number-columns-repeated'
+  } end
+  def prepare_subitem(coli); Cell.new(worksheet,rowi,coli) end
+  
   ## @return [Worksheet] worksheet which contains the row
   # @!attribute [r] worksheet
   def worksheet; parent end
@@ -118,15 +126,6 @@ class Row < XMLTiedItem
     @itemcache.each_value{ |cell| cell.set_rowi(rowi) }
   end
   
-  # @!group XMLTiedArray_WithRepeatableItems related methods
-  def subnode_options; {
-    :node_name => 'table-cell', 
-    :alt_node_names => ['covered-table-cell'], 
-    :ignore_groupings => ['table-header-rows'], 
-    :repeated_attribute => 'number-columns-repeated'
-  } end
-  def prepare_subitem(coli); Cell.new(worksheet,rowi,coli) end
-
 end
 
 end
