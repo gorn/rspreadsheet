@@ -14,7 +14,7 @@ if RUBY_VERSION > '2.1'
     
     refine LibXML::XML::Node do
       def equals?(node2); raise 'nic' end
-      def ==(node2)  
+      def ===(node2)  
         self.simplification_of?(node2) and node2.simplification_of?(self)
       end
       # if node2 contains at least all that I do
