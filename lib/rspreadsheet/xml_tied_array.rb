@@ -1,4 +1,5 @@
 require 'helpers/class_extensions'
+require 'pry'
 
 module Rspreadsheet
 
@@ -29,20 +30,30 @@ end
 #               of course util you want to insert something. If this may happens, importer must
 #               provide method prepare_empty_xmlnode which prepares (and returns) empty xml node.
 #               It is lazy called, as late as possible.
-#   * subitem_xml_options - returns hash of options used to locate subitems in xml (TODO: rewrite in clear way)
+#   * subnode_options - returns hash of options used to locate subitems in xml with these values
+#     * subnode_options[:node_name] - how the relevant subitems are named (string)
+#     * subnode_options[:alt_node_names] - array of strings of alternative names to :node_name
+#       these are recognized in searching, but never created when creating new node.
+#     * subnode_options[:node_namespace] - namespace of relevant subitems (defaults to table)
+#     * subnode_options[:repeated_attribute] - attribute of elements which tell how many 
+#       times this is repeated (this is only used in XMLTiedArray_WithRepeatableItems)
+#     * subnode_options[:ignore_groupings] - some subnodes can rather be groups of subnodes, these
+#       groups need to be expanded and nodes put out of them 
 #   * intilize must call initialize_xml_tied_array
 #
-# Terminology
-#   * item, subitem is object from @itemcache (quite often subclass of XMLTiedItem)
-#   * node, subnode is LibXML::XML::Node object
-#
-# this class is made to be included.
-#
-# Note for developers:
-# Beware that the implementation of methods needs to be done in a way that it continues to
-# work when items are "repeatable" - see XMLTiedArray_WithRepeatableItems. When impractical or impossible
-# please implement the corresponding method in XMLTiedArray_WithRepeatableItems or at least override it there
-# and make it raise exception.
+#== Notes for developers
+# 
+#   * This class is made to be included.
+#   * Terminology
+#     * item, subitem is object from @itemcache (quite often subclass of XMLTiedItem)
+#     * node, subnode is LibXML::XML::Node object
+#   * usual flow is that when user asks for an item the proxy item object is created (prepare_item) which
+#     only contains index etx, but no values. When the values are needed, it asks its parent to get the xmlnode, it first 
+#     uses xmlsubnodes method to get all sumbodes and then by respecting the repeating finds apropriate node.
+#   * Beware that the implementation of methods needs to be done in a way that it continues to
+#     work when items are "repeatable" - see XMLTiedArray_WithRepeatableItems. When impractical or impossible
+#     please implement the corresponding method in XMLTiedArray_WithRepeatableItems or at least override it there
+#     and make it raise exception.
 # 
 # @private
 module XMLTiedArray
@@ -122,7 +133,7 @@ module XMLTiedArray
   # returns xmlnode with index
   # DOES not respect repeated_attribute
   def my_subnode(aindex)
-    raise 'Using method which does not respect repeated_attribute with options that are using it. You probably donot want to do that.' unless subitem_xml_options[:xml_repeated_attribute].nil?
+    raise 'Using method which does not respect repeated_attribute with options that are using it. You probably donot want to do that.' unless subnode_options[:repeated_attribute].nil?
     return xmlsubnodes[aindex-1]
   end
 
@@ -150,8 +161,8 @@ module XMLTiedArray
  
   def prepare_empty_subnode
     Tools.prepare_ns_node(
-      subitem_xml_options[:xml_items_node_namespace] || 'table',
-      subitem_xml_options[:xml_items_node_name]
+      subnode_options[:node_namespace] || 'table',
+      subnode_options[:node_name]
     )
   end
   
@@ -165,16 +176,45 @@ module XMLTiedArray
   # @!group finding and accessing subnodes
   # array containing subnodes of xmlnode which represent subitems
   def xmlsubnodes
-    return [] if xmlnode.nil?
-    ele = xmlnode.elements
-    return [] if ele.empty?
-    so = subitem_xml_options[:xml_items_node_name]
-    
-    ele.select do |node| 
-      node.andand.name == so
+    axmlnode = self.xmlnode
+    return [] if axmlnode.nil?
+    node_name = subnode_options[:node_name]
+    alt_node_names = subnode_options[:alt_node_names] || []
+    ignore_groupings = subnode_options[:ignore_groupings] || []
+
+    result = []
+    axmlnode.children.each do |node|
+      if ignore_groupings.include?(node.andand.name)
+        node.children.each do |subnode|
+          result << subnode
+        end
+      else
+        result << node
+      end
+    end
+
+    result.select do |node|
+      node.element? &&                        # nejde o textový node 
+      ( (node_name == node.andand.name) ||    # a jde o node s pořadovaným názvem
+        alt_node_names.include?(node.andand.name) )  # nebo s alternativním přípustným názvem
     end
   end
     
 end
 
 end 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

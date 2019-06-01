@@ -33,8 +33,7 @@ class Cell < XMLTiedItem
   attr_reader :rowi
   
   # @!group XMLTiedItem related methods and extensions  
-  def xml_options; {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'} end
-  def parent; row end
+  def parent; row end #TODO: otazka zda je treba definovat zde, mozna uz je to v XMLTiedItem osefovano
   def coli; index end
     
   def set_rowi(arowi); @rowi = arowi end # this should ONLY be used by parent row
@@ -65,7 +64,8 @@ class Cell < XMLTiedItem
   end
   def value
     gt = guess_cell_type
-    if (self.mode == :regular) or (self.mode == :repeated)
+    amode = self.mode 
+    if (amode == :regular) or (amode == :repeated)
       case 
         when gt == nil then nil
         when gt == Float then xmlnode.attributes['value'].to_f
@@ -75,10 +75,10 @@ class Cell < XMLTiedItem
         when gt == :percentage then xmlnode.attributes['value'].to_f
         when gt == :currency then xmlnode.attributes['value'].to_d
       end
-    elsif self.mode == :outbound
+    elsif amode == :outbound
       nil
     else
-      raise "Unknown cell mode #{self.mode}"
+      raise "Unknown cell mode #{amode}"
     end
   end
   

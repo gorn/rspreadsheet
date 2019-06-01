@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'pry'
 
 describe Rspreadsheet::Cell do
   before do 
@@ -350,5 +351,20 @@ describe Rspreadsheet::Cell do
     @sheet1.C2.should == 'test'
     inscell = @sheet1.insert_cell_before(2,4) # should not move cells with data
     @sheet1.C2.should == 'test' 
+  end
+
+  it 'Does not ignore cells covered by other merged cells (issue 42)' do
+    sheet = Rspreadsheet.new('./spec/testfile-issue-42-43.ods').sheet(1)
+    sheet.C1.should == 'week1'
+    sheet.C2.should == 'week2'
+    sheet.C3.should == 'week3'
+    sheet.C4.should == 'week4'
+    sheet.C7.should == 'week7'        
+  end
+  it 'Does not ignore rows repeated on every page = header rows (issue 43)' do
+    sheet = Rspreadsheet.new('./spec/testfile-issue-42-43.ods').sheet(2)
+    sheet.A1.should == 'Schedule'
+    sheet.B2.should == 'Course'
+    sheet.A3.should == 'Teacher'
   end
 end

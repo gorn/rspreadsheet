@@ -10,7 +10,12 @@ module Rspreadsheet
 class Worksheet
   include XMLTiedArray_WithRepeatableItems
   attr_accessor :xmlnode
-  def subitem_xml_options; {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'} end
+  # @!group XMLTiedArray related methods
+  def subnode_options; {
+    :node_name => 'table-row', 
+    :ignore_groupings => ['table-header-rows'], 
+    :repeated_attribute => 'number-rows-repeated'
+  } end
 
   def initialize(xmlnode_or_sheet_name,workbook) # workbook is here ONLY because of inserting images - to find unique name - it would be much better if it should bot be there
     initialize_xml_tied_array
@@ -105,7 +110,8 @@ class Worksheet
       when 0 then raise 'Not implemented yet' #TODO: return list of all cells
       when 1..2
         r,c = Rspreadsheet::Tools.a2c(*params)
-        row(r).andand.cell(c)
+        arow = row(r)
+        arow.andand.cell(c)
       else raise ArgumentError.new('Wrong number of arguments.')
     end
   end

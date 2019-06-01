@@ -14,8 +14,6 @@ using ClassExtensions if RUBY_VERSION > '2.1'
 #      more so subitem can implement parent and index methods.
 
 # @private
-# abstract class. All successors have some options. MUST implement: 
-#   * xml_options
 #
 # If you override intializer make sure you call initialize_xml_tied_item(aparent,aindex).
 # 
@@ -42,9 +40,7 @@ class XMLTiedItem < XMLTied
   def set_index(aindex); @xml_tied_item_index=aindex end
   def index=(aindex); @xml_tied_item_index=aindex end
   
-  # `xml_options[:xml_items_node_name]` gives the name of the tag representing cell
-  # `xml_options[:number-columns-repeated]` gives the name of the previous tag which sais how many times the item is repeated
-  def xml_options; abstract end
+  def name_of_repeated_attribute; parent.subnode_options[:repeated_attribute] end
     
   def initialize_xml_tied_item(aparent,aindex)
     @xml_tied_parent = aparent unless aparent.nil?
@@ -58,7 +54,7 @@ class XMLTiedItem < XMLTied
      else :regular
    end
   end
-  def repeated; (Tools.get_ns_attribute_value(xmlnode, 'table', xml_options[:xml_repeated_attribute]) || 1 ).to_i end
+  def repeated; (Tools.get_ns_attribute_value(xmlnode, 'table', name_of_repeated_attribute) || 1 ).to_i end
   def repeated?; mode==:repeated || mode==:outbound end
   alias :is_repeated? :repeated?
   def xmlnode

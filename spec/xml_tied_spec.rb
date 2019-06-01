@@ -19,7 +19,7 @@ describe Rspreadsheet::XMLTiedArray do
   
   it 'raises when prepare_empty_xmlnode fails in insert_new_empty_subnode_before' do
     class TestXMLTiedArray 
-      def subitem_xml_options; {} end
+      def subnode_options; {} end
       def xmlnode; nil end
     end
     
