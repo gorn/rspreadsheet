@@ -107,6 +107,10 @@ else # Monkeypatching
       each_element { |e| result << e }
       return result
     end
+    # TODO: posoudit jestli by to nebylo rychlejsi takto
+#     def elements
+#       children.select { |e| e.element? }
+#     end
   end
 
 end

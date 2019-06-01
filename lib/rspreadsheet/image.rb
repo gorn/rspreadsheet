@@ -17,7 +17,7 @@ class WorksheetImages
   end
   
   # @!group XMLTiedArray_WithRepeatableItems related methods    
-  def subitem_xml_options; {:xml_items_node_name => 'frame', :xml_items_node_namespace => 'draw'} end
+  def subitem_xml_options; {:node_name => 'frame', :node_namespace => 'draw'} end
   def prepare_subitem(index); Image.new(self,index) end
   def xmlnode; @worksheet.xmlnode.find('./table:shapes').first end
   def prepare_empty_xmlnode
@@ -106,7 +106,7 @@ class Image < XMLTiedItem
   end    
     
   # @!group XMLTiedItem related methods
-  def xml_options; {:xml_items_node_name => 'frame'} end
+  def xml_options; {:node_name => 'frame'} end
 
 #    
 # Note: when creating new empty image we might have included xlink:type attribute but specification

@@ -120,10 +120,15 @@ class Row < XMLTiedItem
   
  private
   # @!group XMLTiedArray_WithRepeatableItems related methods
-  def subitem_xml_options; {:xml_items_node_name => 'table-cell', :xml_repeated_attribute => 'number-columns-repeated'} end
+  def subitem_xml_options; {
+    :node_name => 'table-cell', 
+    :alt_node_names => ['covered-table-cell'], 
+    :ignore_groupings => ['table-header-rows'], 
+    :repeated_attribute => 'number-columns-repeated'
+  } end
   def prepare_subitem(coli); Cell.new(worksheet,rowi,coli) end
   # @!group XMLTiedItem related methods and extensions
-  def xml_options; {:xml_items_node_name => 'table-row', :xml_repeated_attribute => 'number-rows-repeated'} end
+  def xml_options; {:node_name => 'table-row', :repeated_attribute => 'number-rows-repeated'} end
 
 end
 

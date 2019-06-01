@@ -31,8 +31,9 @@ module XMLTiedArray_WithRepeatableItems
   def find_subnode_with_range(aindex)
     options = subitem_xml_options
     rightindex = 0
-    xmlsubnodes.each do |node|
-      repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
+    xmlsub = self.xmlsubnodes
+    xmlsub.each do |node|
+      repeated = (node.attributes[options[:repeated_attribute]] || 1).to_i
       leftindex = rightindex + 1 
       rightindex = rightindex+repeated
       if rightindex>= aindex
@@ -69,13 +70,13 @@ module XMLTiedArray_WithRepeatableItems
   
   def prepare_repeated_subnode(times_repeated,options)
     result = prepare_empty_subnode
-    Tools.set_ns_attribute(result,'table',options[:xml_repeated_attribute],times_repeated, 1)
+    Tools.set_ns_attribute(result,'table',options[:repeated_attribute],times_repeated, 1)
     result
   end
   
   def clone_before_and_set_repeated_attribute(node,times_repeated,options)
     newnode = node.copy(true)
-    Tools.set_ns_attribute(newnode,'table',options[:xml_repeated_attribute],times_repeated,1)
+    Tools.set_ns_attribute(newnode,'table',options[:repeated_attribute],times_repeated,1)
     node.prev = newnode
   end
   
@@ -105,7 +106,7 @@ module XMLTiedArray_WithRepeatableItems
   end
   
   def how_many_times_node_is_repeated(node)   # adding respect to repeated nodes
-    (node.attributes[subitem_xml_options[:xml_repeated_attribute]] || 1).to_i
+    (node.attributes[subitem_xml_options[:repeated_attribute]] || 1).to_i
   end
   
   
@@ -132,8 +133,8 @@ module XMLTiedArray_WithRepeatableItems
   def find_nonempty_subnode_indexes(axmlnode, options)
     index = 0
     result = []
-    axmlnode.elements.select{|node| node.name == options[:xml_items_node_name]}.each do |node|
-      repeated = (node.attributes[options[:xml_repeated_attribute]] || 1).to_i
+    axmlnode.elements.select{|node| node.name == options[:node_name]}.each do |node|
+      repeated = (node.attributes[options[:repeated_attribute]] || 1).to_i
       index = index + repeated
       if !(node.content.nil? or node.content.empty? or node.content =='') and (repeated==1)
         result << index

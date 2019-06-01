@@ -42,7 +42,7 @@ class XMLTiedItem < XMLTied
   def set_index(aindex); @xml_tied_item_index=aindex end
   def index=(aindex); @xml_tied_item_index=aindex end
   
-  # `xml_options[:xml_items_node_name]` gives the name of the tag representing cell
+  # `xml_options[:node_name]` gives the name of the tag representing cell
   # `xml_options[:number-columns-repeated]` gives the name of the previous tag which sais how many times the item is repeated
   def xml_options; abstract end
     
@@ -58,7 +58,7 @@ class XMLTiedItem < XMLTied
      else :regular
    end
   end
-  def repeated; (Tools.get_ns_attribute_value(xmlnode, 'table', xml_options[:xml_repeated_attribute]) || 1 ).to_i end
+  def repeated; (Tools.get_ns_attribute_value(xmlnode, 'table', xml_options[:repeated_attribute]) || 1 ).to_i end
   def repeated?; mode==:repeated || mode==:outbound end
   alias :is_repeated? :repeated?
   def xmlnode
