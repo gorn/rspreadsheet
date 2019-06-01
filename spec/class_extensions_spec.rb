@@ -1,9 +1,9 @@
 require 'spec_helper'
-using ClassExtensions
 
 
 if RUBY_VERSION > '2.1'
   # testing ClassExtensionsForSpec
+  using ClassExtensions
   describe LibXML::XML::Node do
     before do 
       @n = LibXML::XML::Node.new('a')
