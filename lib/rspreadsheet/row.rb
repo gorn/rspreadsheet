@@ -118,7 +118,6 @@ class Row < XMLTiedItem
     @itemcache.each_value{ |cell| cell.set_rowi(rowi) }
   end
   
- private
   # @!group XMLTiedArray_WithRepeatableItems related methods
   def subnode_options; {
     :node_name => 'table-cell', 
@@ -127,8 +126,6 @@ class Row < XMLTiedItem
     :repeated_attribute => 'number-columns-repeated'
   } end
   def prepare_subitem(coli); Cell.new(worksheet,rowi,coli) end
-  # @!group XMLTiedItem related methods and extensions
-  def xml_options; {:node_name => 'table-row', :repeated_attribute => 'number-rows-repeated'} end
 
 end
 

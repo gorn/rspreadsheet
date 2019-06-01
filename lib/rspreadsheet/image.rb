@@ -105,9 +105,6 @@ class Image < XMLTiedItem
     Tools.set_ns_attribute(xml_image_subnode,'xlink','href', value ) 
   end    
     
-  # @!group XMLTiedItem related methods
-  def xml_options; {:node_name => 'frame'} end
-
 #    
 # Note: when creating new empty image we might have included xlink:type attribute but specification
 # says it has default value simple [1] so we omit it. The same goes for 

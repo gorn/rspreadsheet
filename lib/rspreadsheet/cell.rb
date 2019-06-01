@@ -33,8 +33,7 @@ class Cell < XMLTiedItem
   attr_reader :rowi
   
   # @!group XMLTiedItem related methods and extensions  
-  def xml_options; {:node_name => 'table-cell', :repeated_attribute => 'number-columns-repeated'} end
-  def parent; row end
+  def parent; row end #TODO: otazka zda je treba definovat zde, mozna uz je to v XMLTiedItem osefovano
   def coli; index end
     
   def set_rowi(arowi); @rowi = arowi end # this should ONLY be used by parent row
