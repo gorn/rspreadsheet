@@ -32,8 +32,8 @@ if RUBY_VERSION > '2.1'
     it 'can compare nodes' do
       @n.to_s.should == @m.to_s
       @n.to_s.should_not == @m2.to_s
-      @n.should === @m
-      @n.should_not === @m2
+      (@n === @m).should == true
+      (@n === @m2).should_not == true
     end
     it 'has correct text' do
       @n.first_diff(@m).should == nil
