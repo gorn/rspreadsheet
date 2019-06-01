@@ -63,15 +63,7 @@ Or install it yourself as:
 
     $ gem install rspreadsheet
 
-If you get this error concering libxml, like
-
-    checking for libxml/xmlversion.h in /opt/include/libxml2,/opt/local/include/libxml2,/usr/local/include/libxml2,/usr/include/libxml2... no
-    *** extconf.rb failed ***
-or 
-
-    mkmf.rb can't find header files for ruby at /usr/lib/ruby/include/ruby.h 
-        
-then you might not have installed libxml for ruby. I.e. in debian something like <code>sudo aptitude install ruby-libxml</code> or using equivalent command in other package managers.
+If you get any error, have a look at [troubleshooting](TROUBLESHOOTING.md)
 
 ## Contibutions, ideas and wishes welcomed
 
