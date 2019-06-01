@@ -93,7 +93,7 @@ class Row < XMLTiedItem
     if myxmlnode.nil?
       []
     else
-      worksheet.find_nonempty_subnode_indexes(myxmlnode, subitem_xml_options)
+      worksheet.find_nonempty_subnode_indexes(myxmlnode, subnode_options)
     end
   end
   alias :used_range :range
@@ -120,7 +120,7 @@ class Row < XMLTiedItem
   
  private
   # @!group XMLTiedArray_WithRepeatableItems related methods
-  def subitem_xml_options; {
+  def subnode_options; {
     :node_name => 'table-cell', 
     :alt_node_names => ['covered-table-cell'], 
     :ignore_groupings => ['table-header-rows'], 

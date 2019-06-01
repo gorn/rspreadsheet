@@ -30,13 +30,14 @@ end
 #               of course util you want to insert something. If this may happens, importer must
 #               provide method prepare_empty_xmlnode which prepares (and returns) empty xml node.
 #               It is lazy called, as late as possible.
-#   * subitem_xml_options - returns hash of options used to locate subitems in xml with these values
-#     * subitem_xml_options[:node_name] - how the relevant subitems are named (string)
-#     * subitem_xml_options[:alt_node_names] - array of strings of alternative names to :node_name
+#   * subnode_options - returns hash of options used to locate subitems in xml with these values
+#     * subnode_options[:node_name] - how the relevant subitems are named (string)
+#     * subnode_options[:alt_node_names] - array of strings of alternative names to :node_name
 #       these are recognized in searching, but never created when creating new node.
-#     * subitem_xml_options[:node_namespace] - namespace of relevant subitems (defaults to table)
-#     * subitem_xml_options[:repeated_attribute] - attribute of elements which tell how many 
+#     * subnode_options[:node_namespace] - namespace of relevant subitems (defaults to table)
+#     * subnode_options[:repeated_attribute] - attribute of elements which tell how many 
 #       times this is repeated (this is only used in XMLTiedArray_WithRepeatableItems)
+#     * subnode_options[:ignore_groupings] - soe su
 #   * intilize must call initialize_xml_tied_array
 #
 #== Notes for developers
@@ -131,7 +132,7 @@ module XMLTiedArray
   # returns xmlnode with index
   # DOES not respect repeated_attribute
   def my_subnode(aindex)
-    raise 'Using method which does not respect repeated_attribute with options that are using it. You probably donot want to do that.' unless subitem_xml_options[:repeated_attribute].nil?
+    raise 'Using method which does not respect repeated_attribute with options that are using it. You probably donot want to do that.' unless subnode_options[:repeated_attribute].nil?
     return xmlsubnodes[aindex-1]
   end
 
@@ -159,8 +160,8 @@ module XMLTiedArray
  
   def prepare_empty_subnode
     Tools.prepare_ns_node(
-      subitem_xml_options[:node_namespace] || 'table',
-      subitem_xml_options[:node_name]
+      subnode_options[:node_namespace] || 'table',
+      subnode_options[:node_name]
     )
   end
   
@@ -176,8 +177,8 @@ module XMLTiedArray
   def xmlsubnodes
     axmlnode = self.xmlnode    
     return [] if axmlnode.nil?
-    node_name = subitem_xml_options[:node_name]
-    alt_node_names = subitem_xml_options[:alt_node_names] || []
+    node_name = subnode_options[:node_name]
+    alt_node_names = subnode_options[:alt_node_names] || []
 
     axmlnode.children.select do |node|
       node.element? &&                        # nejde o textový node 

@@ -17,7 +17,7 @@ class WorksheetImages
   end
   
   # @!group XMLTiedArray_WithRepeatableItems related methods    
-  def subitem_xml_options; {:node_name => 'frame', :node_namespace => 'draw'} end
+  def subnode_options; {:node_name => 'frame', :node_namespace => 'draw'} end
   def prepare_subitem(index); Image.new(self,index) end
   def xmlnode; @worksheet.xmlnode.find('./table:shapes').first end
   def prepare_empty_xmlnode

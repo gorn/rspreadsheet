@@ -29,7 +29,7 @@ module XMLTiedArray_WithRepeatableItems
   end
 
   def find_subnode_with_range(aindex)
-    options = subitem_xml_options
+    options = subnode_options
     rightindex = 0
     xmlsub = self.xmlsubnodes
     xmlsub.each do |node|
@@ -51,7 +51,7 @@ module XMLTiedArray_WithRepeatableItems
   
   def insert_new_empty_subnode_before_respect_repeatable(aindex)
     axmlnode = xmlnode
-    options = subitem_xml_options
+    options = subnode_options
     node,index_range = find_subnode_with_range(aindex)
     
     if !node.nil? # found the node, now do the insert
@@ -83,7 +83,7 @@ module XMLTiedArray_WithRepeatableItems
   # detaches subnode with aindex  
   def detach_my_subnode_respect_repeated(aindex)
     axmlnode = xmlnode
-    options = subitem_xml_options
+    options = subnode_options
     node,index_range = find_subnode_with_range(aindex)
     if index_range.size > 1 # pokud potřebuje vůbec detachovat
       if !node.nil? # detach subnode
@@ -106,14 +106,14 @@ module XMLTiedArray_WithRepeatableItems
   end
   
   def how_many_times_node_is_repeated(node)   # adding respect to repeated nodes
-    (node.attributes[subitem_xml_options[:repeated_attribute]] || 1).to_i
+    (node.attributes[subnode_options[:repeated_attribute]] || 1).to_i
   end
   
   
   # clean up item from xml (handle possible detachments) and itemcache. leave the object invalidation on the object
   # this should not be called from nowhere but XMLTiedItem.delete
   def delete_subitem(aindex)
-#     options = subitem_xml_options
+#     options = subnode_options
     delete_my_subnode_respect_repeated(aindex)  # vymaž node z xml
     @itemcache.delete(aindex)
     @itemcache.keys.sort.select{|i| i>=aindex+1 }.each do |i| 

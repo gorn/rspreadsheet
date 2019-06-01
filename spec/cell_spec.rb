@@ -352,11 +352,6 @@ describe Rspreadsheet::Cell do
     inscell = @sheet1.insert_cell_before(2,4) # should not move cells with data
     @sheet1.C2.should == 'test' 
   end
-  it 'NEWTEST' do
-    sheet = Rspreadsheet.new('./spec/testfile3.ods').sheet(1)
-    sheet.A1.should == 'A1t'
-    sheet.row(4).cell(1).value.should == 'A4t'
-  end
 
   it 'Does not ignore cells covered by other merged cells (issue 42)' do
     sheet = Rspreadsheet.new('./spec/testfile-issue-42-43.ods').sheet(1)
