@@ -162,7 +162,8 @@ module Tools
     end
   end
   def self.remove_ns_attribute(node,ns_prefix,key)
-    node.attributes.get_attribute_ns(Tools.get_namespace(ns_prefix).href,key)
+    ns = Tools.get_namespace(ns_prefix)
+    attr = node.attributes.get_attribute_ns(ns.href, key)
     attr.remove! unless attr.nil? 
   end
   def self.prepare_ns_node(ns_prefix,nodename,value=nil)
@@ -175,7 +176,6 @@ module Tools
       node << subnode
     end
   end
-  
   
   def self.get_unused_filename(zip,prefix, extension)
     (1000..9999).each do |ndx|

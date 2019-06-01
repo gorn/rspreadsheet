@@ -367,4 +367,9 @@ describe Rspreadsheet::Cell do
     sheet.B2.should == 'Course'
     sheet.A3.should == 'Teacher'
   end
+  it 'responds by exception to unusual cases' do
+    cell = @sheet1.cell('A1')
+    cell.define_singleton_method(:mode) { :intenionally_unusual_mode_just_for_test }
+    expect { cell.value }.to raise_error(/Unknown cell mode/)
+  end
 end

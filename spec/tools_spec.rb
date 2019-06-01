@@ -13,6 +13,8 @@ describe Rspreadsheet::Tools do
     @tools.convert_cell_address_to_coordinates('Zz1').should == [1,702]
     @tools.a2c('AdA2').should == [2,781]
     @tools.a2c('ADA','2').should == [2,781]
+    @tools.a2c('G','11').should == [11,7]
+    @tools.a2c(11, 'G').should == [11,7]
   end
   it 'converts correctly cell coordinates to adresses' do
     @tools.convert_cell_coordinates_to_address([1,1]).should == 'A1'
@@ -34,6 +36,9 @@ describe Rspreadsheet::Tools do
     expect{ @tools.a2c('A1A') }.to raise_error
     expect{ @tools.a2c('1A11') }.to raise_error
     expect{ @tools.a2c('1A11') }.to raise_error
+    expect{ @tools.a2c('F','G') }.to raise_error
+    expect{ @tools.a2c(5,'G1') }.to raise_error
+    expect{ @tools.a2c('G1',5) }.to raise_error
   end
   it 'converts correctly cell adresses given by components to coordinates' do
     @tools.a2c('A','1').should eq [1,1]
@@ -45,5 +50,13 @@ describe Rspreadsheet::Tools do
     @tools.a2c('3','17').should eq [3,17]
     @tools.a2c(21,'11.0').should eq [21,11]
     @tools.a2c('23',22/2).should eq [23,11]
+  end
+  it 'can remove attributes from nodes' do
+    node = LibXML::XML::Node.new('a')
+    @tools.set_ns_attribute(node,'table','ref','123')
+    @tools.get_ns_attribute_value(node,'table','ref').should == '123'
+    @tools.remove_ns_attribute(node,'table','ref')
+    @tools.get_ns_attribute_value(node,'table','ref').should == nil
+    @tools.get_ns_attribute_value(node,'table','ref','nic').should == 'nic'    
   end
 end
