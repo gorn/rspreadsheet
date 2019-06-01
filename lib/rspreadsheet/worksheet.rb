@@ -35,10 +35,6 @@ class Worksheet
   def name; Tools.get_ns_attribute_value(@xmlnode,'table','name') end
   def name=(value); Tools.set_ns_attribute(@xmlnode,'table','name', value) end
   
-  def rowxmlnode(rowi)
-    my_subnode(rowi)
-  end
-    
   def first_unused_row_index
     first_unused_subitem_index
   end

@@ -64,6 +64,7 @@ describe Rspreadsheet::Worksheet do
       @sheet.cells('B2').value.should == 'test text'
       @sheet.cells('B','2').value.should == 'test text'
       @sheet.cells(2,'B').value.should == 'test text'
+      expect { @sheet.cells(2,'B',2) }.to raise_error
     end
     it 'makes Cell object accessible' do
       @sheet.cells(1,1).value = 'test text'
@@ -100,6 +101,19 @@ describe Rspreadsheet::Worksheet do
       Rspreadsheet.raise_on_negative_coordinates = false
       @sheet.rows(-1).should == nil                      # return nil if configured to do so
       Rspreadsheet.raise_on_negative_coordinates = pom   # reset the setting back
+    end
+    it 'needs string or XMLNode on creation' do
+      expect { Rspreadsheet::Worksheet.new(1.2345) }.to raise_error
+    end
+    it 'returns correct number of rows' do
+      @sheet.first_unused_row_index.should == 1
+      @sheet[5,7] = 'text into cell'
+      @sheet.first_unused_row_index.should == 6
+      @sheet[995,7] = 'text into cell'
+      @sheet.first_unused_row_index.should == 996
+    end
+    it 'does not implement the "return all cells" function yet' do
+      expect { @sheet.cell }.to raise_error
     end
   end
 end
