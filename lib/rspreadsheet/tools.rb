@@ -188,6 +188,18 @@ module Tools
   def self.new_time_value(h,m,s)
     Time.new(StartOfEpoch.year,StartOfEpoch.month,StartOfEpoch.day,h,m,s)
   end
+  
+  def self.output_to_stream(io,&block)
+    if io.kind_of? File or io.kind_of? String
+      Zip::File.open(io, 'br+') do |zip|
+        yield zip
+      end
+    elsif io.kind_of? StringIO # or io.kind_of? IO
+      Zip::OutputStream.write_buffer(io) do |zip|
+        yield zip
+      end
+    end
+  end
  
 end
   

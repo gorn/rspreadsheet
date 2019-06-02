@@ -70,38 +70,56 @@ class Workbook
     case
       when @filename.nil? && io.nil?
         raise 'New file should be named on first save.'
-      when @filename.nil? && (io.kind_of?(String) || io.kind_of?(File) || io.kind_of?(IO) || io.kind_of?(StringIO))
-        Zip::File.open(TEMPLATE_FILE_NAME) do |empty_template_zip|                       # open empty_template file
-          write_zip_to(io) do |output_zip|                                               # open output stream of file
-            copy_internally_without_content(empty_template_zip,output_zip)  # copy empty_template internals
-            update_manifest_and_content_xml(empty_template_zip,output_zip)               # update xmls + pictures
-          end
-        end
       when @filename.kind_of?(String) && io.nil?
-        write_zip_to(@filename) do |input_and_output_zip|                            # open old file
+        Tools.output_to_stream(@filename) do |input_and_output_zip|                  # open old file
           update_manifest_and_content_xml(input_and_output_zip,input_and_output_zip) # input and output are identical
         end
-        
       when @filename.kind_of?(String) && (io.kind_of?(String) || io.kind_of?(File))
-        io = io.path if io.kind_of?(File)                                            # convert file to its filename
-        FileUtils.cp(@filename , io)                                                 # copy file externally
-        @filename = io                                                               # remember new name
-        save_to_io(nil)                                                              # continue modyfying file on spot
-        
-      when @filename.kind_of?(String) && (io.kind_of?(IO) || io.kind_of?(StringIO))
-        Zip::File.open(@filename) do | old_zip |                                    # open old file
-          write_zip_to(io) do |output_zip_stream|                                   # open output stream
-            copy_internally_without_content(old_zip,output_zip_stream) # copy the old internals
-            update_manifest_and_content_xml(old_zip,output_zip_stream)              # update xmls + pictures
-          end
+        io = io.path if io.kind_of?(File)                                           # convert file to its filename
+        FileUtils.cp(@filename , io)                                                # copy file externally
+        @filename = io                                                              # remember new name
+        save_to_io(nil)                                                             # continue modyfying file on spot
+      when io.kind_of?(IO) || io.kind_of?(String) || io.kind_of?(StringIO)
+        Tools.output_to_stream(io) do |output_io|                                    # open output stream of file
+          write_ods_to_io(output_io)
         end
-        # rewind result
-        io.rewind
-      else
+        io.rewind if io.kind_of?(StringIO)
+      else raise 'Ivalid combinations of parameter types in save'
     end
   end
-  alias :to_io :save
   alias :save_to_io  :save
+  alias :save_as :save
+  def to_io
+    WorkbookIO.new(self)
+  end
+  
+  def write2_ods_to_io(io)
+    if @filename.nil?
+      Zip::File.open(TEMPLATE_FILE_NAME) do |empty_template_zip|                  # open empty_template file
+        copy_internally_without_content(empty_template_zip,io)           # copy empty_template internals
+        update_manifest_and_content_xml(empty_template_zip,io)           # update xmls + pictures
+      end
+    else
+      Zip::File.open(@filename) do | old_zip |                                    # open old file
+        copy_internally_without_content(old_zip,io)                               # copy the old internals
+        update_manifest_and_content_xml(old_zip,io)                               # update xmls + pictures
+      end
+    end
+  end
+  
+  def write_ods_to_io(io)
+    if @filename.nil?
+      Zip::File.open(TEMPLATE_FILE_NAME) do |empty_template_zip|         # open empty_template file
+        copy_internally_without_content(empty_template_zip,io)           # copy empty_template internals
+        update_manifest_and_content_xml(empty_template_zip,io)           # update xmls + pictures
+      end
+    else
+      Zip::File.open(@filename) do | old_zip |                           # open old file
+        copy_internally_without_content(old_zip,io)                      # copy the old internals
+        update_manifest_and_content_xml(old_zip,io)                      # update xmls + pictures
+      end
+    end
+  end
   
   private 
 
@@ -109,7 +127,6 @@ class Workbook
     update_manifest_xml(input_zip,output_zip)
     update_content_xml(output_zip)
   end
-  
   
   def update_content_xml(zip)
     save_entry_to_zip(zip,CONTENT_FILE_NAME,@content_xml.to_s(indent: false))
@@ -162,7 +179,6 @@ class Workbook
   
   def save_entry_to_zip(zip,internal_filename,contents)
     if zip.kind_of? Zip::File
-#       raise [internal_filename,contents].inspect  unless File.exists?(internal_filename)
       zip.get_output_stream(internal_filename) do  |f|
         f.write contents
       end
@@ -171,19 +187,7 @@ class Workbook
       zip.write(contents)
     end
   end
-  
-  def write_zip_to(io,&block)
-    if io.kind_of? File or io.kind_of? String
-      Zip::File.open(io, 'br+') do |zip|
-        yield zip
-      end
-    elsif io.kind_of? StringIO # or io.kind_of? IO
-      Zip::OutputStream.write_buffer(io) do |zip|
-        yield zip
-      end
-    end
-  end
-  
+    
   CONTENT_FILE_NAME = 'content.xml'
   MANIFEST_FILE_NAME = 'META-INF/manifest.xml'
   TEMPLATE_FILE_NAME = (File.dirname(__FILE__)+'/empty_file_template.ods').freeze
@@ -193,4 +197,20 @@ class Workbook
     @xmlnode << worksheet.xmlnode if worksheet.xmlnode.doc != @xmlnode.doc
   end
 end
+
+class WorkbookIO
+  def initialize(workbook)
+    @workbook = workbook
+  end
+  def read
+    buffer.string
+  end
+  private
+  def buffer
+    Zip::OutputStream.write_buffer do |io|
+      @workbook.write_ods_to_io(io)
+    end
+  end
+end
+
 end

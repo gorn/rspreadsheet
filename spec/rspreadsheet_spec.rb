@@ -166,13 +166,29 @@ describe Rspreadsheet do
       book.save('/tmp/testfile.ods')
     end.not_to raise_error
   end
-  it 'can save file to io stream and the content is the same as when saving to file', :skip do
+  it 'can save file to io stream and the content is the same as when saving to file', :focus do
     book = Rspreadsheet.new($test_filename)    # open test file
     
-    file = File.open(@tmp_filename, 'w')        # and save the stream to @tmp_filename
-    file.write(book.save_to_io)
-    file.close
+    File.open(@tmp_filename, 'w') do |file| 
+      file.write(book.to_io.read) # this does not work
+    end
+  
+    book1 = Rspreadsheet.new($test_filename)   # now open both again
+    book2 = Rspreadsheet.new(@tmp_filename)
+    @sheet1 = book1.worksheets(1)
+    @sheet2 = book2.worksheets(1)
     
+    @sheet1.nonemptycells.each do |cell|       # and test if they are identical
+      @sheet2[cell.rowi,cell.coli].should == cell.value
+    end
+  end
+  it 'can save file to file and the content is the same as when saving to file', :focus do
+    book = Rspreadsheet.new($test_filename)    # open test file
+    
+    file = open(@tmp_filename, 'w') 
+    book.save_to_io(file)              # and save the stream to @tmp_filename
+    file.close
+
     book1 = Rspreadsheet.new($test_filename)   # now open both again
     book2 = Rspreadsheet.new(@tmp_filename)
     @sheet1 = book1.worksheets(1)
