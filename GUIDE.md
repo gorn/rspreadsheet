@@ -37,8 +37,10 @@ i.move_to('100mm','99.98mm')
 The file needs to be saved after doing changes. 
 ````ruby
 workbook.save
-workbook.save('new_filename.ods')   # changes filename and saves
-workbook.save(any_io_object)        # file can be saved to any IO like object as well
+workbook.save('new_filename.ods')    # changes filename and saves
+workbook.save(any_io_object)         # file can be saved to any IO like object as well
+workbook.to_io                       # coverts it to IO object which can be used to 
+anotherIO.write(workbook.to_io.read) # send file over internet without saving it first
 ````
 ### Date and Time
 OpenDocument and ruby have different models of date, time and datetime. Ruby containg three different objects. Time and DateTime cover all cases, Date covers dates only. OpenDocument distinguishes two groups - time of a day (time) and everything else (date). To simplify things a little we return cell values containg time of day as Time object and cell values containg datetime of date as DateTime. I am aware that this is very arbitrary choice, but it is very practical. This way and to some extend the types of values from OpenDocument are preserved when read from files, beeing acted upon and written back to spreadshhet.
