@@ -44,8 +44,9 @@ book.save
 book.save('different_filename.ods')
 ```
 
+  * Detailed [Guide to using Rspreadsheet](GUIDE.md) is available. 
   * [More examples](https://gist.github.com/gorn/b432e6a69e82628349e6) of lots of alternative syntax **you can leave you comments and suggestions there**
-  * [Guide to using Rspreadsheet](GUIDE.md) some other notes
+
 
 ## Installation and Configuration
 
