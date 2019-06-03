@@ -166,7 +166,7 @@ describe Rspreadsheet do
       book.save('/tmp/testfile.ods')
     end.not_to raise_error
   end
-  it 'can save file to io stream and the content is the same as when saving to file', :focus do
+  it 'can save file to io stream and the content is the same as when saving to file' do
     book = Rspreadsheet.new($test_filename)    # open test file
     
     File.open(@tmp_filename, 'w') do |file| 
@@ -182,7 +182,7 @@ describe Rspreadsheet do
       @sheet2[cell.rowi,cell.coli].should == cell.value
     end
   end
-  it 'can save file to file and the content is the same as when saving to file', :focus do
+  it 'can save file to file and the content is the same as when saving to file' do
     book = Rspreadsheet.new($test_filename)    # open test file
     
     file = open(@tmp_filename, 'w') 

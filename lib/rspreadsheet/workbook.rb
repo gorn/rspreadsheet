@@ -93,20 +93,6 @@ class Workbook
     WorkbookIO.new(self)
   end
   
-  def write2_ods_to_io(io)
-    if @filename.nil?
-      Zip::File.open(TEMPLATE_FILE_NAME) do |empty_template_zip|                  # open empty_template file
-        copy_internally_without_content(empty_template_zip,io)           # copy empty_template internals
-        update_manifest_and_content_xml(empty_template_zip,io)           # update xmls + pictures
-      end
-    else
-      Zip::File.open(@filename) do | old_zip |                                    # open old file
-        copy_internally_without_content(old_zip,io)                               # copy the old internals
-        update_manifest_and_content_xml(old_zip,io)                               # update xmls + pictures
-      end
-    end
-  end
-  
   def write_ods_to_io(io)
     if @filename.nil?
       Zip::File.open(TEMPLATE_FILE_NAME) do |empty_template_zip|         # open empty_template file
