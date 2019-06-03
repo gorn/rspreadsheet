@@ -21,6 +21,7 @@ class Workbook
   alias :add_worksheet :create_worksheet 
   # @return [Integer] number of sheets in the workbook
   def worksheets_count; @worksheets.length end
+  alias :worksheet_count :worksheets_count
   # @return [String] names of sheets in the workbook
   def worksheet_names; @worksheets.collect{ |ws| ws.name } end
   # @param [Integer,String]

@@ -7,6 +7,7 @@ require 'helpers/class_extensions'
 
 module Rspreadsheet
   extend Configuration
+
   define_setting :raise_on_negative_coordinates, true
 
   # makes creating new workbooks as easy as `Rspreadsheet.new` or `Rspreadsheet.open('filename.ods')
