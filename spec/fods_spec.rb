@@ -3,11 +3,12 @@ using ClassExtensions if RUBY_VERSION > '2.1'
 
 describe 'Rspreadsheet flat ODS format' do
   before do
-    @tmp_filename = '/tmp/testfile.ods'        # delete temp file before tests
-    delete_tmpfile(@tmp_filename)
+    delete_tmpfile(tmp_filename_fods = '/tmp/testfile.fods')   # delete temp file before tests
+    delete_tmpfile(tmp_filename_ods = '/tmp/testfile.ods')
   end
   after do
-    delete_tmpfile(@tmp_filename) # delete temp file after tests
+    delete_tmpfile(tmp_filename_fods)
+    delete_tmpfile(tmp_filename_ods)
   end
 
   it 'can open flat ods testfile and reads its content correctly' do
@@ -18,23 +19,44 @@ describe 'Rspreadsheet flat ODS format' do
     end
     s[1,2].should === 'text'
     s[2,2].should === Date.new(2014,1,1)
+    
+    cell = s.cell(6,3)
+    cell.format.bold.should == true
+    cell = s.cell(6,4)
+    cell.format.bold.should == false
+    cell.format.italic.should == true
+    cell = s.cell(6,5)
+    cell.format.italic.should == false
+    cell.format.color.should == '#ff3333'
+    cell = s.cell(6,6)
+    cell.format.color.should_not == '#ff3333'
+    cell.format.background_color.should == '#6666ff'
+    cell = s.cell(6,7)
+    cell.format.font_size.should == '7pt'
   end
   
-  it 'can open and save flast ods file, and saved file is exactly same as original' do
-    book = Rspreadsheet.new($test_filename_fods)    # open test file
-    book.save(@tmp_filename)                    # and save it as temp file
+  it 'does not change when opened and saved again' do
+    book = Rspreadsheet.new($test_filename_fods, format: :flat)    # open test file
+    book.save(tmp_filename_fods, format: :flat)            # and save it as temp file
+    Tools.content_xml_diff($test_filename_fods, tmp_filename_fods).should be_nil
+  end
+  
+  it 'can be converted to normal format with save_as' do
+    book = Rspreadsheet.open($test_filename_fods, format: :flat)
+    book.save_as(tmp_filename_ods, format: normal)
+    Tools.content_xml_diff($test_filename_fods, tmp_filename_ods).should be_nil
+  end
+
+  it 'pick format automaticaaly' do
+    book = Rspreadsheet.open($test_filename_fods).flat_format?.should be_true
+    book.save_as(tmp_filename_fods)
+    expect {book = Rspreadsheet.open(tmp_filename_fods)}.not_to raise_error
+    book.format.format.should == :flat
     
-    # now compare them
-    @content_xml1 = Zip::File.open($test_filename) do |zip|
-      LibXML::XML::Document.io zip.get_input_stream('content.xml')
-    end
-    @content_xml2 = Zip::File.open(@tmp_filename) do |zip|
-      LibXML::XML::Document.io zip.get_input_stream('content.xml')
-    end
-    
-    @content_xml2.root.first_diff(@content_xml1.root).should be_nil
-    @content_xml1.root.first_diff(@content_xml2.root).should be_nil
-    @content_xml1.root.to_s.should == @content_xml2.root.to_s
+    book = Rspreadsheet.open($test_filename_ods).normal_format?.should == true
+    book.save_as(tmp_filename_ods)
+    expect {book = Rspreadsheet.open(tmp_filename_ods)}.not_to raise_error
+    book.format.should == :normal    
   end
 
   private

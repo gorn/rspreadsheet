@@ -201,6 +201,23 @@ module Tools
     end
   end
  
+  def self.content_xml_diff(filename1,filename2)
+    content_xml1 = Zip::File.open(filename1) do |zip|
+      LibXML::XML::Document.io zip.get_input_stream('content.xml')
+    end
+    content_xml2 = Zip::File.open(filename2) do |zip|
+      LibXML::XML::Document.io zip.get_input_stream('content.xml')
+    end
+    
+    message = []
+    message << content_xml2.root.first_diff(content_xml1.root)
+    message << content_xml1.root.first_diff(content_xml2.root)
+    message << 'content XML not equal' unless content_xml1.root.to_s.should == content_xml2.root.to_s
+    message.compact.join('; ')
+    message = nil if message == ''
+    message
+  end
+  
 end
   
 end
