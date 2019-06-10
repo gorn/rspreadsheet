@@ -3,12 +3,12 @@ using ClassExtensions if RUBY_VERSION > '2.1'
 
 describe 'Rspreadsheet flat ODS format' do
   before do
-    delete_tmpfile(tmp_filename_fods = '/tmp/testfile.fods')   # delete temp file before tests
-    delete_tmpfile(tmp_filename_ods = '/tmp/testfile.ods')
+    delete_tmpfile(@tmp_filename_fods = '/tmp/testfile.fods')   # delete temp file before tests
+    delete_tmpfile(@tmp_filename_ods = '/tmp/testfile.ods')
   end
   after do
-    delete_tmpfile(tmp_filename_fods)
-    delete_tmpfile(tmp_filename_ods)
+    delete_tmpfile(@tmp_filename_fods)
+    delete_tmpfile(@tmp_filename_ods)
   end
 
   it 'can open flat ods testfile and reads its content correctly' do
@@ -37,26 +37,29 @@ describe 'Rspreadsheet flat ODS format' do
   
   it 'does not change when opened and saved again' do
     book = Rspreadsheet.new($test_filename_fods, format: :flat)    # open test file
-    book.save(tmp_filename_fods, format: :flat)            # and save it as temp file
-    Tools.content_xml_diff($test_filename_fods, tmp_filename_fods).should be_nil
+    book.save(@tmp_filename_fods)                                  # and save it as temp file
+    Rspreadsheet::Tools.xml_file_diff($test_filename_fods, @tmp_filename_fods).should be_nil
   end
   
-  it 'can be converted to normal format with save_as' do
+  it 'can be converted to normal format with convert_format_to_normal', :pending do
     book = Rspreadsheet.open($test_filename_fods, format: :flat)
-    book.save_as(tmp_filename_ods, format: normal)
-    Tools.content_xml_diff($test_filename_fods, tmp_filename_ods).should be_nil
+    book.convert_format_to_normal
+    book.save_as(@tmp_filename_ods)
+    Rspreadsheet::Tools.content_xml_diff($test_filename_fods, @tmp_filename_ods).should be_nil
   end
 
   it 'pick format automaticaaly' do
-    book = Rspreadsheet.open($test_filename_fods).flat_format?.should be_true
-    book.save_as(tmp_filename_fods)
-    expect {book = Rspreadsheet.open(tmp_filename_fods)}.not_to raise_error
-    book.format.format.should == :flat
+    book = Rspreadsheet.open($test_filename_fods)
+    book.flat_format?.should == true
+    book.save_as(@tmp_filename_fods)
+    expect {book = Rspreadsheet.open(@tmp_filename_fods)}.not_to raise_error
+    book.normal_format?.should == false
     
-    book = Rspreadsheet.open($test_filename_ods).normal_format?.should == true
-    book.save_as(tmp_filename_ods)
-    expect {book = Rspreadsheet.open(tmp_filename_ods)}.not_to raise_error
-    book.format.should == :normal    
+    book = Rspreadsheet.open($test_filename_ods)
+    book.normal_format?.should == true
+    book.save_as(@tmp_filename_ods)
+    expect {book = Rspreadsheet.open(@tmp_filename_ods)}.not_to raise_error
+    book.flat_format?.should == false
   end
 
   private
