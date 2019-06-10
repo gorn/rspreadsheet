@@ -4,6 +4,7 @@
 You can open ODS file (OpenDocument Spreadsheet) like this
 ````ruby
 workbook = Rspreadsheet.open('./test.ods')
+workbook = Rspreadsheet.open('./test.fods') # gem supports flast OpenDocument format
 ````
 and access its first sheet like this
 ````ruby
@@ -42,6 +43,19 @@ workbook.save(any_io_object)         # file can be saved to any IO like object a
 workbook.to_io                       # coverts it to IO object which can be used to 
 anotherIO.write(workbook.to_io.read) # send file over internet without saving it first
 ````
+
+### Creating fresh new file
+You may name the spreadsheet on creation or at first save.
+
+````ruby
+workbook = Rspreadsheet.new
+workbook.save('./filename.ods')      # filename nust be provided at least on first save
+workbook2 = Rspreadsheet.new('./filename2.fods', format: :flat)
+workbook2.save                       
+```
+
+If you want to use the fods flat format, you must create it as such.
+
 ### Date and Time
 OpenDocument and ruby have different models of date, time and datetime. Ruby containg three different objects. Time and DateTime cover all cases, Date covers dates only. OpenDocument distinguishes two groups - time of a day (time) and everything else (date). To simplify things a little we return cell values containg time of day as Time object and cell values containg datetime of date as DateTime. I am aware that this is very arbitrary choice, but it is very practical. This way and to some extend the types of values from OpenDocument are preserved when read from files, beeing acted upon and written back to spreadshhet.
 
