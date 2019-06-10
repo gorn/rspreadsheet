@@ -73,7 +73,9 @@ describe Rspreadsheet do
   end
   it 'can create new worksheet' do
     book = Rspreadsheet.new
+    book.worksheet_count.should == 0
     book.create_worksheet
+    book.worksheet_count.should == 1
   end
   it 'examples from README file are working' do
     Rspreadsheet.open($test_filename).save(@tmp_filename)

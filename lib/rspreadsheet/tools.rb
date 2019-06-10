@@ -1,7 +1,11 @@
-module Rspreadsheet
+  require 'pry'
+
+  module Rspreadsheet
 
 # this module contains methods used bz several objects
 module Tools
+  using ClassExtensions if RUBY_VERSION > '2.1'
+  
   def self.only_letters?(x); x.kind_of?(String) and x.match(/^[A-Za-z]*$/) != nil end
   def self.kind_of_integer?(x)
     (x.kind_of?(Numeric) and x.to_i==x) or 
@@ -189,7 +193,7 @@ module Tools
     Time.new(StartOfEpoch.year,StartOfEpoch.month,StartOfEpoch.day,h,m,s)
   end
   
-  def self.output_to_stream(io,&block)
+  def self.output_to_zip_stream(io,&block)
     if io.kind_of? File or io.kind_of? String
       Zip::File.open(io, 'br+') do |zip|
         yield zip
@@ -201,6 +205,32 @@ module Tools
     end
   end
  
+  def self.content_xml_diff(filename1,filename2)
+    content_xml1 = Zip::File.open(filename1) do |zip|
+      LibXML::XML::Document.io zip.get_input_stream('content.xml')
+    end
+    content_xml2 = Zip::File.open(filename2) do |zip|
+      LibXML::XML::Document.io zip.get_input_stream('content.xml')
+    end
+    
+    return xml_diff(content_xml1.root,content_xml2.root)
+  end
+  
+  def self.xml_file_diff(filename1,filename2)
+    content_xml1 = LibXML::XML::Document.file(filename1).root
+    content_xml2 = LibXML::XML::Document.file(filename2).root
+    return xml_diff(content_xml1, content_xml2)
+  end
+
+  def self.xml_diff(xml_node1,xml_node2)
+    message = []
+    message << xml_node2.first_diff(xml_node1)
+    message << xml_node1.first_diff(xml_node2)
+    message << 'content XML not equal' unless xml_node1.to_s.should == xml_node2.to_s
+    message = message.compact.join('; ')
+    message = nil if message == ''
+    message
+  end
 end
   
 end

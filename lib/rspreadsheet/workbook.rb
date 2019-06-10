@@ -2,12 +2,13 @@ require 'zip'
 require 'libxml'
 
 module Rspreadsheet
+    
 class Workbook
   attr_reader :filename
   attr_reader :xmlnode # debug
   def xmldoc; @xmlnode.doc end
   
-  #@!group Worskheets methods
+  #@!group Worksheet methods
   def create_worksheet_from_node(source_node)
     sheet = Worksheet.new(source_node,self)
     register_worksheet(sheet)
@@ -21,10 +22,11 @@ class Workbook
   alias :add_worksheet :create_worksheet 
   # @return [Integer] number of sheets in the workbook
   def worksheets_count; @worksheets.length end
+  alias :worksheet_count :worksheets_count
   # @return [String] names of sheets in the workbook
   def worksheet_names; @worksheets.collect{ |ws| ws.name } end
   # @param [Integer,String]
-  # @return [Worskheet] worksheet with given index or name
+  # @return [Worksheet] worksheet with given index or name
   def worksheets(index_or_name)
     case index_or_name
       when Integer then begin
@@ -61,8 +63,7 @@ class Workbook
     @xmlnode.find('./table:table').each do |node|
       create_worksheet_from_node(node)
     end
-  end
-  
+  end  
 
   # @param [String] Optional new filename
   # Saves the worksheet. Optionally you can provide new filename or IO stream to which the file should be saved.
@@ -71,16 +72,16 @@ class Workbook
       when @filename.nil? && io.nil?
         raise 'New file should be named on first save.'
       when @filename.kind_of?(String) && io.nil?
-        Tools.output_to_stream(@filename) do |input_and_output_zip|                  # open old file
-          update_manifest_and_content_xml(input_and_output_zip,input_and_output_zip) # input and output are identical
+        Tools.output_to_zip_stream(@filename) do |input_and_output_zip|                  # open old file
+          update_zip_manifest_and_content_xml(input_and_output_zip,input_and_output_zip) # input and output are identical
         end
-      when @filename.kind_of?(String) && (io.kind_of?(String) || io.kind_of?(File))
+      when (@filename.kind_of?(String) && (io.kind_of?(String) || io.kind_of?(File)))
         io = io.path if io.kind_of?(File)                                           # convert file to its filename
         FileUtils.cp(@filename , io)                                                # copy file externally
         @filename = io                                                              # remember new name
         save_to_io(nil)                                                             # continue modyfying file on spot
       when io.kind_of?(IO) || io.kind_of?(String) || io.kind_of?(StringIO)
-        Tools.output_to_stream(io) do |output_io|                                    # open output stream of file
+        Tools.output_to_zip_stream(io) do |output_io|                               # open output stream of file
           write_ods_to_io(output_io)
         end
         io.rewind if io.kind_of?(StringIO)
@@ -97,19 +98,22 @@ class Workbook
     if @filename.nil?
       Zip::File.open(TEMPLATE_FILE_NAME) do |empty_template_zip|         # open empty_template file
         copy_internally_without_content(empty_template_zip,io)           # copy empty_template internals
-        update_manifest_and_content_xml(empty_template_zip,io)           # update xmls + pictures
+        update_zip_manifest_and_content_xml(empty_template_zip,io)           # update xmls + pictures
       end
     else
       Zip::File.open(@filename) do | old_zip |                           # open old file
         copy_internally_without_content(old_zip,io)                      # copy the old internals
-        update_manifest_and_content_xml(old_zip,io)                      # update xmls + pictures
+        update_zip_manifest_and_content_xml(old_zip,io)                      # update xmls + pictures
       end
     end
   end
   
+  def flat_format?; false end
+  def normal_format?; true end
+
   private 
 
-  def update_manifest_and_content_xml(input_zip,output_zip)
+  def update_zip_manifest_and_content_xml(input_zip,output_zip)
     update_manifest_xml(input_zip,output_zip)
     update_content_xml(output_zip)
   end
@@ -182,6 +186,44 @@ class Workbook
     @worksheets[index-1]=worksheet
     @xmlnode << worksheet.xmlnode if worksheet.xmlnode.doc != @xmlnode.doc
   end
+      
+end
+
+class WorkbookFlat < Workbook
+  def initialize(afilename=nil)
+    @worksheets=[]
+    @filename = afilename
+    @xml_doc = LibXML::XML::Document.file(@filename || FLAT_TEMPLATE_FILE_NAME)
+    @xmlnode = @xml_doc.find_first('//office:spreadsheet')
+    @xmlnode.find('./table:table').each do |node|
+      create_worksheet_from_node(node)
+    end
+  end
+
+  def save(io=nil)
+    case
+      when @filename.nil? && io.nil?
+        raise 'New file should be named on first save, please provide filename (or IO).'
+      when @filename.kind_of?(String) && io.nil?
+        @xml_doc.save(@filename)
+      when (@filename.kind_of?(String) && (io.kind_of?(String) || io.kind_of?(File)))
+        @filename = (io.kind_of?(File)) ? io.path : io
+        @xml_doc.save(@filename)
+      when io.kind_of?(IO) || io.kind_of?(String) || io.kind_of?(StringIO)
+        IO.write(io,@xml_doc.to_s)
+        io.rewind if io.kind_of?(StringIO)
+      else raise 'Invalid combinations of parameter types in save'
+    end
+  end
+  alias :save_to_io  :save
+  alias :save_as :save
+  
+  def flat_format?; true end
+  def normal_format?; false end
+
+  private 
+  FLAT_TEMPLATE_FILE_NAME = (File.dirname(__FILE__)+'/empty_file_template.fods').freeze  
+    
 end
 
 class WorkbookIO
