@@ -1,5 +1,4 @@
 require 'helpers/class_extensions'
-require 'pry'
 
 module Rspreadsheet
 

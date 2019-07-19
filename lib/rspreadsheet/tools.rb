@@ -1,8 +1,6 @@
-  require 'pry'
+module Rspreadsheet
 
-  module Rspreadsheet
-
-# this module contains methods used bz several objects
+# this module contains methods used by several objects
 module Tools
   using ClassExtensions if RUBY_VERSION > '2.1'
   
