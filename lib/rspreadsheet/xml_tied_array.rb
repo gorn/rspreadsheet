@@ -97,7 +97,8 @@ module XMLTiedArray
   
   # Number of subitems
   def size; first_unused_subitem_index-1 end
-  alias :lenght :size
+  alias :length :size
+  alias :lenght :size  # common misspelling (deprecated: may be removed in future)
       
   # Finds first unused subitem index
   def first_unused_subitem_index
