@@ -131,7 +131,7 @@ module XMLTiedArray
 
 #   # @!group accessing subnodes
   # returns xmlnode with index
-  # DOES not respect repeated_attribute
+  # does NOT respect repeated_attribute
   def my_subnode(aindex)
     raise 'Using method which does not respect repeated_attribute with options that are using it. You probably donot want to do that.' unless subnode_options[:repeated_attribute].nil?
     return xmlsubnodes[aindex-1]
@@ -157,7 +157,7 @@ module XMLTiedArray
     else
       raise IndexError.new("Index #{aindex} out of bounds (1..#{self.size})")
     end
-  end    
+  end
  
   def prepare_empty_subnode
     Tools.prepare_ns_node(

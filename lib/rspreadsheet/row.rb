@@ -109,12 +109,17 @@ class Row < XMLTiedItem
   def add_row_above
     parent.add_row_above(rowi)
   end
+  alias :insert_row_above :add_row_above
   
   def next_row; relative(+1) end
   alias :next :next_row
   
   def relative(rowi_offset)
     worksheet.row(self.rowi+rowi_offset)
+  end
+  
+  def clone_above_row(target_rowi)
+    parent.clone_item_before(rowi, target_rowi)
   end
   
  # @!group Private methods, which should not be called directly

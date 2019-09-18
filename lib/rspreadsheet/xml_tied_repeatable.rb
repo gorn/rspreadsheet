@@ -44,12 +44,14 @@ module XMLTiedArray_WithRepeatableItems
   end
   
   # @!group inserting new subnodes
-  
-  def insert_new_empty_subnode_before(aindex)
-    insert_new_empty_subnode_before_respect_repeatable(aindex)
-  end
-  
+    
   def insert_new_empty_subnode_before_respect_repeatable(aindex)
+    new_subnode = prepare_repeated_subnode(1, subnode_options)
+    insert_subnode_before_respect_repeatable(new_subnode, aindex)
+  end
+  alias :insert_new_empty_subnode_before :insert_new_empty_subnode_before_respect_repeatable
+  
+  def insert_subnode_before_respect_repeatable(subnode,aindex)
     axmlnode = xmlnode
     options = subnode_options
     node,index_range = find_subnode_with_range(aindex)
@@ -58,15 +60,16 @@ module XMLTiedArray_WithRepeatableItems
       [index_range.begin..aindex-1,aindex..index_range.end].reject {|range| range.size<1}.each do |range| # split  original node by cloning
         clone_before_and_set_repeated_attribute(node,range.size,options)
       end
-      node.prev.prev =  prepare_repeated_subnode(1, options)   # insert new node
-      node.remove!                                             # remove the original node
+      node.prev.prev =  subnode                   # insert subnode
+      node.remove!                                # remove the original node
     else # insert outbound xmlnode
-      [index+1..aindex-1,aindex..aindex].reject {|range| range.size<1}.each do |range|
-        axmlnode << prepare_repeated_subnode(range.size, options)
-      end  
+      number_of_preceeding_items = aindex-1-(index+1)+1 
+      axmlnode << prepare_repeated_subnode(number_of_preceeding_items, options) unless number_of_preceeding_items<1 # insert preceeding cells
+      axmlnode << subnode                         # insert subnode
     end #TODO: Out of bounds indexes handling
     return my_subnode(aindex)
   end
+  alias :insert_subnode_before :insert_subnode_before_respect_repeatable
   
   def prepare_repeated_subnode(times_repeated,options)
     result = prepare_empty_subnode
@@ -80,6 +83,13 @@ module XMLTiedArray_WithRepeatableItems
     node.prev = newnode
   end
   
+  # takes item on source_index, clones it and inserts it before target_index
+  def clone_item_before(source_index, target_index)
+    newnode = my_subnode(source_index).copy(true)
+    Tools.delete_ns_attribute(newnode,'table',subnode_options[:repeated_attribute])
+    insert_subnode_before_respect_repeatable(newnode,target_index)
+  end
+
   # detaches subnode with aindex  
   def detach_my_subnode_respect_repeated(aindex)
     axmlnode = xmlnode
@@ -108,7 +118,6 @@ module XMLTiedArray_WithRepeatableItems
   def how_many_times_node_is_repeated(node)   # adding respect to repeated nodes
     (node.attributes[subnode_options[:repeated_attribute]] || 1).to_i
   end
-  
   
   # clean up item from xml (handle possible detachments) and itemcache. leave the object invalidation on the object
   # this should not be called from nowhere but XMLTiedItem.delete

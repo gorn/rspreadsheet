@@ -276,6 +276,21 @@ describe Rspreadsheet::Row do
     @sheet.A1.should_not == 'This is first nonheader row, but it is in colheader'
     @sheet.B3.should == 'First completely nonheader cell'
   end
+  it 'can be cloned to other row' do
+    @sheet2.row(5)[1].should == 5
+    @sheet2.row(6)[1].should == 6
+    
+    @sheet2.row(6)[1].should_not == 4
+    @sheet2.row(4).clone_above_row(6)
+    @sheet2.row(4)[1].should == 4
+    @sheet2.row(5)[1].should == 5
+    @sheet2.row(6)[1].should == 4
+    @sheet2.row(7)[1].should == 6
+    @sheet2.row(6)[1].should == @sheet2.row(4)[1]
+    @sheet2.row(6)[2].should == @sheet2.row(4)[2]
+    @sheet2.row(6)[3].should == @sheet2.row(4)[3]
+    @sheet2.row(6).cell(2).formula.should == @sheet2.row(4).cell(2).formula
+  end
 end
 
  
