@@ -270,6 +270,12 @@ describe Rspreadsheet::Row do
     @row = @sheet1.rows(5)
     @row.worksheet.should == @sheet1
   end
+  it 'does not skip header rows (issue #43)' do
+    @sheet = Rspreadsheet.open('./spec/testfile3-header_rows_and_cells.fods').worksheet(1)
+    @sheet.A1.should == 'Cell in header row'
+    @sheet.A1.should_not == 'This is first nonheader row, but it is in colheader'
+    @sheet.B3.should == 'First completely nonheader cell'
+  end
 end
 
  
