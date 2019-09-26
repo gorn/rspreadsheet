@@ -69,24 +69,25 @@ class Workbook
   # Saves the worksheet. Optionally you can provide new filename or IO stream to which the file should be saved.
   def save(io=nil)
     case
-      when @filename.nil? && io.nil?
+      when @filename.nil? && io.nil?                                                  # either the filename needs to be set or io given
         raise 'New file should be named on first save.'
-      when @filename.kind_of?(String) && io.nil?
+      when @filename.kind_of?(String) && io.nil?                                      ##CASE: filename given as string
         Tools.output_to_zip_stream(@filename) do |input_and_output_zip|                  # open old file
-          update_zip_manifest_and_content_xml(input_and_output_zip,input_and_output_zip) # input and output are identical
+          update_zip_manifest_and_content_xml(input_and_output_zip,input_and_output_zip) # input and output are identical = change inplace
         end
-      when (@filename.kind_of?(String) && (io.kind_of?(String) || io.kind_of?(File)))
-        io = io.path if io.kind_of?(File)                                           # convert file to its filename
-        FileUtils.cp(@filename , io)                                                # copy file externally
-        @filename = io                                                              # remember new name
-        save_to_io(nil)                                                             # continue modyfying file on spot
-      when io.kind_of?(IO) || io.kind_of?(String) || io.kind_of?(StringIO)
-        Tools.output_to_zip_stream(io) do |output_io|                               # open output stream of file
+      when (@filename.kind_of?(String) && (io.kind_of?(String) || io.kind_of?(File))) ##CASE: both are given + io is file (behave like SavaAs)
+        io = io.path if io.kind_of?(File)                                             # convert file to its filename
+        FileUtils.cp(@filename , io)                                                  # copy file externally
+        @filename = io                                                                # remember new name
+        save_to_io(nil)                                                               # continue modyfying file on spot
+      when io.kind_of?(IO) || io.kind_of?(String) || io.kind_of?(StringIO)            ##CASE: io is a stream
+        Tools.output_to_zip_stream(io) do |output_io|                                 # open output stream of file
           write_ods_to_io(output_io)
         end
         io.rewind if io.kind_of?(StringIO)
       else raise 'Ivalid combinations of parameter types in save'
     end
+    true # return true in case the save is succesfull (maybe in some cases there are more meaningful return values)
   end
   alias :save_to_io  :save
   alias :save_as :save

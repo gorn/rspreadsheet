@@ -88,7 +88,7 @@ class Cell < XMLTiedItem
   ## or not, this is the responibility of caller. However beware that specification does not specify how the time 
   ## should be interpreted. By observing LibreOffice behaviour, I have found these options
   ##   1. "Time only cell" has time is stored as PT16H22M35S (16:22:35) where the duration is duration from midnight.  
-  ##      Because ruby does NOT have TimeOfDay type we need to represent that as DateTime. I have chosen 1899-12-30 00:00:00 as 
+  ##      Because ruby does NOT have TimeOfDay type we need to represent that as Time. I have chosen 1899-12-30 00:00:00 as 
   ##      StartOfEpoch time, because it plays well with case 2.
   ##   2. "DateTime converted to Time only cell" has time stored as PT923451H33M00.000000168S (15:33:00 with date part 2005-05-05 
   ##      before conversion to time only). It is strange format which seems to have hours meaning number of hours after 1899-12-30 00:00:00
@@ -266,6 +266,9 @@ class Cell < XMLTiedItem
   end
   def format
     @format ||= CellFormat.new(self)
+  end
+  def blank_cached_content
+    xmlnode.content=''
   end
   
   def formula
