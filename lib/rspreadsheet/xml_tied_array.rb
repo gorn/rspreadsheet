@@ -138,7 +138,7 @@ module Rspreadsheet
     # returns xmlnode with index
     # does NOT respect repeated_attribute
     def my_subnode(aindex)
-      raise 'Using method which does not respect repeated_attribute with options that are using it. You probably donot want to do that.' unless subnode_options[:repeated_attribute].nil?
+      raise 'Using method which does not respect repeated_attribute with options that are using it. You probably do not want to do that.' unless subnode_options[:repeated_attribute].nil?
       return xmlsubnodes[aindex-1]
     end
 
