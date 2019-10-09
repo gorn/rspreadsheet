@@ -103,9 +103,14 @@ module Rspreadsheet
     alias :length :size
     alias :lenght :size  # common misspelling (deprecated: may be removed in future)
 
+    def last_node_with_content
+      i = xmlsubnodes.map{|x| x.content.empty?}.rindex(false)
+      xmlsubnodes[0..i]
+    end
+
     # Finds first unused subitem index
     def first_unused_subitem_index
-      xmlsubnodes.sum { |node| how_many_times_node_is_repeated(node) }.to_i + 1
+      last_node_with_content.sum { |node| how_many_times_node_is_repeated(node) }.to_i + 1
     end
 
     # @!group inserting new items

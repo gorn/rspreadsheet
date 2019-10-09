@@ -2,8 +2,8 @@ require 'spec_helper'
 using ClassExtensions if RUBY_VERSION > '2.1'
 
 describe Rspreadsheet::Worksheet do
-  describe "from test workbook file" do 
-    before do 
+  describe "from test workbook file" do
+    before do
       @sheet = Rspreadsheet.new($test_filename).worksheets(1)
     end
     it 'contains nonempty xml in rows for testfile' do
@@ -19,8 +19,23 @@ describe Rspreadsheet::Worksheet do
   end
 end
 
+describe "from test workbook file with styles over a lot of cells" do
+  before do
+    @sheet = Rspreadsheet.new($test_filename_repeated_styles).worksheets(1)
+  end
+  it 'should have 19 rows' do
+    @sheet.size.should == 19
+  end
+  it 'should have 2 cells in row 1' do
+    @sheet.row[0].size == 2
+  end
+  it 'should have 4 cells in row 2' do
+    @sheet.row[1].size == 4
+  end
+end
+
 describe Rspreadsheet::Worksheet do
-  describe "newly created" do 
+  describe "newly created" do
     before do
       @book = Rspreadsheet.new
       @sheet = @book.create_worksheet
@@ -59,7 +74,7 @@ describe Rspreadsheet::Worksheet do
       @sheet[2,'B'].should == 'test text'
       @sheet['B',2].should == 'test text'
       @sheet['B','2'].should == 'test text'
-      
+
       @sheet.cells(2,2).value.should == 'test text'
       @sheet.cells('B2').value.should == 'test text'
       @sheet.cells('B','2').value.should == 'test text'
@@ -75,7 +90,7 @@ describe Rspreadsheet::Worksheet do
       @sheet.name = 'Icecream'
       @sheet.name.should == 'Icecream'
       @sheet.name = 'Cofee'
-      @sheet.name.should == 'Cofee'    
+      @sheet.name.should == 'Cofee'
     end
     it 'out of range indexes return nil value or raise if configured to do so' do
       @sheet[999,999].should == nil
@@ -84,20 +99,20 @@ describe Rspreadsheet::Worksheet do
       expect { @sheet[-1,-1] }.to raise_error   # default is to raise error
       expect { @sheet[0,0] }.to raise_error
       expect { @sheet[-2,-5] }.to raise_error
-      
+
       Rspreadsheet.raise_on_negative_coordinates = false
       @sheet[-1,-1].should be_nil               # return nil if configured to do so
       @sheet[0,0].should be_nil
       @sheet[-2,-5].should be_nil
-      
+
       Rspreadsheet.raise_on_negative_coordinates = pom  # reset the setting back
-  
+
       Rspreadsheet.configuration { |config| config.raise_on_negative_coordinates.should be == pom }
     end
     it 'returns nil with negative index or raise if configured to do so' do
       pom = Rspreadsheet.raise_on_negative_coordinates
       expect { @sheet.rows(-1) }.to raise_error          # default is to raise error
-      
+
       Rspreadsheet.raise_on_negative_coordinates = false
       @sheet.rows(-1).should == nil                      # return nil if configured to do so
       Rspreadsheet.raise_on_negative_coordinates = pom   # reset the setting back
