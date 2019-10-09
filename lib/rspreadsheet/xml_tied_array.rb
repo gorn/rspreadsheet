@@ -104,8 +104,12 @@ module Rspreadsheet
     alias :lenght :size  # common misspelling (deprecated: may be removed in future)
 
     def last_node_with_content
-      i = xmlsubnodes.map{|x| x.content.empty?}.rindex(false)
-      xmlsubnodes[0..i]
+      case i = xmlsubnodes.map{|x| x.content.empty?}.rindex(false)
+        when nil
+          xmlsubnodes
+        else
+          xmlsubnodes[0..i]
+      end
     end
 
     # Finds first unused subitem index
