@@ -32,7 +32,11 @@ Coveralls.wear!
 $test_filename = './spec/testfile1.ods'
 $test_filename_fods = './spec/testfile1.fods'
 $test_filename_images = './spec/testfile2-images.ods'
-$test_filename_repeated_styles = './spec/testfile4.ods'
+
+def get_sheet(name, suffix="ods")
+  Rspreadsheet.new("./spec/#{name}.#{suffix}")
+end
+
 
 # require my gem
 require 'rspreadsheet'
