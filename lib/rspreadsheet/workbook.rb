@@ -52,10 +52,17 @@ class Workbook
   end
   alias :sheet :worksheet
 
-  # return Array of all worksheets in the document
-  def worksheets
-    @worksheets
-  end
+	# @param [Integer,String]
+  # if index_or_name is provided, calls worksheet
+	# @return Array of all worksheets in the document
+	def worksheets(index_or_name=nil)
+		case index_or_name
+  		when nil
+				@worksheets
+			else
+  			worksheet(index_or_name)
+		end
+	end
 
   alias :sheets :worksheets
   def [](index_or_name); self.worksheets(index_or_name) end
