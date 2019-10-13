@@ -2,8 +2,8 @@ require 'spec_helper'
 using ClassExtensions if RUBY_VERSION > '2.1'
 
 describe Rspreadsheet::Worksheet do
-  describe "from test workbook file" do 
-    before do 
+  describe "from test workbook file" do
+    before do
       @sheet = Rspreadsheet.new($test_filename).worksheets(1)
     end
     it 'contains nonempty xml in rows for testfile' do
@@ -19,8 +19,46 @@ describe Rspreadsheet::Worksheet do
   end
 end
 
+["ods","fods"].each do |format|
+  describe "from testfile4 format #{format} with styles over a lot of cells" do
+   before do
+      @sheet = get_sheet("testfile4", format).worksheets(1)
+    end
+    it 'should have 19 rows' do
+      @sheet.size.should == 19
+    end
+    it 'should have 2 cells in row 1' do
+      @sheet.row[0].size.should == 2
+    end
+    it 'should have 4 cells in row 2 (2 merged cells)' do
+      @sheet.row[1].size.should == 4
+    end
+    it 'should have 1 cell in row 5' do
+      @sheet.row[4].size.should == 1
+    end
+    it 'should have 2 columns in row 10' do
+      @sheet.row[9].size.should == 2
+    end
+    it 'should have 3 columns in row 11' do
+      @sheet.row[10].size.should == 3
+    end
+  end
+end
+
+describe "check gnumeric testfile" do
+  before do
+    @sheet = get_sheet("testfile5").worksheet(1)
+  end
+  it 'should have 6 row' do
+    @sheet.size.should == 6
+  end
+  it 'should have 7 cells in row 1' do
+    @sheet.row[0].size.should == 7
+  end
+end
+
 describe Rspreadsheet::Worksheet do
-  describe "newly created" do 
+  describe "newly created" do
     before do
       @book = Rspreadsheet.new
       @sheet = @book.create_worksheet
@@ -59,7 +97,7 @@ describe Rspreadsheet::Worksheet do
       @sheet[2,'B'].should == 'test text'
       @sheet['B',2].should == 'test text'
       @sheet['B','2'].should == 'test text'
-      
+
       @sheet.cells(2,2).value.should == 'test text'
       @sheet.cells('B2').value.should == 'test text'
       @sheet.cells('B','2').value.should == 'test text'
@@ -75,7 +113,7 @@ describe Rspreadsheet::Worksheet do
       @sheet.name = 'Icecream'
       @sheet.name.should == 'Icecream'
       @sheet.name = 'Cofee'
-      @sheet.name.should == 'Cofee'    
+      @sheet.name.should == 'Cofee'
     end
     it 'out of range indexes return nil value or raise if configured to do so' do
       @sheet[999,999].should == nil
@@ -84,20 +122,20 @@ describe Rspreadsheet::Worksheet do
       expect { @sheet[-1,-1] }.to raise_error   # default is to raise error
       expect { @sheet[0,0] }.to raise_error
       expect { @sheet[-2,-5] }.to raise_error
-      
+
       Rspreadsheet.raise_on_negative_coordinates = false
       @sheet[-1,-1].should be_nil               # return nil if configured to do so
       @sheet[0,0].should be_nil
       @sheet[-2,-5].should be_nil
-      
+
       Rspreadsheet.raise_on_negative_coordinates = pom  # reset the setting back
-  
+
       Rspreadsheet.configuration { |config| config.raise_on_negative_coordinates.should be == pom }
     end
     it 'returns nil with negative index or raise if configured to do so' do
       pom = Rspreadsheet.raise_on_negative_coordinates
       expect { @sheet.rows(-1) }.to raise_error          # default is to raise error
-      
+
       Rspreadsheet.raise_on_negative_coordinates = false
       @sheet.rows(-1).should == nil                      # return nil if configured to do so
       Rspreadsheet.raise_on_negative_coordinates = pom   # reset the setting back

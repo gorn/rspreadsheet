@@ -5,14 +5,14 @@ Bundler.setup
 RSpec.configure do |config|
 #   config.fail_fast = 4
 #   config.warnings = true
-  
+
   # so i can run individual test just by appending :focus to them
   config.treat_symbols_as_metadata_keys_with_true_values = true if config.respond_to? :treat_symbols_as_metadata_keys_with_true_values= # older form
-#  config.filter_run_when_matching(:focus)     
-    
+#  config.filter_run_when_matching(:focus)
+
 ## preparing for RSpec 4 (will be default in RSpec 4
-  
-  if config.respond_to? :expect_with and config.respond_to? :include_chain_clauses_in_custom_matcher_descriptions  
+
+  if config.respond_to? :expect_with and config.respond_to? :include_chain_clauses_in_custom_matcher_descriptions
     config.expect_with :rspec do |expectations|
       expectations.include_chain_clauses_in_custom_matcher_descriptions = true
     end
@@ -32,6 +32,11 @@ Coveralls.wear!
 $test_filename = './spec/testfile1.ods'
 $test_filename_fods = './spec/testfile1.fods'
 $test_filename_images = './spec/testfile2-images.ods'
+
+def get_sheet(name, suffix="ods")
+  Rspreadsheet.new("./spec/#{name}.#{suffix}")
+end
+
 
 # require my gem
 require 'rspreadsheet'
