@@ -104,7 +104,7 @@ module Rspreadsheet
     alias :lenght :size  # common misspelling (deprecated: may be removed in future)
 
     def last_node_with_content
-      case i = xmlsubnodes.map{|x| x.content.empty?}.rindex(false)
+      case i = xmlsubnodes.map{|x| x.content.strip.empty?}.rindex(false)
         when nil
           xmlsubnodes
         else
