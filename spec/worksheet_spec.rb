@@ -19,18 +19,41 @@ describe Rspreadsheet::Worksheet do
   end
 end
 
-describe "from test workbook file with styles over a lot of cells" do
+["ods","fods"].each do |format|
+  describe "from testfile4 format #{format} with styles over a lot of cells" do
+   before do
+      @sheet = get_sheet("testfile4", format).worksheets(1)
+    end
+    it 'should have 19 rows' do
+      @sheet.size.should == 19
+    end
+    it 'should have 2 cells in row 1' do
+      @sheet.row[0].size.should == 2
+    end
+    it 'should have 4 cells in row 2 (2 merged cells)' do
+      @sheet.row[1].size.should == 4
+    end
+    it 'should have 1 cell in row 5' do
+      @sheet.row[4].size.should == 1
+    end
+    it 'should have 2 columns in row 10' do
+      @sheet.row[9].size.should == 2
+    end
+    it 'should have 3 columns in row 11' do
+      @sheet.row[10].size.should == 3
+    end
+  end
+end
+
+describe "check gnumeric testfile" do
   before do
-    @sheet = Rspreadsheet.new($test_filename_repeated_styles).worksheets(1)
+    @sheet = get_sheet("testfile5").worksheet(1)
   end
-  it 'should have 19 rows' do
-    @sheet.size.should == 19
+  it 'should have 6 row' do
+    @sheet.size.should == 6
   end
-  it 'should have 2 cells in row 1' do
-    @sheet.row[0].size == 2
-  end
-  it 'should have 4 cells in row 2' do
-    @sheet.row[1].size == 4
+  it 'should have 7 cells in row 1' do
+    @sheet.row[0].size.should == 7
   end
 end
 
