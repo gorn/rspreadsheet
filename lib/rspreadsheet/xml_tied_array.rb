@@ -68,7 +68,7 @@ module XMLTiedArray
   def subitem(aindex)
     aindex = aindex.to_i
     if aindex.to_i<=0
-      raise 'Item index should be greater then 0' if Rspreadsheet.raise_on_negative_coordinates
+      raise 'Item index should be greater than 0' if Rspreadsheet.raise_on_negative_coordinates
       nil 
     else 
       @itemcache[aindex] ||= prepare_subitem(aindex)
@@ -202,19 +202,4 @@ module XMLTiedArray
     
 end
 
-end 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+end
