@@ -4,10 +4,12 @@ describe Rspreadsheet::Workbook do
   it 'has correct number of sheets' do
     book = Rspreadsheet::Workbook.new($test_filename)
     book.worksheets_count.should == 1
+    book.size.should == 1
     book.worksheets(0).should be_nil
     book.worksheets(1).should be_kind_of(Rspreadsheet::Worksheet)
     book.worksheets(2).should be_nil
-    book.worksheets(nil).should be_nil
+    book.worksheets(nil).should_not be_nil
+    book.worksheet(nil).should be_nil
   end
   it 'freshly created has correctly namespaced xmlnode' do
     @xmlnode = Rspreadsheet::Workbook.new.xmlnode
@@ -38,7 +40,7 @@ describe Rspreadsheet::Workbook do
     book.create_worksheet('test')
     book.worksheets('test').should eq book.worksheets(1)
     book.create_worksheet('another')
-    book.worksheets('another').should eq book.worksheets(2)    
+    book.worksheets('another').should eq book.worksheets(2)
   end
   it 'can access sheets with brief syntax' do
     book = Rspreadsheet::Workbook.new
@@ -70,7 +72,7 @@ describe Rspreadsheet::Workbook do
     book = Rspreadsheet::Workbook.new
     expect { book.worksheet(Array.new()) }.to raise_error
   end
-end 
+end
 
 
 
